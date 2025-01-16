@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Wallet } from "lucide-react";
 
 const Index = () => {
   const [loading, setLoading] = useState(false);
@@ -42,7 +43,6 @@ const Index = () => {
     } catch (error: any) {
       let errorMessage = error.message;
       
-      // Handle specific error cases
       if (error.message.includes("email_address_invalid")) {
         errorMessage = "Please enter a valid email address";
       } else if (error.message.includes("password")) {
@@ -62,9 +62,15 @@ const Index = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-violet-800 to-purple-900">
       <div className="w-full max-w-md p-8 mx-4 backdrop-blur-lg bg-white/10 rounded-2xl shadow-xl border border-white/20">
-        <h1 className="text-3xl font-bold text-center mb-8 text-white">
-          {isSignUp ? "Create Account" : "Welcome Back"}
+        <div className="flex justify-center mb-8">
+          <Wallet className="h-12 w-12 text-white" />
+        </div>
+        <h1 className="text-4xl font-bold text-center mb-2 text-white">
+          Spendly
         </h1>
+        <p className="text-center text-white/70 mb-8">
+          Track your expenses with style
+        </p>
         <form onSubmit={handleAuth} className="space-y-6">
           <div>
             <Input

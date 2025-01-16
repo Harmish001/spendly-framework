@@ -22,6 +22,9 @@ const Index = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: window.location.origin,
+          },
         });
         if (error) throw error;
         toast({
@@ -37,10 +40,19 @@ const Index = () => {
         navigate("/dashboard");
       }
     } catch (error: any) {
+      let errorMessage = error.message;
+      
+      // Handle specific error cases
+      if (error.message.includes("email_address_invalid")) {
+        errorMessage = "Please enter a valid email address";
+      } else if (error.message.includes("password")) {
+        errorMessage = "Password must be at least 6 characters long";
+      }
+      
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -72,6 +84,7 @@ const Index = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/50"
               required
+              minLength={6}
             />
           </div>
           <Button

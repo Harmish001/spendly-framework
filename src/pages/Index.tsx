@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Wallet } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 const Index = () => {
   const [loading, setLoading] = useState(false);
@@ -31,6 +32,7 @@ const Index = () => {
         toast({
           title: "Success!",
           description: "Please check your email to verify your account.",
+          duration: 4000,
         });
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -53,6 +55,7 @@ const Index = () => {
         variant: "destructive",
         title: "Error",
         description: errorMessage,
+        duration: 4000,
       });
     } finally {
       setLoading(false);
@@ -60,58 +63,62 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-violet-800 to-purple-900">
-      <div className="w-full max-w-md p-8 mx-4 backdrop-blur-lg bg-white/10 rounded-2xl shadow-xl border border-white/20">
-        <div className="flex justify-center mb-8">
-          <Wallet className="h-12 w-12 text-white" />
-        </div>
-        <h1 className="text-4xl font-bold text-center mb-2 text-white">
-          Spendly
-        </h1>
-        <p className="text-center text-white/70 mb-8">
-          Track your expenses with style
-        </p>
-        <form onSubmit={handleAuth} className="space-y-6">
-          <div>
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/50"
-              required
-            />
+    <div className="min-h-screen flex items-center justify-center">
+      <Card className="w-full max-w-md mx-4 rounded-[16px] overflow-hidden border border-border/40">
+        <CardContent className="p-8">
+          <div className="flex justify-center mb-8">
+            <div className="p-3 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20">
+              <Wallet className="h-8 w-8 text-primary" />
+            </div>
           </div>
-          <div>
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/50"
-              required
-              minLength={6}
-            />
+          <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            Spendly
+          </h1>
+          <p className="text-center text-muted-foreground mb-8">
+            Track your expenses with style
+          </p>
+          <form onSubmit={handleAuth} className="space-y-6">
+            <div>
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="rounded-[16px] bg-background border-border/40"
+                required
+              />
+            </div>
+            <div>
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="rounded-[16px] bg-background border-border/40"
+                required
+                minLength={6}
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full rounded-[16px] bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold transition-all duration-200"
+              disabled={loading}
+            >
+              {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+            </Button>
+          </form>
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              {isSignUp
+                ? "Already have an account? Sign In"
+                : "Don't have an account? Sign Up"}
+            </button>
           </div>
-          <Button
-            type="submit"
-            className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-semibold py-2 rounded-lg transition-all duration-200"
-            disabled={loading}
-          >
-            {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
-          </Button>
-        </form>
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-white/80 hover:text-white transition-colors"
-          >
-            {isSignUp
-              ? "Already have an account? Sign In"
-              : "Don't have an account? Sign Up"}
-          </button>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

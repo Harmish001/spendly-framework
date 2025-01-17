@@ -69,13 +69,13 @@ export const ExpenseModal = ({ onExpenseAdded }: { onExpenseAdded: () => void })
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500"
+          className="rounded-[20px]"
         >
           <PlusCircle className="h-5 w-5 mr-2" />
           Add Expense
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md rounded-[16px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CategoryIcon className="h-5 w-5" />
@@ -92,7 +92,7 @@ export const ExpenseModal = ({ onExpenseAdded }: { onExpenseAdded: () => void })
               placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="pl-8"
+              className="pl-8 rounded-[16px]"
               autoFocus
               required
             />
@@ -102,16 +102,17 @@ export const ExpenseModal = ({ onExpenseAdded }: { onExpenseAdded: () => void })
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            className="rounded-[16px]"
           />
           <Select value={category} onValueChange={setCategory} required>
-            <SelectTrigger>
+            <SelectTrigger className="rounded-[16px]">
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-[16px]">
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 return (
-                  <SelectItem key={cat.id} value={cat.id}>
+                  <SelectItem key={cat.id} value={cat.id} className="rounded-[16px]">
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4" />
                       {cat.label}
@@ -123,7 +124,7 @@ export const ExpenseModal = ({ onExpenseAdded }: { onExpenseAdded: () => void })
           </Select>
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500"
+            className="w-full rounded-[20px]"
             disabled={loading}
           >
             {loading ? "Adding..." : "Add Expense"}

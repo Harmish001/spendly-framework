@@ -38,12 +38,16 @@ export const ExpenseFilters = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <Select value={selectedMonth} onValueChange={onMonthChange}>
-        <SelectTrigger>
+        <SelectTrigger className="rounded-[16px]">
           <SelectValue placeholder="Select month" />
         </SelectTrigger>
         <SelectContent>
           {months.map((month, index) => (
-            <SelectItem key={index} value={(index + 1).toString().padStart(2, '0')}>
+            <SelectItem 
+              key={index} 
+              value={(index + 1).toString().padStart(2, '0')}
+              className="rounded-[16px]"
+            >
               {month}
             </SelectItem>
           ))}
@@ -51,12 +55,12 @@ export const ExpenseFilters = ({
       </Select>
 
       <Select value={selectedYear} onValueChange={onYearChange}>
-        <SelectTrigger>
+        <SelectTrigger className="rounded-[16px]">
           <SelectValue placeholder="Select year" />
         </SelectTrigger>
         <SelectContent>
           {years.map((year) => (
-            <SelectItem key={year} value={year}>
+            <SelectItem key={year} value={year} className="rounded-[16px]">
               {year}
             </SelectItem>
           ))}
@@ -64,12 +68,12 @@ export const ExpenseFilters = ({
       </Select>
 
       <Select value={selectedCategory} onValueChange={onCategoryChange}>
-        <SelectTrigger>
+        <SelectTrigger className="rounded-[16px]">
           <SelectValue placeholder="Select category" />
         </SelectTrigger>
         <SelectContent>
           {categories.map((category) => (
-            <SelectItem key={category} value={category}>
+            <SelectItem key={category} value={category} className="rounded-[16px]">
               {category}
             </SelectItem>
           ))}

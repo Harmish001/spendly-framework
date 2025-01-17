@@ -75,16 +75,16 @@ const Dashboard = () => {
   }, [selectedMonth, selectedYear, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-800 to-purple-900 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-3xl font-bold flex items-center gap-2">
             <Wallet className="h-8 w-8" />
             Spendly
           </h1>
           <Button
-            variant="ghost"
-            className="text-white hover:bg-white/10"
+            variant="outline"
+            className="rounded-[20px]"
             onClick={handleSignOut}
           >
             <LogOut className="h-5 w-5 mr-2" />
@@ -111,17 +111,17 @@ const Dashboard = () => {
             return (
               <Card
                 key={expense.id}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 transition-colors"
+                className="border rounded-[16px] hover:border-gray-300 transition-colors"
               >
                 <CardContent className="flex items-center justify-between p-6">
                   <div className="flex items-center gap-4">
-                    <div className="p-2 bg-white/20 rounded-lg">
+                    <div className="p-2 rounded-[16px] border">
                       <CategoryIcon className="h-6 w-6" />
                     </div>
                     <div>
                       <p className="font-semibold">{expense.description || "No description"}</p>
-                      <p className="text-sm text-white/70">{expense.category}</p>
-                      <p className="text-xs text-white/50">
+                      <p className="text-sm text-gray-500">{expense.category}</p>
+                      <p className="text-xs text-gray-400">
                         {new Date(expense.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -132,7 +132,7 @@ const Dashboard = () => {
             )
           })}
           {expenses.length === 0 && (
-            <div className="text-center text-white/70 py-8">
+            <div className="text-center text-gray-500 py-8">
               No expenses found for the selected filters.
             </div>
           )}

@@ -1,4 +1,8 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Filter } from "lucide-react";
 
 interface ExpenseFiltersProps {
   selectedMonth: string;
@@ -35,50 +39,65 @@ export const ExpenseFilters = ({
   onYearChange,
   onCategoryChange
 }: ExpenseFiltersProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <Select value={selectedMonth} onValueChange={onMonthChange}>
-        <SelectTrigger className="rounded-[16px]">
-          <SelectValue placeholder="Select month" />
-        </SelectTrigger>
-        <SelectContent>
-          {months.map((month, index) => (
-            <SelectItem 
-              key={index} 
-              value={(index + 1).toString().padStart(2, '0')}
-              className="rounded-[16px]"
-            >
-              {month}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="rounded-[20px]">
+          <Filter className="h-4 w-4 mr-2" />
+          Filters
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md rounded-[16px]">
+        <DialogHeader>
+          <DialogTitle>Filter Expenses</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <Select value={selectedMonth} onValueChange={onMonthChange}>
+            <SelectTrigger className="rounded-[16px]">
+              <SelectValue placeholder="Select month" />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((month, index) => (
+                <SelectItem 
+                  key={index} 
+                  value={(index + 1).toString().padStart(2, '0')}
+                  className="rounded-[16px]"
+                >
+                  {month}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-      <Select value={selectedYear} onValueChange={onYearChange}>
-        <SelectTrigger className="rounded-[16px]">
-          <SelectValue placeholder="Select year" />
-        </SelectTrigger>
-        <SelectContent>
-          {years.map((year) => (
-            <SelectItem key={year} value={year} className="rounded-[16px]">
-              {year}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+          <Select value={selectedYear} onValueChange={onYearChange}>
+            <SelectTrigger className="rounded-[16px]">
+              <SelectValue placeholder="Select year" />
+            </SelectTrigger>
+            <SelectContent>
+              {years.map((year) => (
+                <SelectItem key={year} value={year} className="rounded-[16px]">
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-      <Select value={selectedCategory} onValueChange={onCategoryChange}>
-        <SelectTrigger className="rounded-[16px]">
-          <SelectValue placeholder="Select category" />
-        </SelectTrigger>
-        <SelectContent>
-          {categories.map((category) => (
-            <SelectItem key={category} value={category} className="rounded-[16px]">
-              {category}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+          <Select value={selectedCategory} onValueChange={onCategoryChange}>
+            <SelectTrigger className="rounded-[16px]">
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((category) => (
+                <SelectItem key={category} value={category} className="rounded-[16px]">
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

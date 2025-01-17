@@ -23,11 +23,11 @@ const years = Array.from({ length: 5 }, (_, i) => (currentYear - 2 + i).toString
 
 const categories = [
   "All Categories",
-  "Food & Dining",
+  "Investment",
+  "Food and Dining",
   "Transportation",
   "Shopping",
-  "Entertainment",
-  "Bills & Utilities",
+  "Loan",
   "Others"
 ];
 

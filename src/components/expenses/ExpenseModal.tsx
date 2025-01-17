@@ -3,16 +3,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, Coffee, Car, ShoppingBag, Tv, Wrench, MoreHorizontal } from "lucide-react";
+import { PlusCircle, Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const categories = [
-  { id: "food", label: "Food & Dining", icon: Coffee },
+  { id: "investment", label: "Investment", icon: Wallet },
+  { id: "food", label: "Food and Dining", icon: Utensils },
   { id: "transport", label: "Transportation", icon: Car },
   { id: "shopping", label: "Shopping", icon: ShoppingBag },
-  { id: "entertainment", label: "Entertainment", icon: Tv },
-  { id: "utilities", label: "Bills & Utilities", icon: Wrench },
+  { id: "loan", label: "Loan", icon: BanknoteIcon },
   { id: "others", label: "Others", icon: MoreHorizontal },
 ];
 
@@ -45,6 +45,7 @@ export const ExpenseModal = ({ onExpenseAdded }: { onExpenseAdded: () => void })
       toast({
         title: "Success!",
         description: "Expense added successfully",
+        duration: 4000,
       });
 
       setIsOpen(false);
@@ -57,6 +58,7 @@ export const ExpenseModal = ({ onExpenseAdded }: { onExpenseAdded: () => void })
         variant: "destructive",
         title: "Error",
         description: error.message,
+        duration: 4000,
       });
     } finally {
       setLoading(false);

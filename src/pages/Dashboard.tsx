@@ -2,18 +2,19 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Wallet, Coffee, Car, ShoppingBag, Tv, Wrench, MoreHorizontal, Trash2 } from "lucide-react";
+import { LogOut, Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2 } from "lucide-react";
 import { ExpenseModal } from "@/components/expenses/ExpenseModal";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
 
 const categoryIcons: Record<string, any> = {
-  "food": Coffee,
+  "investment": Wallet,
+  "food": Utensils,
   "transport": Car,
   "shopping": ShoppingBag,
-  "entertainment": Tv,
-  "utilities": Wrench,
+  "loan": BanknoteIcon,
   "others": MoreHorizontal,
 };
 
@@ -28,6 +29,7 @@ const Dashboard = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear() + '');
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [totalExpense, setTotalExpense] = useState(0);
+  const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -77,14 +79,17 @@ const Dashboard = () => {
       toast({
         title: "Success",
         description: "Expense deleted successfully",
+        duration: 4000,
       });
 
       fetchExpenses();
+      setExpenseToDelete(null);
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message,
+        duration: 4000,
       });
     }
   };
@@ -118,7 +123,7 @@ const Dashboard = () => {
           </h1>
           <Button
             variant="outline"
-            className="rounded-[20px]"
+            className="rounded-[16px]"
             onClick={handleSignOut}
           >
             <LogOut className="h-5 w-5 mr-2" />
@@ -129,15 +134,15 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card className="rounded-[16px] overflow-hidden" style={{ background: "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)" }}>
             <CardContent className="p-6">
-              <h2 className="text-lg font-semibold mb-2">Current Month</h2>
+              <h2 className="text-lg font-semibold mb-2">Current Period</h2>
               <p className="text-3xl font-bold">{currentMonthName} {selectedYear}</p>
             </CardContent>
           </Card>
 
-          <Card className="rounded-[16px] overflow-hidden" style={{ background: "linear-gradient(to right, #d7d2cc 0%, #304352 100%)" }}>
+          <Card className="rounded-[16px] overflow-hidden" style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}>
             <CardContent className="p-6">
               <h2 className="text-lg font-semibold mb-2 text-white">Total Expenses</h2>
-              <p className="text-3xl font-bold text-white">₹{totalExpense.toFixed(2)}</p>
+              <p className="text-3xl font-bold text-white">₹{totalExpense.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
             </CardContent>
           </Card>
         </div>
@@ -180,8 +185,8 @@ const Dashboard = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="rounded-full hover:bg-red-100 hover:text-red-600"
-                      onClick={() => handleDeleteExpense(expense.id)}
+                      className="rounded-[16px] hover:bg-red-100 hover:text-red-600"
+                      onClick={() => setExpenseToDelete(expense.id)}
                     >
                       <Trash2 className="h-5 w-5" />
                     </Button>
@@ -197,6 +202,26 @@ const Dashboard = () => {
           )}
         </div>
       </div>
+
+      <AlertDialog open={!!expenseToDelete} onOpenChange={() => setExpenseToDelete(null)}>
+        <AlertDialogContent className="rounded-[16px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Expense</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this expense? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-[16px]">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="rounded-[16px] bg-red-500 hover:bg-red-600"
+              onClick={() => expenseToDelete && handleDeleteExpense(expenseToDelete)}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

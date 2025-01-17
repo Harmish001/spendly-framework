@@ -42,7 +42,8 @@ const Dashboard = () => {
 
       if (selectedMonth && selectedYear) {
         const startDate = `${selectedYear}-${selectedMonth.padStart(2, '0')}-01`;
-        const endDate = `${selectedYear}-${selectedMonth.padStart(2, '0')}-31`;
+        const lastDay = new Date(parseInt(selectedYear), parseInt(selectedMonth), 0).getDate();
+        const endDate = `${selectedYear}-${selectedMonth.padStart(2, '0')}-${lastDay}`;
         query = query.gte("date", startDate).lte("date", endDate);
       }
 
@@ -55,7 +56,6 @@ const Dashboard = () => {
       if (error) throw error;
       setExpenses(data || []);
       
-      // Calculate total expense
       const total = (data || []).reduce((sum, expense) => sum + Number(expense.amount), 0);
       setTotalExpense(total);
     } catch (error: any) {
@@ -63,6 +63,7 @@ const Dashboard = () => {
         variant: "destructive",
         title: "Error",
         description: error.message,
+        duration: 4000,
       });
     }
   };
@@ -101,6 +102,7 @@ const Dashboard = () => {
         variant: "destructive",
         title: "Error signing out",
         description: error.message,
+        duration: 4000,
       });
     } else {
       navigate("/");
@@ -134,20 +136,19 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card className="rounded-[16px] overflow-hidden" style={{ background: "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)" }}>
             <CardContent className="p-6">
-              <h2 className="text-lg font-semibold mb-2">Current Period</h2>
               <p className="text-3xl font-bold">{currentMonthName} {selectedYear}</p>
             </CardContent>
           </Card>
 
           <Card className="rounded-[16px] overflow-hidden" style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}>
-            <CardContent className="p-6">
+            <CardContent className="p-6 flex flex-col items-start">
               <h2 className="text-lg font-semibold mb-2 text-white">Total Expenses</h2>
               <p className="text-3xl font-bold text-white">₹{totalExpense.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
             </CardContent>
           </Card>
         </div>
 
-        <div className="mb-6 flex justify-between items-center">
+        <div className="mb-6 flex justify-between items-center gap-4">
           <ExpenseModal onExpenseAdded={fetchExpenses} />
           <ExpenseFilters
             selectedMonth={selectedMonth}
@@ -172,9 +173,9 @@ const Dashboard = () => {
                     <div className="p-2 rounded-[16px] border">
                       <CategoryIcon className="h-6 w-6" />
                     </div>
-                    <div>
+                    <div className="text-left">
                       <p className="font-semibold">{expense.description || "No description"}</p>
-                      <p className="text-sm text-gray-500">{expense.category}</p>
+                      <p className="text-sm text-gray-500 capitalize">{expense.category}</p>
                       <p className="text-xs text-gray-400">
                         {new Date(expense.created_at).toLocaleDateString()}
                       </p>

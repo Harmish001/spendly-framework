@@ -44,7 +44,7 @@ export const ExpenseFilters = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="rounded-[20px]">
+        <Button variant="outline" className="rounded-[16px]">
           <Filter className="h-4 w-4 mr-2" />
           Filters
         </Button>
@@ -58,7 +58,7 @@ export const ExpenseFilters = ({
             <SelectTrigger className="rounded-[16px]">
               <SelectValue placeholder="Select month" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-[16px]">
               {months.map((month, index) => (
                 <SelectItem 
                   key={index} 
@@ -75,7 +75,7 @@ export const ExpenseFilters = ({
             <SelectTrigger className="rounded-[16px]">
               <SelectValue placeholder="Select year" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-[16px]">
               {years.map((year) => (
                 <SelectItem key={year} value={year} className="rounded-[16px]">
                   {year}
@@ -88,7 +88,7 @@ export const ExpenseFilters = ({
             <SelectTrigger className="rounded-[16px]">
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-[16px]">
               {categories.map((category) => (
                 <SelectItem key={category} value={category} className="rounded-[16px]">
                   {category}

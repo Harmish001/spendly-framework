@@ -119,16 +119,16 @@ const Dashboard = () => {
     <div className="min-h-screen flex">
       <div className="flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Wallet className="h-8 w-8" />
               Spendly
             </h1>
-            <div className="flex items-center gap-4">
-              <Sheet open={isExpenseFormOpen} onOpenChange={setIsExpenseFormOpen}>
+            <div className="flex flex-wrap items-center gap-4">
+              <Sheet>
                 <SheetTrigger asChild>
                   <Button
-                    className="rounded-[16px]"
+                    className="rounded-[16px] w-full md:w-auto"
                     style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
                   >
                     Add Expense
@@ -139,28 +139,42 @@ const Dashboard = () => {
                     <SheetTitle>Add New Expense</SheetTitle>
                   </SheetHeader>
                   <div className="mt-4">
-                    <ExpenseForm onExpenseAdded={() => {
-                      fetchExpenses();
-                      setIsExpenseFormOpen(false);
-                    }} />
+                    <ExpenseForm onExpenseAdded={fetchExpenses} />
                   </div>
                 </SheetContent>
               </Sheet>
 
-              <ExpenseFilters
-                selectedMonth={selectedMonth}
-                selectedYear={selectedYear}
-                selectedCategory={selectedCategory}
-                onMonthChange={setSelectedMonth}
-                onYearChange={setSelectedYear}
-                onCategoryChange={setSelectedCategory}
-                onFilter={fetchExpenses}
-              />
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    className="rounded-[16px] w-full md:w-auto"
+                    style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
+                  >
+                    Filters
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Filter Expenses</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-4">
+                    <ExpenseFilters
+                      selectedMonth={selectedMonth}
+                      selectedYear={selectedYear}
+                      selectedCategory={selectedCategory}
+                      onMonthChange={setSelectedMonth}
+                      onYearChange={setSelectedYear}
+                      onCategoryChange={setSelectedCategory}
+                      onFilter={fetchExpenses}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
 
-              <Link to="/statistics">
+              <Link to="/statistics" className="w-full md:w-auto">
                 <Button
                   variant="outline"
-                  className="rounded-[16px]"
+                  className="rounded-[16px] w-full"
                   style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)", color: "white" }}
                 >
                   <ChartPie className="h-5 w-5 mr-2" />
@@ -170,7 +184,7 @@ const Dashboard = () => {
 
               <Button
                 variant="outline"
-                className="rounded-[16px]"
+                className="rounded-[16px] w-full md:w-auto"
                 onClick={handleSignOut}
                 style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)", color: "white" }}
               >

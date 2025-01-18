@@ -19,7 +19,7 @@ const Statistics = () => {
         if (error) throw error;
 
         // Group expenses by category and calculate total
-        const categoryTotals = expenses.reduce((acc: any, curr: any) => {
+        const categoryTotals = expenses.reduce((acc: Record<string, number>, curr) => {
           const category = curr.category;
           if (!acc[category]) {
             acc[category] = 0;
@@ -29,12 +29,12 @@ const Statistics = () => {
         }, {});
 
         // Calculate total amount
-        const totalAmount = Object.values(categoryTotals).reduce((a: any, b: any) => a + b, 0);
+        const totalAmount = Object.values(categoryTotals).reduce((a, b) => Number(a) + Number(b), 0);
 
         // Convert to percentage and format for pie chart
-        const chartData = Object.entries(categoryTotals).map(([category, amount]: [string, any]) => ({
+        const chartData = Object.entries(categoryTotals).map(([category, amount]) => ({
           name: category.charAt(0).toUpperCase() + category.slice(1),
-          value: Number(((amount / totalAmount) * 100).toFixed(2))
+          value: Number(((Number(amount) / totalAmount) * 100).toFixed(2))
         }));
 
         setData(chartData);

@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, ChartPie } from "lucide-react";
-import { ExpenseSidebar } from "@/components/expenses/ExpenseSidebar";
+import { ExpenseForm } from "@/components/expenses/ExpenseForm";
+import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 
 const categoryIcons: Record<string, any> = {
@@ -29,6 +31,7 @@ const Dashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [totalExpense, setTotalExpense] = useState(0);
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
+  const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false);
   const navigate = useNavigate();
 
   const fetchExpenses = async () => {
@@ -46,7 +49,19 @@ const Dashboard = () => {
       }
 
       if (selectedCategory !== "All Categories") {
-        query = query.ilike("category", selectedCategory.toLowerCase());
+        const categoryMapping: Record<string, string> = {
+          "Investment": "investment",
+          "Food and Dining": "food",
+          "Transportation": "transport",
+          "Shopping": "shopping",
+          "Loan": "loan",
+          "Others": "others"
+        };
+        
+        const mappedCategory = categoryMapping[selectedCategory];
+        if (mappedCategory) {
+          query = query.eq("category", mappedCategory);
+        }
       }
 
       const { data, error } = await query;
@@ -102,16 +117,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen flex">
-      <ExpenseSidebar
-        onExpenseAdded={fetchExpenses}
-        selectedMonth={selectedMonth}
-        selectedYear={selectedYear}
-        selectedCategory={selectedCategory}
-        onMonthChange={setSelectedMonth}
-        onYearChange={setSelectedYear}
-        onCategoryChange={setSelectedCategory}
-      />
-      
       <div className="flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-8">
@@ -120,6 +125,38 @@ const Dashboard = () => {
               Spendly
             </h1>
             <div className="flex items-center gap-4">
+              <Sheet open={isExpenseFormOpen} onOpenChange={setIsExpenseFormOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    className="rounded-[16px]"
+                    style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
+                  >
+                    Add Expense
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Add New Expense</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-4">
+                    <ExpenseForm onExpenseAdded={() => {
+                      fetchExpenses();
+                      setIsExpenseFormOpen(false);
+                    }} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              <ExpenseFilters
+                selectedMonth={selectedMonth}
+                selectedYear={selectedYear}
+                selectedCategory={selectedCategory}
+                onMonthChange={setSelectedMonth}
+                onYearChange={setSelectedYear}
+                onCategoryChange={setSelectedCategory}
+                onFilter={fetchExpenses}
+              />
+
               <Link to="/statistics">
                 <Button
                   variant="outline"
@@ -130,6 +167,7 @@ const Dashboard = () => {
                   Statistics
                 </Button>
               </Link>
+
               <Button
                 variant="outline"
                 className="rounded-[16px]"

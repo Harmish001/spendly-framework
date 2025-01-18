@@ -4,11 +4,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, ChartPie } from "lucide-react";
+import { LogOut, Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, ChartPie, Plus } from "lucide-react";
 import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -33,6 +34,7 @@ const Dashboard = () => {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const fetchExpenses = async () => {
     try {
@@ -116,92 +118,147 @@ const Dashboard = () => {
   const currentMonthName = months[parseInt(selectedMonth) - 1];
 
   return (
-    <div className="min-h-screen flex">
-      <div className="flex-1 p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Wallet className="h-8 w-8" />
-              Spendly
-            </h1>
-            <div className="flex flex-wrap items-center gap-4">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button
-                    className="rounded-[16px] w-full md:w-auto"
-                    style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
-                  >
-                    Add Expense
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Add New Expense</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-4">
-                    <ExpenseForm onExpenseAdded={fetchExpenses} />
-                  </div>
-                </SheetContent>
-              </Sheet>
-
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button
-                    className="rounded-[16px] w-full md:w-auto"
-                    style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
-                  >
-                    Filters
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Filter Expenses</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-4">
-                    <ExpenseFilters
-                      selectedMonth={selectedMonth}
-                      selectedYear={selectedYear}
-                      selectedCategory={selectedCategory}
-                      onMonthChange={setSelectedMonth}
-                      onYearChange={setSelectedYear}
-                      onCategoryChange={setSelectedCategory}
-                      onFilter={fetchExpenses}
-                    />
-                  </div>
-                </SheetContent>
-              </Sheet>
-
-              <Link to="/statistics" className="w-full md:w-auto">
+    <div className="min-h-screen">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center justify-between">
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Wallet className="h-6 w-6" />
+            Spendly
+          </h1>
+          <div className="flex items-center gap-4">
+            {!isMobile && (
+              <Link to="/statistics">
                 <Button
                   variant="outline"
-                  className="rounded-[16px] w-full"
+                  className="rounded-[16px]"
                   style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)", color: "white" }}
                 >
                   <ChartPie className="h-5 w-5 mr-2" />
                   Statistics
                 </Button>
               </Link>
-
-              <Button
-                variant="outline"
-                className="rounded-[16px] w-full md:w-auto"
-                onClick={handleSignOut}
-                style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)", color: "white" }}
-              >
-                <LogOut className="h-5 w-5 mr-2" />
-                Sign Out
-              </Button>
-            </div>
+            )}
+            <Button
+              variant="outline"
+              className="rounded-[16px]"
+              onClick={handleSignOut}
+              style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)", color: "white" }}
+            >
+              <LogOut className="h-5 w-5" />
+              {!isMobile && <span className="ml-2">Sign Out</span>}
+            </Button>
           </div>
+        </div>
+      </header>
 
-          <Card className="rounded-[16px] overflow-hidden mb-8" style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}>
-            <CardContent className="p-6 flex flex-col items-start">
-              <p className="text-lg font-semibold mb-2 text-white">{currentMonthName} {selectedYear} - Total Expenses</p>
-              <p className="text-3xl font-bold text-white">₹{totalExpense.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
-            </CardContent>
-          </Card>
+      <div className="container py-4 md:py-8">
+        <Card className="rounded-[16px] overflow-hidden mb-8" style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}>
+          <CardContent className="p-6 flex flex-col items-start">
+            <p className="text-lg font-semibold mb-2 text-white">{currentMonthName} {selectedYear} - Total Expenses</p>
+            <p className="text-3xl font-bold text-white">₹{totalExpense.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+          </CardContent>
+        </Card>
 
-          <div className="space-y-4">
+        {isMobile && (
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                className="fixed bottom-6 left-6 rounded-full w-12 h-12 shadow-lg"
+                style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
+              >
+                <Plus className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left">
+              <SheetHeader>
+                <SheetTitle>Add New Expense</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4">
+                <ExpenseForm onExpenseAdded={fetchExpenses} />
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
+
+        {isMobile && (
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                className="fixed bottom-6 right-6 rounded-full w-12 h-12 shadow-lg"
+                style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
+              >
+                <ChartPie className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Statistics</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4">
+                <Link to="/statistics" className="w-full">
+                  <Button
+                    className="w-full rounded-[16px]"
+                    style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
+                  >
+                    View Statistics
+                  </Button>
+                </Link>
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
+
+        {!isMobile && (
+          <div className="flex flex-wrap items-center gap-4 mb-8">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  className="rounded-[16px] w-full md:w-auto"
+                  style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
+                >
+                  Add Expense
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Add New Expense</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">
+                  <ExpenseForm onExpenseAdded={fetchExpenses} />
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  className="rounded-[16px] w-full md:w-auto"
+                  style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
+                >
+                  Filters
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Filter Expenses</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">
+                  <ExpenseFilters
+                    selectedMonth={selectedMonth}
+                    selectedYear={selectedYear}
+                    selectedCategory={selectedCategory}
+                    onMonthChange={setSelectedMonth}
+                    onYearChange={setSelectedYear}
+                    onCategoryChange={setSelectedCategory}
+                    onFilter={fetchExpenses}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        )}
+
+        <div className="space-y-4">
             {expenses.map((expense) => {
               const CategoryIcon = categoryIcons[expense.category] || MoreHorizontal;
               return (
@@ -242,7 +299,6 @@ const Dashboard = () => {
                 No expenses found for the selected filters.
               </div>
             )}
-          </div>
         </div>
       </div>
 

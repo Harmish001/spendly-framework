@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Filter } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 interface ExpenseFiltersProps {
   selectedMonth: string;
@@ -11,6 +11,7 @@ interface ExpenseFiltersProps {
   onMonthChange: (value: string) => void;
   onYearChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
+  onFilter: () => void;
 }
 
 const months = [
@@ -37,23 +38,28 @@ export const ExpenseFilters = ({
   selectedCategory,
   onMonthChange,
   onYearChange,
-  onCategoryChange
+  onCategoryChange,
+  onFilter
 }: ExpenseFiltersProps) => {
   const [isOpen, setIsOpen] = useState(false);
   
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="rounded-[16px]">
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTrigger asChild>
+        <Button 
+          variant="outline" 
+          className="rounded-[16px]"
+          style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)", color: "white" }}
+        >
           <Filter className="h-4 w-4 mr-2" />
           Filters
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md rounded-[16px]">
-        <DialogHeader>
-          <DialogTitle>Filter Expenses</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
+      </SheetTrigger>
+      <SheetContent className="w-[300px]">
+        <SheetHeader>
+          <SheetTitle>Filter Expenses</SheetTitle>
+        </SheetHeader>
+        <div className="space-y-4 mt-4">
           <Select value={selectedMonth} onValueChange={onMonthChange}>
             <SelectTrigger className="rounded-[16px]">
               <SelectValue placeholder="Select month" />
@@ -96,8 +102,19 @@ export const ExpenseFilters = ({
               ))}
             </SelectContent>
           </Select>
+
+          <Button 
+            onClick={() => {
+              onFilter();
+              setIsOpen(false);
+            }}
+            className="w-full rounded-[16px]"
+            style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
+          >
+            Apply Filters
+          </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };

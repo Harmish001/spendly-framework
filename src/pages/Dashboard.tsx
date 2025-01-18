@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2 } from "lucide-react";
+import { LogOut, Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, ChartPie } from "lucide-react";
 import { ExpenseSidebar } from "@/components/expenses/ExpenseSidebar";
 import { toast } from "sonner";
 
@@ -42,11 +42,11 @@ const Dashboard = () => {
         const startDate = `${selectedYear}-${selectedMonth.padStart(2, '0')}-01`;
         const lastDay = new Date(parseInt(selectedYear), parseInt(selectedMonth), 0).getDate();
         const endDate = `${selectedYear}-${selectedMonth.padStart(2, '0')}-${lastDay}`;
-        query = query.gte("date", startDate).lte("date", endDate);
+        query = query.gte("created_at", startDate).lte("created_at", endDate);
       }
 
       if (selectedCategory !== "All Categories") {
-        query = query.eq("category", selectedCategory.toLowerCase());
+        query = query.ilike("category", selectedCategory.toLowerCase());
       }
 
       const { data, error } = await query;
@@ -57,9 +57,7 @@ const Dashboard = () => {
       const total = (data || []).reduce((sum, expense) => sum + Number(expense.amount), 0);
       setTotalExpense(total);
     } catch (error: any) {
-      toast.error(error.message, {
-        duration: 3000,
-      });
+      console.error("Error fetching expenses:", error.message);
     }
   };
 
@@ -121,14 +119,27 @@ const Dashboard = () => {
               <Wallet className="h-8 w-8" />
               Spendly
             </h1>
-            <Button
-              variant="outline"
-              className="rounded-[16px]"
-              onClick={handleSignOut}
-            >
-              <LogOut className="h-5 w-5 mr-2" />
-              Sign Out
-            </Button>
+            <div className="flex items-center gap-4">
+              <Link to="/statistics">
+                <Button
+                  variant="outline"
+                  className="rounded-[16px]"
+                  style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)", color: "white" }}
+                >
+                  <ChartPie className="h-5 w-5 mr-2" />
+                  Statistics
+                </Button>
+              </Link>
+              <Button
+                variant="outline"
+                className="rounded-[16px]"
+                onClick={handleSignOut}
+                style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)", color: "white" }}
+              >
+                <LogOut className="h-5 w-5 mr-2" />
+                Sign Out
+              </Button>
+            </div>
           </div>
 
           <Card className="rounded-[16px] overflow-hidden mb-8" style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}>

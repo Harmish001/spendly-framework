@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { Header } from "@/components/layout/Header";
+import { useNavigate } from "react-router-dom";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -34,9 +35,40 @@ const Dashboard = () => {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [authChecking, setAuthChecking] = useState(true);
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate('/');
+          return;
+        }
+        setAuthChecking(false);
+        fetchExpenses();
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        navigate('/');
+      }
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        navigate('/');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const fetchExpenses = async () => {
+    if (authChecking) return;
+    
     setLoading(true);
     try {
       let query = supabase
@@ -100,6 +132,14 @@ const Dashboard = () => {
   };
 
   const currentMonthName = months[parseInt(selectedMonth) - 1];
+
+  if (authChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   if (loading && expenses.length === 0) {
     return (

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal } from "lucide-react";
+import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -43,18 +43,13 @@ export const ExpenseForm = ({ onExpenseAdded }: ExpenseFormProps) => {
 
       if (error) throw error;
 
-      toast.success("Expense added successfully", {
-        duration: 3000,
-      });
-
+      toast.success("Expense added successfully");
       setAmount("");
       setDescription("");
       setCategory("");
       onExpenseAdded();
     } catch (error: any) {
-      toast.error(error.message, {
-        duration: 3000,
-      });
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -106,9 +101,12 @@ export const ExpenseForm = ({ onExpenseAdded }: ExpenseFormProps) => {
       <Button
         type="submit"
         className="w-full rounded-[16px]"
-        style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
+        style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
         disabled={loading}
       >
+        {loading ? (
+          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+        ) : null}
         {loading ? "Adding..." : "Add Expense"}
       </Button>
     </form>

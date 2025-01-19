@@ -62,7 +62,10 @@ const Statistics = () => {
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back to Dashboard
           </Button>
-        
+        </div>
+        <StatisticsCharts data={data} loading={loading} />
+      </div>
+    </div>
   );
 };
 

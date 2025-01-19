@@ -34,7 +34,7 @@ const Dashboard = () => {
   const [totalExpense, setTotalExpense] = useState(0);
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
@@ -48,7 +48,6 @@ const Dashboard = () => {
           return;
         }
         setAuthChecking(false);
-        fetchExpenses();
       } catch (error) {
         console.error('Error checking auth:', error);
         navigate('/');
@@ -65,6 +64,12 @@ const Dashboard = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  useEffect(() => {
+    if (!authChecking) {
+      fetchExpenses();
+    }
+  }, [authChecking, selectedMonth, selectedYear, selectedCategory]);
 
   const fetchExpenses = async () => {
     if (authChecking) return;
@@ -141,14 +146,6 @@ const Dashboard = () => {
     );
   }
 
-  if (loading && expenses.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen">
       <Header />
@@ -165,105 +162,114 @@ const Dashboard = () => {
           />
         </div>
 
-        <Card className="rounded-[16px] overflow-hidden mb-8" style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}>
-          <CardContent className="p-6 flex flex-col items-start">
-            <p className="text-lg font-semibold mb-2 text-white">{currentMonthName} {selectedYear} - Total Expenses</p>
-            <p className="text-3xl font-bold text-white">₹{totalExpense.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
-          </CardContent>
-        </Card>
-
-        {isMobile && (
-          <Sheet open={isExpenseFormOpen} onOpenChange={setIsExpenseFormOpen}>
-            <SheetTrigger asChild>
-              <Button
-                className="fixed bottom-6 left-6 rounded-full w-12 h-12 shadow-lg"
-                style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
-              >
-                <Plus className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left">
-              <SheetHeader>
-                <SheetTitle>Add New Expense</SheetTitle>
-              </SheetHeader>
-              <div className="mt-4">
-                <ExpenseForm onExpenseAdded={() => {
-                  fetchExpenses();
-                  setIsExpenseFormOpen(false);
-                }} />
-              </div>
-            </SheetContent>
-          </Sheet>
-        )}
-
-        {!isMobile && (
-          <div className="flex flex-wrap items-center gap-4 mb-8">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  className="rounded-[16px]"
-                  style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
-                >
-                  Add Expense
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Add New Expense</SheetTitle>
-                </SheetHeader>
-                <div className="mt-4">
-                  <ExpenseForm onExpenseAdded={() => {
-                    fetchExpenses();
-                    setIsExpenseFormOpen(false);
-                  }} />
-                </div>
-              </SheetContent>
-            </Sheet>
+        {loading ? (
+          <div className="min-h-[400px] flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin" />
           </div>
-        )}
+        ) : (
+          <>
+            <Card className="rounded-[16px] overflow-hidden mb-8" style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}>
+              <CardContent className="p-6 flex flex-col items-start">
+                <p className="text-lg font-semibold mb-2 text-white">{currentMonthName} {selectedYear} - Total Expenses</p>
+                <p className="text-3xl font-bold text-white">₹{totalExpense.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+              </CardContent>
+            </Card>
 
-        <div className="space-y-4">
-          {expenses.map((expense) => {
-            const CategoryIcon = categoryIcons[expense.category] || MoreHorizontal;
-            return (
-              <Card
-                key={expense.id}
-                className="border rounded-[16px] hover:border-gray-300 transition-colors"
-              >
-                <CardContent className="flex items-center justify-between p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 rounded-[16px] border">
-                      <CategoryIcon className="h-6 w-6" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-semibold">{expense.description || "No description"}</p>
-                      <p className="text-sm text-gray-500 capitalize">{expense.category}</p>
-                      <p className="text-xs text-gray-400">
-                        {new Date(expense.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
+            {isMobile && (
+              <Sheet open={isExpenseFormOpen} onOpenChange={setIsExpenseFormOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    className="fixed bottom-6 left-6 rounded-full w-12 h-12 shadow-lg"
+                    style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
+                  >
+                    <Plus className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left">
+                  <SheetHeader>
+                    <SheetTitle>Add New Expense</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-4">
+                    <ExpenseForm onExpenseAdded={() => {
+                      fetchExpenses();
+                      setIsExpenseFormOpen(false);
+                    }} />
                   </div>
-                  <div className="flex items-center gap-4">
-                    <p className="text-xl font-bold">₹{expense.amount}</p>
+                </SheetContent>
+              </Sheet>
+            )}
+
+            {!isMobile && (
+              <div className="flex flex-wrap items-center gap-4 mb-8">
+                <Sheet>
+                  <SheetTrigger asChild>
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-[16px] hover:bg-red-100 hover:text-red-600"
-                      onClick={() => setExpenseToDelete(expense.id)}
+                      className="rounded-[16px]"
+                      style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
                     >
-                      <Trash2 className="h-5 w-5" />
+                      Add Expense
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-          {expenses.length === 0 && !loading && (
-            <div className="text-center text-gray-500 py-8">
-              No expenses found for the selected filters.
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>Add New Expense</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-4">
+                      <ExpenseForm onExpenseAdded={() => {
+                        fetchExpenses();
+                        setIsExpenseFormOpen(false);
+                      }} />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {expenses.length === 0 ? (
+                <div className="text-center text-gray-500 py-8">
+                  No expenses found for the selected filters.
+                </div>
+              ) : (
+                expenses.map((expense) => {
+                  const CategoryIcon = categoryIcons[expense.category] || MoreHorizontal;
+                  return (
+                    <Card
+                      key={expense.id}
+                      className="border rounded-[16px] hover:border-gray-300 transition-colors"
+                    >
+                      <CardContent className="flex items-center justify-between p-6">
+                        <div className="flex items-center gap-4">
+                          <div className="p-2 rounded-[16px] border">
+                            <CategoryIcon className="h-6 w-6" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-semibold">{expense.description || "No description"}</p>
+                            <p className="text-sm text-gray-500 capitalize">{expense.category}</p>
+                            <p className="text-xs text-gray-400">
+                              {new Date(expense.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <p className="text-xl font-bold">₹{expense.amount}</p>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-[16px] hover:bg-red-100 hover:text-red-600"
+                            onClick={() => setExpenseToDelete(expense.id)}
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              )}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
 
       <AlertDialog open={!!expenseToDelete} onOpenChange={() => setExpenseToDelete(null)}>

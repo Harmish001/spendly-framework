@@ -1,6 +1,6 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, ChartPie, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ExpenseFilters } from "../expenses/ExpenseFilters";
 
@@ -34,27 +34,25 @@ export const MobileSidebar = ({
         <SheetHeader>
           <SheetTitle>Menu</SheetTitle>
         </SheetHeader>
-        <div className="flex flex-col gap-4 mt-4">
-          <Link to="/statistics" className="w-full">
-            <Button 
-              className="w-full rounded-[16px]"
-              style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
-            >
-              View Statistics
-            </Button>
-          </Link>
-          <div className="space-y-4">
-            <h3 className="font-semibold">Filters</h3>
-            <ExpenseFilters
-              selectedMonth={selectedMonth}
-              selectedYear={selectedYear}
-              selectedCategory={selectedCategory}
-              onMonthChange={onMonthChange}
-              onYearChange={onYearChange}
-              onCategoryChange={onCategoryChange}
-              onFilter={onFilter}
-            />
-          </div>
+        <div className="flex flex-col gap-6 mt-6">
+          <nav className="space-y-2">
+            <Link to="/statistics" className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-accent">
+              <ChartPie className="h-5 w-5" />
+              Statistics
+            </Link>
+            <div className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-accent cursor-pointer">
+              <Filter className="h-5 w-5" />
+              <ExpenseFilters
+                selectedMonth={selectedMonth}
+                selectedYear={selectedYear}
+                selectedCategory={selectedCategory}
+                onMonthChange={onMonthChange}
+                onYearChange={onYearChange}
+                onCategoryChange={onCategoryChange}
+                onFilter={onFilter}
+              />
+            </div>
+          </nav>
         </div>
       </SheetContent>
     </Sheet>

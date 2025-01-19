@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, ChartPie, Plus, Loader2 } from "lucide-react";
+import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Plus, Loader2 } from "lucide-react";
 import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileSidebar } from "@/components/layout/MobileSidebar";
+import { Header } from "@/components/layout/Header";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -34,7 +34,6 @@ const Dashboard = () => {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
 
   const fetchExpenses = async () => {
@@ -100,19 +99,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast.error("Error signing out");
-    } else {
-      navigate("/");
-    }
-  };
-
-  useEffect(() => {
-    fetchExpenses();
-  }, [selectedMonth, selectedYear, selectedCategory]);
-
   const currentMonthName = months[parseInt(selectedMonth) - 1];
 
   if (loading && expenses.length === 0) {
@@ -125,50 +111,20 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center justify-between">
-          <div className="flex items-center gap-4">
-            <MobileSidebar
-              selectedMonth={selectedMonth}
-              selectedYear={selectedYear}
-              selectedCategory={selectedCategory}
-              onMonthChange={setSelectedMonth}
-              onYearChange={setSelectedYear}
-              onCategoryChange={setSelectedCategory}
-              onFilter={fetchExpenses}
-            />
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Wallet className="h-6 w-6" />
-              Spendly
-            </h1>
-          </div>
-          <div className="flex items-center gap-4">
-            {!isMobile && (
-              <Link to="/statistics">
-                <Button
-                  variant="outline"
-                  className="rounded-[16px]"
-                  style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
-                >
-                  <ChartPie className="h-5 w-5 mr-2" />
-                  Statistics
-                </Button>
-              </Link>
-            )}
-            <Button
-              variant="outline"
-              className="rounded-[16px]"
-              onClick={handleSignOut}
-              style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
-            >
-              <LogOut className="h-5 w-5" />
-              {!isMobile && <span className="ml-2">Sign Out</span>}
-            </Button>
-          </div>
-        </div>
-      </header>
-
+      <Header />
       <div className="container py-4 md:py-8">
+        <div className="flex items-center justify-between mb-6">
+          <MobileSidebar
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            selectedCategory={selectedCategory}
+            onMonthChange={setSelectedMonth}
+            onYearChange={setSelectedYear}
+            onCategoryChange={setSelectedCategory}
+            onFilter={fetchExpenses}
+          />
+        </div>
+
         <Card className="rounded-[16px] overflow-hidden mb-8" style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}>
           <CardContent className="p-6 flex flex-col items-start">
             <p className="text-lg font-semibold mb-2 text-white">{currentMonthName} {selectedYear} - Total Expenses</p>
@@ -177,38 +133,27 @@ const Dashboard = () => {
         </Card>
 
         {isMobile && (
-          <>
-            <Sheet open={isExpenseFormOpen} onOpenChange={setIsExpenseFormOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  className="fixed bottom-6 left-6 rounded-full w-12 h-12 shadow-lg"
-                  style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
-                >
-                  <Plus className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left">
-                <SheetHeader>
-                  <SheetTitle>Add New Expense</SheetTitle>
-                </SheetHeader>
-                <div className="mt-4">
-                  <ExpenseForm onExpenseAdded={() => {
-                    fetchExpenses();
-                    setIsExpenseFormOpen(false);
-                  }} />
-                </div>
-              </SheetContent>
-            </Sheet>
-
-            <Link to="/statistics">
+          <Sheet open={isExpenseFormOpen} onOpenChange={setIsExpenseFormOpen}>
+            <SheetTrigger asChild>
               <Button
-                className="fixed bottom-6 right-6 rounded-full w-12 h-12 shadow-lg"
+                className="fixed bottom-6 left-6 rounded-full w-12 h-12 shadow-lg"
                 style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
               >
-                <ChartPie className="h-6 w-6" />
+                <Plus className="h-6 w-6" />
               </Button>
-            </Link>
-          </>
+            </SheetTrigger>
+            <SheetContent side="left">
+              <SheetHeader>
+                <SheetTitle>Add New Expense</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4">
+                <ExpenseForm onExpenseAdded={() => {
+                  fetchExpenses();
+                  setIsExpenseFormOpen(false);
+                }} />
+              </div>
+            </SheetContent>
+          </Sheet>
         )}
 
         {!isMobile && (
@@ -216,7 +161,7 @@ const Dashboard = () => {
             <Sheet>
               <SheetTrigger asChild>
                 <Button
-                  className="rounded-[16px] w-full md:w-auto"
+                  className="rounded-[16px]"
                   style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
                 >
                   Add Expense

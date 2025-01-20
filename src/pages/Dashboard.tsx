@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Plus, Loader2 } from "lucide-react";
-import { ExpenseForm } from "@/components/expenses/ExpenseForm";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { Header } from "@/components/layout/Header";
 import { useNavigate } from "react-router-dom";
 import { ResponsivePie } from "@nivo/pie";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -40,6 +39,8 @@ const Dashboard = () => {
   const [authChecking, setAuthChecking] = useState(true);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -156,6 +157,30 @@ const Dashboard = () => {
 
   const currentMonthName = months[parseInt(selectedMonth) - 1];
 
+  useEffect(() => {
+    if (tabsRef.current) {
+      const currentMonthTab = tabsRef.current.querySelector(`[data-value="${selectedMonth}"]`);
+      if (currentMonthTab) {
+        const tabsList = tabsRef.current.querySelector('[role="tablist"]');
+        if (tabsList) {
+          const scrollPosition = currentMonthTab.getBoundingClientRect().left - 
+            tabsList.getBoundingClientRect().left - 
+            (tabsList.clientWidth - currentMonthTab.clientWidth) / 2;
+          tabsList.scrollLeft = scrollPosition;
+        }
+      }
+    }
+  }, [selectedMonth]);
+
+  const handleFilter = () => {
+    fetchExpenses();
+    setIsSidebarOpen(false);
+    setIsExpenseFormOpen(false);
+    toast.success("Filters applied successfully", {
+      duration: 3000,
+    });
+  };
+
   if (authChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -176,18 +201,29 @@ const Dashboard = () => {
             onMonthChange={setSelectedMonth}
             onYearChange={setSelectedYear}
             onCategoryChange={setSelectedCategory}
-            onFilter={fetchExpenses}
+            onFilter={handleFilter}
           />
         </div>
 
-        <div className="mb-6 overflow-x-auto">
-          <Tabs defaultValue={selectedMonth} onValueChange={setSelectedMonth} className="w-full">
-            <TabsList className="inline-flex w-full justify-start space-x-2 overflow-x-auto p-2">
+        <div className="mb-6 relative" ref={tabsRef}>
+          <Tabs 
+            defaultValue={selectedMonth} 
+            onValueChange={setSelectedMonth} 
+            className="w-full"
+          >
+            <TabsList className="inline-flex w-full justify-start p-2 overflow-x-auto scrollbar-none">
               {months.map((month, index) => (
                 <TabsTrigger
                   key={index}
                   value={(index + 1).toString().padStart(2, '0')}
                   className="min-w-[100px] rounded-full"
+                  data-value={(index + 1).toString().padStart(2, '0')}
+                  style={{
+                    background: selectedMonth === (index + 1).toString().padStart(2, '0') 
+                      ? "linear-gradient(to right, #243949 0%, #517fa4 100%)" 
+                      : "transparent",
+                    color: selectedMonth === (index + 1).toString().padStart(2, '0') ? "white" : "inherit"
+                  }}
                 >
                   {month}
                 </TabsTrigger>
@@ -213,7 +249,13 @@ const Dashboard = () => {
                       padAngle={0.7}
                       cornerRadius={3}
                       activeOuterRadiusOffset={8}
-                      colors={{ scheme: 'purple_orange' }}
+                      colors={[
+                        "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+                        "linear-gradient(to right, #c1c161 0%, #d4d4b1 100%)",
+                        "linear-gradient(to right, #e6b980 0%, #eacda3 100%)",
+                        "linear-gradient(to right, #d7d2cc 0%, #304352 100%)",
+                        "linear-gradient(to right, #ffc3a0 0%, #ffafbd 100%)"
+                      ]}
                       borderWidth={1}
                       borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
                       enableArcLinkLabels={false}

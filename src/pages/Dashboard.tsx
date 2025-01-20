@@ -11,8 +11,9 @@ import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { Header } from "@/components/layout/Header";
 import { useNavigate } from "react-router-dom";
 import { ResponsivePie } from "@nivo/pie";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ExpenseSidebar } from "@/components/expenses/ExpenseSidebar";
+import { ExpenseFormSheet } from "@/components/expenses/ExpenseFormSheet";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -205,35 +206,12 @@ const Dashboard = () => {
             onFilter={handleFilter}
           />
           
-          {/* Mobile Add Expense Button */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                className="md:hidden rounded-[20px]"
-                style={{
-                  background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
-                  color: "white"
-                }}
-              >
-                <PlusCircle className="h-5 w-5 mr-2" />
-                Add Expense
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="p-0">
-              <ExpenseSidebar
-                onExpenseAdded={() => {
-                  fetchExpenses();
-                  setIsSidebarOpen(false);
-                }}
-                selectedMonth={selectedMonth}
-                selectedYear={selectedYear}
-                selectedCategory={selectedCategory}
-                onMonthChange={setSelectedMonth}
-                onYearChange={setSelectedYear}
-                onCategoryChange={setSelectedCategory}
-              />
-            </SheetContent>
-          </Sheet>
+          <ExpenseFormSheet
+            onExpenseAdded={() => {
+              fetchExpenses();
+              setIsSidebarOpen(false);
+            }}
+          />
         </div>
 
         <div className="mb-6 relative" ref={tabsRef}>

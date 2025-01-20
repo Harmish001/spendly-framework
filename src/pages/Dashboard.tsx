@@ -4,14 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2 } from "lucide-react";
+import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { Header } from "@/components/layout/Header";
 import { useNavigate } from "react-router-dom";
 import { ResponsivePie } from "@nivo/pie";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ExpenseSidebar } from "@/components/expenses/ExpenseSidebar";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -203,6 +204,36 @@ const Dashboard = () => {
             onCategoryChange={setSelectedCategory}
             onFilter={handleFilter}
           />
+          
+          {/* Mobile Add Expense Button */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                className="md:hidden rounded-[20px]"
+                style={{
+                  background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+                  color: "white"
+                }}
+              >
+                <PlusCircle className="h-5 w-5 mr-2" />
+                Add Expense
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="p-0">
+              <ExpenseSidebar
+                onExpenseAdded={() => {
+                  fetchExpenses();
+                  setIsSidebarOpen(false);
+                }}
+                selectedMonth={selectedMonth}
+                selectedYear={selectedYear}
+                selectedCategory={selectedCategory}
+                onMonthChange={setSelectedMonth}
+                onYearChange={setSelectedYear}
+                onCategoryChange={setSelectedCategory}
+              />
+            </SheetContent>
+          </Sheet>
         </div>
 
         <div className="mb-6 relative" ref={tabsRef}>
@@ -250,11 +281,12 @@ const Dashboard = () => {
                       cornerRadius={3}
                       activeOuterRadiusOffset={8}
                       colors={[
-                        "linear-gradient(to right, #243949 0%, #517fa4 100%)",
-                        "linear-gradient(to right, #c1c161 0%, #d4d4b1 100%)",
-                        "linear-gradient(to right, #e6b980 0%, #eacda3 100%)",
-                        "linear-gradient(to right, #d7d2cc 0%, #304352 100%)",
-                        "linear-gradient(to right, #ffc3a0 0%, #ffafbd 100%)"
+                        "#4A90E2",  // Blue
+                        "#5E5CE6",  // Purple
+                        "#7B68EE",  // Medium slate blue
+                        "#4169E1",  // Royal blue
+                        "#6A5ACD",  // Slate blue
+                        "#483D8B"   // Dark slate blue
                       ]}
                       borderWidth={1}
                       borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}

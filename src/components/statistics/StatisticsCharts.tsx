@@ -1,4 +1,3 @@
-import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -32,59 +31,24 @@ export const StatisticsCharts = ({ data, loading }: StatisticsChartsProps) => {
   return (
     <div className="space-y-8">
       <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Expense Distribution (3D Pie Chart)</h2>
-        <div className="h-[400px] w-full">
-          <ResponsivePie
-            data={data}
-            margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
-            innerRadius={0.5}
-            padAngle={0.7}
-            cornerRadius={3}
-            activeOuterRadiusOffset={8}
-            colors={{ scheme: 'nivo' }}
-            borderWidth={1}
-            borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
-            arcLinkLabelsSkipAngle={10}
-            arcLinkLabelsTextColor="#333333"
-            arcLinkLabelsThickness={2}
-            arcLinkLabelsColor={{ from: 'color' }}
-            arcLabelsSkipAngle={10}
-            arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
-            enableArcLinkLabels={true}
-            arcLinkLabel={d => `${d.id} (₹${d.value})`}
-            legends={[
-              {
-                anchor: 'bottom',
-                direction: 'row',
-                justify: false,
-                translateX: 0,
-                translateY: 56,
-                itemsSpacing: 0,
-                itemWidth: 100,
-                itemHeight: 18,
-                itemTextColor: '#999',
-                itemDirection: 'left-to-right',
-                itemOpacity: 1,
-                symbolSize: 18,
-                symbolShape: 'circle',
-              }
-            ]}
-          />
-        </div>
-      </Card>
-
-      <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Expense Distribution (Bar Chart)</h2>
-        <div className="h-[400px] w-full">
+        <h2 className="text-2xl font-bold mb-6">Expense Distribution</h2>
+        <div className="h-[300px] w-full">
           <ResponsiveBar
             data={barData}
             keys={['amount']}
             indexBy="category"
-            margin={{ top: 50, right: 50, bottom: 80, left: 80 }}
-            padding={0.3}
+            margin={{ top: 30, right: 30, bottom: 50, left: 60 }}
+            padding={0.2}
             valueScale={{ type: 'linear' }}
-            colors={{ scheme: 'nivo' }}
-            borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+            colors={[
+              'linear-gradient(225deg, #FFE29F 0%, #FFA99F 48%, #FF719A 100%)'
+            ]}
+            borderRadius={4}
+            borderWidth={1}
+            borderColor={{
+              from: 'color',
+              modifiers: [['darker', 0.2]]
+            }}
             axisTop={null}
             axisRight={null}
             axisBottom={{
@@ -93,7 +57,7 @@ export const StatisticsCharts = ({ data, loading }: StatisticsChartsProps) => {
               tickRotation: -45,
               legend: 'Category',
               legendPosition: 'middle',
-              legendOffset: 60
+              legendOffset: 40
             }}
             axisLeft={{
               tickSize: 5,
@@ -101,27 +65,13 @@ export const StatisticsCharts = ({ data, loading }: StatisticsChartsProps) => {
               tickRotation: 0,
               legend: 'Amount (₹)',
               legendPosition: 'middle',
-              legendOffset: -60
+              legendOffset: -40
             }}
             labelSkipWidth={12}
             labelSkipHeight={12}
-            labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-            legends={[
-              {
-                dataFrom: 'keys',
-                anchor: 'bottom-right',
-                direction: 'column',
-                justify: false,
-                translateX: 120,
-                translateY: 0,
-                itemsSpacing: 2,
-                itemWidth: 100,
-                itemHeight: 20,
-                itemDirection: 'left-to-right',
-                itemOpacity: 0.85,
-                symbolSize: 20,
-              }
-            ]}
+            labelTextColor="#ffffff"
+            role="application"
+            ariaLabel="Expense distribution bar chart"
           />
         </div>
       </Card>

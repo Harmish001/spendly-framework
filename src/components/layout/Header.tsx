@@ -21,15 +21,16 @@ export const Header = () => {
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Wallet className="h-6 w-6" />
-            Spendly
+            <Wallet className="h-6 w-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded p-1" />
+            <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Spendly
+            </span>
           </h1>
         </div>
         <Button
           variant="outline"
-          className="rounded-[16px]"
+          className="rounded-[16px] bg-gradient-to-r from-red-500 to-pink-500 text-white border-none hover:from-red-600 hover:to-pink-600"
           onClick={handleSignOut}
-          style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
         >
           <LogOut className="h-5 w-5" />
           <span className="ml-2 hidden md:inline">Sign Out</span>

@@ -63,12 +63,12 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Card className="w-full max-w-md mx-4 rounded-[16px] overflow-hidden border border-border/40">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
+      <Card className="w-full max-w-md mx-4 rounded-[16px] overflow-hidden border border-border/40 backdrop-blur-sm bg-white/80 dark:bg-gray-900/80">
         <CardContent className="p-8">
           <div className="flex justify-center mb-8">
             <div className="p-3 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20">
-              <Wallet className="h-8 w-8 text-primary" />
+              <Wallet className="h-8 w-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full p-1" />
             </div>
           </div>
           <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
@@ -84,7 +84,7 @@ const Index = () => {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="rounded-[16px] bg-background border-border/40"
+                className="rounded-[16px] bg-background/50 border-border/40 focus:border-transparent focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
                 required
               />
             </div>
@@ -94,7 +94,7 @@ const Index = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="rounded-[16px] bg-background border-border/40"
+                className="rounded-[16px] bg-background/50 border-border/40 focus:border-transparent focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
                 required
                 minLength={6}
               />

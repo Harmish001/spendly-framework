@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Plus, Loader2 } from "lucide-react";
@@ -11,6 +12,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { Header } from "@/components/layout/Header";
 import { useNavigate } from "react-router-dom";
+import { ResponsivePie } from "@nivo/pie";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -136,6 +138,22 @@ const Dashboard = () => {
     }
   };
 
+  const getPieChartData = () => {
+    const categoryTotals: Record<string, number> = {};
+    expenses.forEach(expense => {
+      if (!categoryTotals[expense.category]) {
+        categoryTotals[expense.category] = 0;
+      }
+      categoryTotals[expense.category] += Number(expense.amount);
+    });
+
+    return Object.entries(categoryTotals).map(([category, value]) => ({
+      id: category,
+      label: category.charAt(0).toUpperCase() + category.slice(1),
+      value,
+    }));
+  };
+
   const currentMonthName = months[parseInt(selectedMonth) - 1];
 
   if (authChecking) {
@@ -147,7 +165,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Header />
       <div className="container py-4 md:py-8">
         <div className="flex items-center justify-between mb-6">
@@ -162,68 +180,54 @@ const Dashboard = () => {
           />
         </div>
 
+        <div className="mb-6 overflow-x-auto">
+          <Tabs defaultValue={selectedMonth} onValueChange={setSelectedMonth} className="w-full">
+            <TabsList className="inline-flex w-full justify-start space-x-2 overflow-x-auto p-2">
+              {months.map((month, index) => (
+                <TabsTrigger
+                  key={index}
+                  value={(index + 1).toString().padStart(2, '0')}
+                  className="min-w-[100px] rounded-full"
+                >
+                  {month}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+
         {loading ? (
           <div className="min-h-[400px] flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         ) : (
           <>
-            <Card className="rounded-[16px] overflow-hidden mb-8" style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}>
-              <CardContent className="p-6 flex flex-col items-start">
-                <p className="text-lg font-semibold mb-2 text-white">{currentMonthName} {selectedYear} - Total Expenses</p>
-                <p className="text-3xl font-bold text-white">₹{totalExpense.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
-              </CardContent>
-            </Card>
-
-            {isMobile && (
-              <Sheet open={isExpenseFormOpen} onOpenChange={setIsExpenseFormOpen}>
-                <SheetTrigger asChild>
-                  <Button
-                    className="fixed bottom-6 left-6 rounded-full w-12 h-12 shadow-lg"
-                    style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
-                  >
-                    <Plus className="h-6 w-6" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left">
-                  <SheetHeader>
-                    <SheetTitle>Add New Expense</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-4">
-                    <ExpenseForm onExpenseAdded={() => {
-                      fetchExpenses();
-                      setIsExpenseFormOpen(false);
-                    }} />
-                  </div>
-                </SheetContent>
-              </Sheet>
-            )}
-
-            {!isMobile && (
-              <div className="flex flex-wrap items-center gap-4 mb-8">
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button
-                      className="rounded-[16px]"
-                      style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
-                    >
-                      Add Expense
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent>
-                    <SheetHeader>
-                      <SheetTitle>Add New Expense</SheetTitle>
-                    </SheetHeader>
-                    <div className="mt-4">
-                      <ExpenseForm onExpenseAdded={() => {
-                        fetchExpenses();
-                        setIsExpenseFormOpen(false);
-                      }} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              <Card className="col-span-1 md:col-span-2">
+                <CardContent className="p-6">
+                  <div className="relative h-[300px]">
+                    <ResponsivePie
+                      data={getPieChartData()}
+                      margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                      innerRadius={0.6}
+                      padAngle={0.7}
+                      cornerRadius={3}
+                      activeOuterRadiusOffset={8}
+                      colors={{ scheme: 'purple_orange' }}
+                      borderWidth={1}
+                      borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+                      enableArcLinkLabels={false}
+                      arcLabelsSkipAngle={10}
+                      arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
+                    />
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                      <p className="text-sm text-muted-foreground">Total Expenses</p>
+                      <p className="text-3xl font-bold">₹{totalExpense.toLocaleString('en-IN')}</p>
                     </div>
-                  </SheetContent>
-                </Sheet>
-              </div>
-            )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
             <div className="space-y-4">
               {expenses.length === 0 ? (

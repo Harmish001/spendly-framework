@@ -198,7 +198,7 @@ const Dashboard = () => {
             onValueChange={setSelectedMonth} 
             className="w-full"
           >
-            <TabsList className="inline-flex w-full md:justify-center justify-start p-2 overflow-x-auto no-scrollbar">
+            <TabsList className="inline-flex w-full md:w-auto md:justify-start p-2 overflow-x-auto">
               {months.map((month, index) => (
                 <TabsTrigger
                   key={index}
@@ -225,7 +225,7 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            <Card className="col-span-1 md:col-span-2 mb-8 shadow-none border-0">
+            <Card className="col-span-1 md:col-span-2 mb-4 border-0 shadow-none">
               <CardContent className="p-2">
                 <div className="relative h-[250px]">
                   <ResponsivePie
@@ -323,7 +323,7 @@ const Dashboard = () => {
             <Button
               className="rounded-full w-14 h-14 shadow-lg"
               style={{
-                background: "linear-gradient(to right, #ee9ca7, #ffdde1)",
+                background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
                 color: "white"
               }}
             >

@@ -23,6 +23,7 @@ const categories = [
   "Transportation",
   "Shopping",
   "Loan",
+  "Medical",
   "Others"
 ];
 

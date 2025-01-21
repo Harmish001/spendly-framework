@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2, PlusCircle } from "lucide-react";
+import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2, PlusCircle, Stethoscope } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Header } from "@/components/layout/Header";
@@ -20,6 +20,7 @@ const categoryIcons: Record<string, any> = {
   "transport": Car,
   "shopping": ShoppingBag,
   "loan": BanknoteIcon,
+  "medical": Stethoscope,
   "others": MoreHorizontal,
 };
 
@@ -99,6 +100,7 @@ const Dashboard = () => {
           "Transportation": "transport",
           "Shopping": "shopping",
           "Loan": "loan",
+          "Medical": "medical",
           "Others": "others"
         };
         
@@ -188,7 +190,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen bg-background">
       <Header />
       <div className="container py-4 md:py-8">
         <div className="mb-6 relative" ref={tabsRef}>
@@ -198,12 +200,12 @@ const Dashboard = () => {
             onValueChange={setSelectedMonth} 
             className="w-full"
           >
-            <TabsList className="inline-flex w-full md:w-auto md:justify-start p-2 overflow-x-auto">
+            <TabsList className="inline-flex w-full md:w-auto md:justify-start p-2 no-scrollbar">
               {months.map((month, index) => (
                 <TabsTrigger
                   key={index}
                   value={(index + 1).toString().padStart(2, '0')}
-                  className="min-w-[100px] rounded-full"
+                  className="min-w-[100px] rounded-full whitespace-nowrap"
                   data-value={(index + 1).toString().padStart(2, '0')}
                   style={{
                     background: selectedMonth === (index + 1).toString().padStart(2, '0') 

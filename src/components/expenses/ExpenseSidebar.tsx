@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal } from "lucide-react";
+import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Stethoscope } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -12,6 +12,7 @@ const categories = [
   { id: "transport", label: "Transportation", icon: Car },
   { id: "shopping", label: "Shopping", icon: ShoppingBag },
   { id: "loan", label: "Loan", icon: BanknoteIcon },
+  { id: "medical", label: "Medical", icon: Stethoscope },
   { id: "others", label: "Others", icon: MoreHorizontal },
 ];
 

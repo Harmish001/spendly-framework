@@ -4,16 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2, PlusCircle } from "lucide-react";
+import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2, PlusCircle, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { Header } from "@/components/layout/Header";
 import { useNavigate } from "react-router-dom";
 import { ResponsivePie } from "@nivo/pie";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ExpenseSidebar } from "@/components/expenses/ExpenseSidebar";
 import { ExpenseFormSheet } from "@/components/expenses/ExpenseFormSheet";
+import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -195,28 +195,10 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container py-4 md:py-8">
-        <div className="flex items-center justify-between mb-6">
-          <MobileSidebar
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            selectedCategory={selectedCategory}
-            onMonthChange={setSelectedMonth}
-            onYearChange={setSelectedYear}
-            onCategoryChange={setSelectedCategory}
-            onFilter={handleFilter}
-          />
-          
-          <ExpenseFormSheet
-            onExpenseAdded={() => {
-              fetchExpenses();
-              setIsSidebarOpen(false);
-            }}
-          />
-        </div>
-
         <div className="mb-6 relative" ref={tabsRef}>
           <Tabs 
-            defaultValue={selectedMonth} 
+            defaultValue={selectedMonth}
+            value={selectedMonth}
             onValueChange={setSelectedMonth} 
             className="w-full"
           >
@@ -259,12 +241,12 @@ const Dashboard = () => {
                       cornerRadius={3}
                       activeOuterRadiusOffset={8}
                       colors={[
-                        "#4A90E2",  // Blue
-                        "#5E5CE6",  // Purple
-                        "#7B68EE",  // Medium slate blue
-                        "#4169E1",  // Royal blue
-                        "#6A5ACD",  // Slate blue
-                        "#483D8B"   // Dark slate blue
+                        "#9b87f5",  // Primary Purple
+                        "#7E69AB",  // Secondary Purple
+                        "#6E59A5",  // Tertiary Purple
+                        "#8B5CF6",  // Vivid Purple
+                        "#D946EF",  // Magenta Pink
+                        "#1EAEDB"   // Bright Blue
                       ]}
                       borderWidth={1}
                       borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
@@ -293,16 +275,20 @@ const Dashboard = () => {
                     <Card
                       key={expense.id}
                       className="border rounded-[16px] hover:border-gray-300 transition-colors"
+                      style={{
+                        background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+                        color: "white"
+                      }}
                     >
                       <CardContent className="flex items-center justify-between p-6">
                         <div className="flex items-center gap-4">
-                          <div className="p-2 rounded-[16px] border">
+                          <div className="p-2 rounded-[16px] bg-white/10 border border-white/20">
                             <CategoryIcon className="h-6 w-6" />
                           </div>
                           <div className="text-left">
                             <p className="font-semibold">{expense.description || "No description"}</p>
-                            <p className="text-sm text-gray-500 capitalize">{expense.category}</p>
-                            <p className="text-xs text-gray-400">
+                            <p className="text-sm text-white/70 capitalize">{expense.category}</p>
+                            <p className="text-xs text-white/50">
                               {new Date(expense.created_at).toLocaleDateString()}
                             </p>
                           </div>
@@ -312,7 +298,7 @@ const Dashboard = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="rounded-[16px] hover:bg-red-100 hover:text-red-600"
+                            className="rounded-[16px] hover:bg-white/10"
                             onClick={() => setExpenseToDelete(expense.id)}
                           >
                             <Trash2 className="h-5 w-5" />
@@ -326,6 +312,39 @@ const Dashboard = () => {
             </div>
           </>
         )}
+      </div>
+
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-6 right-6 flex gap-4">
+        <ExpenseFilters
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          selectedCategory={selectedCategory}
+          onMonthChange={setSelectedMonth}
+          onYearChange={setSelectedYear}
+          onCategoryChange={setSelectedCategory}
+          onFilter={handleFilter}
+        />
+        <Sheet>
+          <SheetContent side="right" className="p-4">
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Add New Expense</h2>
+              <ExpenseForm onExpenseAdded={() => {
+                fetchExpenses();
+                setIsSidebarOpen(false);
+              }} />
+            </div>
+          </SheetContent>
+          <Button
+            className="rounded-full w-14 h-14 shadow-lg"
+            style={{
+              background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+              color: "white"
+            }}
+          >
+            <PlusCircle className="h-6 w-6" />
+          </Button>
+        </Sheet>
       </div>
 
       <AlertDialog open={!!expenseToDelete} onOpenChange={() => setExpenseToDelete(null)}>

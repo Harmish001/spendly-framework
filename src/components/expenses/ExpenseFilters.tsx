@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Filter } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ExpenseFiltersProps {
   selectedMonth: string;
@@ -42,17 +43,18 @@ export const ExpenseFilters = ({
   onFilter
 }: ExpenseFiltersProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button 
           variant="outline" 
-          className="rounded-[16px]"
+          className={`rounded-full ${isMobile ? 'w-14 h-14' : 'rounded-[16px]'}`}
           style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)", color: "white" }}
         >
-          <Filter className="h-4 w-4 mr-2" />
-          Filters
+          <Filter className={`h-6 w-6 ${!isMobile && 'mr-2'}`} />
+          {!isMobile && 'Filters'}
         </Button>
       </SheetTrigger>
       <SheetContent className="w-[300px]">

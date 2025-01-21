@@ -10,9 +10,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Header } from "@/components/layout/Header";
 import { useNavigate } from "react-router-dom";
 import { ResponsivePie } from "@nivo/pie";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { ExpenseSidebar } from "@/components/expenses/ExpenseSidebar";
-import { ExpenseFormSheet } from "@/components/expenses/ExpenseFormSheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
 
 const categoryIcons: Record<string, any> = {
@@ -326,6 +325,17 @@ const Dashboard = () => {
           onFilter={handleFilter}
         />
         <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              className="rounded-full w-14 h-14 shadow-lg"
+              style={{
+                background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+                color: "white"
+              }}
+            >
+              <PlusCircle className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
           <SheetContent side="right" className="p-4">
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">Add New Expense</h2>
@@ -335,15 +345,6 @@ const Dashboard = () => {
               }} />
             </div>
           </SheetContent>
-          <Button
-            className="rounded-full w-14 h-14 shadow-lg"
-            style={{
-              background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
-              color: "white"
-            }}
-          >
-            <PlusCircle className="h-6 w-6" />
-          </Button>
         </Sheet>
       </div>
 

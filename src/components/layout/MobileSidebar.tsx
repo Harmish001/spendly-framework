@@ -1,24 +1,19 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, ChartPie, Filter } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Menu } from "lucide-react";
 import { ExpenseFilters } from "../expenses/ExpenseFilters";
 
 interface MobileSidebarProps {
-  selectedMonth: string;
   selectedYear: string;
   selectedCategory: string;
-  onMonthChange: (value: string) => void;
   onYearChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
   onFilter: () => void;
 }
 
 export const MobileSidebar = ({
-  selectedMonth,
   selectedYear,
   selectedCategory,
-  onMonthChange,
   onYearChange,
   onCategoryChange,
   onFilter
@@ -36,22 +31,13 @@ export const MobileSidebar = ({
         </SheetHeader>
         <div className="flex flex-col gap-6 mt-6">
           <nav className="space-y-2">
-            <Link to="/statistics" className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-accent">
-              <ChartPie className="h-5 w-5" />
-              Statistics
-            </Link>
-            <div className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-accent cursor-pointer">
-              <Filter className="h-5 w-5" />
-              <ExpenseFilters
-                selectedMonth={selectedMonth}
-                selectedYear={selectedYear}
-                selectedCategory={selectedCategory}
-                onMonthChange={onMonthChange}
-                onYearChange={onYearChange}
-                onCategoryChange={onCategoryChange}
-                onFilter={onFilter}
-              />
-            </div>
+            <ExpenseFilters
+              selectedYear={selectedYear}
+              selectedCategory={selectedCategory}
+              onYearChange={onYearChange}
+              onCategoryChange={onCategoryChange}
+              onFilter={onFilter}
+            />
           </nav>
         </div>
       </SheetContent>

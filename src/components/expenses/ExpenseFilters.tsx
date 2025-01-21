@@ -42,7 +42,7 @@ export const ExpenseFilters = ({
         <Button 
           variant="outline" 
           className={`rounded-full ${isMobile ? 'w-14 h-14' : 'rounded-[16px]'}`}
-          style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)", color: "white" }}
+          style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)", color: "white" }}
         >
           <Filter className={`h-6 w-6 ${!isMobile && 'mr-2'}`} />
           {!isMobile && 'Filters'}
@@ -85,7 +85,7 @@ export const ExpenseFilters = ({
               setIsOpen(false);
             }}
             className="w-full rounded-[16px]"
-            style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
+            style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
           >
             Apply Filters
           </Button>

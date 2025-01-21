@@ -188,7 +188,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Header />
       <div className="container py-4 md:py-8">
         <div className="mb-6 relative" ref={tabsRef}>
@@ -198,7 +198,7 @@ const Dashboard = () => {
             onValueChange={setSelectedMonth} 
             className="w-full"
           >
-            <TabsList className="inline-flex w-full justify-start p-2 overflow-x-auto scrollbar-none">
+            <TabsList className="inline-flex w-full md:justify-center justify-start p-2 overflow-x-auto no-scrollbar">
               {months.map((month, index) => (
                 <TabsTrigger
                   key={index}
@@ -225,8 +225,8 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            <Card className="col-span-1 md:col-span-2 mb-8">
-              <CardContent className="p-4">
+            <Card className="col-span-1 md:col-span-2 mb-8 shadow-none border-0">
+              <CardContent className="p-2">
                 <div className="relative h-[250px]">
                   <ResponsivePie
                     data={getPieChartData()}
@@ -268,35 +268,35 @@ const Dashboard = () => {
                   return (
                     <Card
                       key={expense.id}
-                      className="border rounded-[16px] hover:border-gray-300 transition-colors"
+                      className="border rounded-[16px] hover:border-gray-300 transition-colors overflow-hidden"
                       style={{
                         background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
                         color: "white"
                       }}
                     >
                       <CardContent className="flex items-center justify-between p-6">
-                        <div className="flex items-center gap-4 flex-1">
+                        <div className="flex items-center gap-4 flex-1 min-w-0">
                           <div className="p-2 rounded-[16px] bg-white/10 border border-white/20 shrink-0">
                             <CategoryIcon className="h-6 w-6" />
                           </div>
-                          <div className="text-left min-w-0">
+                          <div className="text-left min-w-0 flex-1">
                             <p className="font-semibold truncate">{expense.description || "No description"}</p>
                             <p className="text-sm text-white/70 capitalize">{expense.category}</p>
                             <p className="text-xs text-white/50">
                               {new Date(expense.created_at).toLocaleDateString()}
                             </p>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-4 shrink-0">
-                          <p className="text-xl font-bold">₹{expense.amount}</p>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-[16px] hover:bg-white/10"
-                            onClick={() => setExpenseToDelete(expense.id)}
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </Button>
+                          <div className="flex items-center gap-4 shrink-0">
+                            <p className="text-xl font-bold whitespace-nowrap">₹{expense.amount}</p>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-[16px] hover:bg-white/10 shrink-0"
+                              onClick={() => setExpenseToDelete(expense.id)}
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>

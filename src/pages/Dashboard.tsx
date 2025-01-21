@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2, PlusCircle, Filter } from "lucide-react";
+import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Header } from "@/components/layout/Header";
@@ -29,13 +29,13 @@ const months = [
 ];
 
 const Dashboard = () => {
-  const [expenses, setExpenses] = useState<any[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1 + '');
+  const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear() + '');
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [expenses, setExpenses] = useState<any[]>([]);
   const [totalExpense, setTotalExpense] = useState(0);
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
-  const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
   const isMobile = useIsMobile();
@@ -156,8 +156,6 @@ const Dashboard = () => {
     }));
   };
 
-  const currentMonthName = months[parseInt(selectedMonth) - 1];
-
   useEffect(() => {
     if (tabsRef.current) {
       const currentMonthTab = tabsRef.current.querySelector(`[data-value="${selectedMonth}"]`);
@@ -176,7 +174,6 @@ const Dashboard = () => {
   const handleFilter = () => {
     fetchExpenses();
     setIsSidebarOpen(false);
-    setIsExpenseFormOpen(false);
     toast.success("Filters applied successfully", {
       duration: 3000,
     });
@@ -196,7 +193,7 @@ const Dashboard = () => {
       <div className="container py-4 md:py-8">
         <div className="mb-6 relative" ref={tabsRef}>
           <Tabs 
-            defaultValue={selectedMonth}
+            defaultValue={currentMonth}
             value={selectedMonth}
             onValueChange={setSelectedMonth} 
             className="w-full"
@@ -228,39 +225,37 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-              <Card className="col-span-1 md:col-span-2">
-                <CardContent className="p-6">
-                  <div className="relative h-[300px]">
-                    <ResponsivePie
-                      data={getPieChartData()}
-                      margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                      innerRadius={0.6}
-                      padAngle={0.7}
-                      cornerRadius={3}
-                      activeOuterRadiusOffset={8}
-                      colors={[
-                        "#9b87f5",  // Primary Purple
-                        "#7E69AB",  // Secondary Purple
-                        "#6E59A5",  // Tertiary Purple
-                        "#8B5CF6",  // Vivid Purple
-                        "#D946EF",  // Magenta Pink
-                        "#1EAEDB"   // Bright Blue
-                      ]}
-                      borderWidth={1}
-                      borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
-                      enableArcLinkLabels={false}
-                      arcLabelsSkipAngle={10}
-                      arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
-                    />
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                      <p className="text-sm text-muted-foreground">Total Expenses</p>
-                      <p className="text-3xl font-bold">₹{totalExpense.toLocaleString('en-IN')}</p>
-                    </div>
+            <Card className="col-span-1 md:col-span-2 mb-8">
+              <CardContent className="p-4">
+                <div className="relative h-[250px]">
+                  <ResponsivePie
+                    data={getPieChartData()}
+                    margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                    innerRadius={0.6}
+                    padAngle={0.7}
+                    cornerRadius={3}
+                    activeOuterRadiusOffset={8}
+                    colors={[
+                      "#9b87f5",
+                      "#7E69AB",
+                      "#6E59A5",
+                      "#8B5CF6",
+                      "#D946EF",
+                      "#1EAEDB"
+                    ]}
+                    borderWidth={1}
+                    borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+                    enableArcLinkLabels={false}
+                    arcLabelsSkipAngle={10}
+                    arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
+                  />
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                    <p className="text-sm text-muted-foreground">Total Expenses</p>
+                    <p className="text-3xl font-bold">₹{totalExpense.toLocaleString('en-IN')}</p>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
 
             <div className="space-y-4">
               {expenses.length === 0 ? (
@@ -280,19 +275,19 @@ const Dashboard = () => {
                       }}
                     >
                       <CardContent className="flex items-center justify-between p-6">
-                        <div className="flex items-center gap-4">
-                          <div className="p-2 rounded-[16px] bg-white/10 border border-white/20">
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className="p-2 rounded-[16px] bg-white/10 border border-white/20 shrink-0">
                             <CategoryIcon className="h-6 w-6" />
                           </div>
-                          <div className="text-left">
-                            <p className="font-semibold">{expense.description || "No description"}</p>
+                          <div className="text-left min-w-0">
+                            <p className="font-semibold truncate">{expense.description || "No description"}</p>
                             <p className="text-sm text-white/70 capitalize">{expense.category}</p>
                             <p className="text-xs text-white/50">
                               {new Date(expense.created_at).toLocaleDateString()}
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 shrink-0">
                           <p className="text-xl font-bold">₹{expense.amount}</p>
                           <Button
                             variant="ghost"
@@ -314,22 +309,21 @@ const Dashboard = () => {
       </div>
 
       {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 flex gap-4">
+      <div className="fixed bottom-6 flex gap-4 w-full px-6">
         <ExpenseFilters
-          selectedMonth={selectedMonth}
           selectedYear={selectedYear}
           selectedCategory={selectedCategory}
-          onMonthChange={setSelectedMonth}
           onYearChange={setSelectedYear}
           onCategoryChange={setSelectedCategory}
           onFilter={handleFilter}
         />
+        <div className="flex-1" />
         <Sheet>
           <SheetTrigger asChild>
             <Button
               className="rounded-full w-14 h-14 shadow-lg"
               style={{
-                background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+                background: "linear-gradient(to right, #ee9ca7, #ffdde1)",
                 color: "white"
               }}
             >

@@ -6,19 +6,12 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ExpenseFiltersProps {
-  selectedMonth: string;
   selectedYear: string;
   selectedCategory: string;
-  onMonthChange: (value: string) => void;
   onYearChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
   onFilter: () => void;
 }
-
-const months = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => (currentYear - 2 + i).toString());
@@ -34,10 +27,8 @@ const categories = [
 ];
 
 export const ExpenseFilters = ({
-  selectedMonth,
   selectedYear,
   selectedCategory,
-  onMonthChange,
   onYearChange,
   onCategoryChange,
   onFilter
@@ -51,7 +42,7 @@ export const ExpenseFilters = ({
         <Button 
           variant="outline" 
           className={`rounded-full ${isMobile ? 'w-14 h-14' : 'rounded-[16px]'}`}
-          style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)", color: "white" }}
+          style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)", color: "white" }}
         >
           <Filter className={`h-6 w-6 ${!isMobile && 'mr-2'}`} />
           {!isMobile && 'Filters'}
@@ -62,23 +53,6 @@ export const ExpenseFilters = ({
           <SheetTitle>Filter Expenses</SheetTitle>
         </SheetHeader>
         <div className="space-y-4 mt-4">
-          <Select value={selectedMonth} onValueChange={onMonthChange}>
-            <SelectTrigger className="rounded-[16px]">
-              <SelectValue placeholder="Select month" />
-            </SelectTrigger>
-            <SelectContent className="rounded-[16px]">
-              {months.map((month, index) => (
-                <SelectItem 
-                  key={index} 
-                  value={(index + 1).toString().padStart(2, '0')}
-                  className="rounded-[16px]"
-                >
-                  {month}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
           <Select value={selectedYear} onValueChange={onYearChange}>
             <SelectTrigger className="rounded-[16px]">
               <SelectValue placeholder="Select year" />
@@ -111,7 +85,7 @@ export const ExpenseFilters = ({
               setIsOpen(false);
             }}
             className="w-full rounded-[16px]"
-            style={{ background: "linear-gradient(to right, #243949 0%, #517fa4 100%)" }}
+            style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
           >
             Apply Filters
           </Button>

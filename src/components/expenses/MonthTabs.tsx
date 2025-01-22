@@ -25,14 +25,14 @@ export const MonthTabs = ({ selectedMonth, onMonthChange }: MonthTabsProps) => {
   }, [currentMonth]);
 
   return (
-    <div className="relative w-full" ref={tabsRef}>
+    <div className="relative w-full overflow-hidden" ref={tabsRef}>
       <Tabs 
         defaultValue={currentMonth}
         value={selectedMonth}
         onValueChange={onMonthChange}
         className="w-full"
       >
-        <TabsList className="h-12 items-center justify-start overflow-x-auto scrollbar-hide">
+        <TabsList className="h-12 items-center justify-start overflow-x-auto scrollbar-hide w-auto">
           {months.map((month, index) => (
             <TabsTrigger
               key={index}

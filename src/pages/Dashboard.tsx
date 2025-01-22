@@ -153,7 +153,6 @@ const Dashboard = () => {
 
   const handleFilter = () => {
     fetchExpenses();
-    setIsSidebarOpen(false);
     toast.success("Filters applied successfully", {
       duration: 3000,
     });
@@ -170,11 +169,13 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container py-4 md:py-8">
-        <MonthTabs
-          selectedMonth={selectedMonth}
-          onMonthChange={setSelectedMonth}
-        />
+      <div className="container py-4 md:py-8 max-w-full overflow-x-hidden">
+        <div className="w-full overflow-hidden">
+          <MonthTabs
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+          />
+        </div>
 
         {loading ? (
           <div className="min-h-[400px] flex items-center justify-center">
@@ -290,10 +291,7 @@ const Dashboard = () => {
           <SheetContent side="right" className="p-4">
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">Add New Expense</h2>
-              <ExpenseForm onExpenseAdded={() => {
-                fetchExpenses();
-                setIsSidebarOpen(false);
-              }} />
+              <ExpenseForm onExpenseAdded={fetchExpenses} />
             </div>
           </SheetContent>
         </Sheet>

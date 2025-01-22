@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2, PlusCircle, Stethoscope } from "lucide-react";
@@ -13,6 +12,7 @@ import { ResponsivePie } from "@nivo/pie";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
+import { MonthTabs } from "@/components/expenses/MonthTabs";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -23,11 +23,6 @@ const categoryIcons: Record<string, any> = {
   "medical": Stethoscope,
   "others": MoreHorizontal,
 };
-
-const months = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
 
 const Dashboard = () => {
   const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
@@ -41,8 +36,6 @@ const Dashboard = () => {
   const [authChecking, setAuthChecking] = useState(true);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -158,21 +151,6 @@ const Dashboard = () => {
     }));
   };
 
-  useEffect(() => {
-    if (tabsRef.current) {
-      const currentMonthTab = tabsRef.current.querySelector(`[data-value="${selectedMonth}"]`);
-      if (currentMonthTab) {
-        const tabsList = tabsRef.current.querySelector('[role="tablist"]');
-        if (tabsList) {
-          const scrollPosition = currentMonthTab.getBoundingClientRect().left - 
-            tabsList.getBoundingClientRect().left - 
-            (tabsList.clientWidth - currentMonthTab.clientWidth) / 2;
-          tabsList.scrollLeft = scrollPosition;
-        }
-      }
-    }
-  }, [selectedMonth]);
-
   const handleFilter = () => {
     fetchExpenses();
     setIsSidebarOpen(false);
@@ -193,33 +171,10 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container py-4 md:py-8">
-        <div className="mb-6 relative overflow-x-auto no-scrollbar" ref={tabsRef}>
-          <Tabs 
-            defaultValue={currentMonth}
-            value={selectedMonth}
-            onValueChange={setSelectedMonth} 
-            className="w-full"
-          >
-            <TabsList className="inline-flex w-full md:w-auto md:justify-start p-2 no-scrollbar">
-              {months.map((month, index) => (
-                <TabsTrigger
-                  key={index}
-                  value={(index + 1).toString().padStart(2, '0')}
-                  className="min-w-[100px] rounded-full whitespace-nowrap"
-                  data-value={(index + 1).toString().padStart(2, '0')}
-                  style={{
-                    background: selectedMonth === (index + 1).toString().padStart(2, '0') 
-                      ? "linear-gradient(to right, #243949 0%, #517fa4 100%)" 
-                      : "transparent",
-                    color: selectedMonth === (index + 1).toString().padStart(2, '0') ? "white" : "inherit"
-                  }}
-                >
-                  {month}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
+        <MonthTabs
+          selectedMonth={selectedMonth}
+          onMonthChange={setSelectedMonth}
+        />
 
         {loading ? (
           <div className="min-h-[400px] flex items-center justify-center">

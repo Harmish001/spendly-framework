@@ -1,124 +1,128 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Wallet } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 
 const Index = () => {
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
-  const handleAuth = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-          },
-        });
-        if (error) throw error;
-        toast({
-          title: "Success!",
-          description: "Please check your email to verify your account.",
-          duration: 4000,
-        });
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        navigate("/dashboard");
-      }
-    } catch (error: any) {
-      let errorMessage = error.message;
-      
-      if (error.message.includes("email_address_invalid")) {
-        errorMessage = "Please enter a valid email address";
-      } else if (error.message.includes("password")) {
-        errorMessage = "Password must be at least 6 characters long";
-      }
-      
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: errorMessage,
-        duration: 4000,
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
+
+      if (error) {
+        if (error.message.includes("Invalid login credentials")) {
+          toast.error("Invalid email or password. Please try again.");
+        } else {
+          toast.error(error.message);
+        }
+        return;
+      }
+
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        if (error.message.includes("already registered")) {
+          toast.error("This email is already registered. Please sign in instead.");
+        } else {
+          toast.error(error.message);
+        }
+        return;
+      }
+
+      toast.success("Check your email for the confirmation link!");
+    } catch (error) {
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
-      <Card className="w-full max-w-md mx-4 rounded-[16px] overflow-hidden border border-border/40 backdrop-blur-sm bg-white/80 dark:bg-gray-900/80">
-        <CardContent className="p-8">
-          <div className="flex justify-center mb-8">
-            <div className="p-3 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20">
-              <Wallet className="h-8 w-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full p-1" />
-            </div>
-          </div>
-          <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Spendly
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 p-4">
+      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-[24px] shadow-xl">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold flex items-center justify-center gap-2 mb-2">
+            <Wallet className="h-8 w-8 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded p-1" />
+            <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Spendly
+            </span>
           </h1>
-          <p className="text-center text-muted-foreground mb-8">
-            Track your expenses with style
-          </p>
-          <form onSubmit={handleAuth} className="space-y-6">
-            <div>
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="rounded-[16px] bg-background/50 border-border/40 focus:border-transparent focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
-                required
-              />
-            </div>
-            <div>
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="rounded-[16px] bg-background/50 border-border/40 focus:border-transparent focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
-                required
-                minLength={6}
-              />
-            </div>
+          <p className="text-gray-600">Track your expenses with ease</p>
+        </div>
+
+        <form className="space-y-6" onSubmit={handleSignIn}>
+          <div>
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="rounded-[16px]"
+            />
+          </div>
+          <div>
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="rounded-[16px]"
+            />
+          </div>
+          <div className="flex flex-col gap-4">
             <Button
               type="submit"
-              className="w-full rounded-[16px] bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold transition-all duration-200"
               disabled={loading}
+              className="w-full rounded-[16px]"
+              style={{
+                background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+              }}
             >
-              {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+              Sign In
             </Button>
-          </form>
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-muted-foreground hover:text-primary transition-colors"
+            <Button
+              type="button"
+              variant="outline"
+              disabled={loading}
+              onClick={handleSignUp}
+              className="w-full rounded-[16px]"
             >
-              {isSignUp
-                ? "Already have an account? Sign In"
-                : "Don't have an account? Sign Up"}
-            </button>
+              Sign Up
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        </form>
+      </div>
     </div>
   );
 };

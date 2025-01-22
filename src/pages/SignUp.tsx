@@ -6,32 +6,33 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Wallet } from "lucide-react";
 
-const Index = () => {
+const SignUp = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (error) {
-        if (error.message.includes("Invalid login credentials")) {
-          toast.error("Invalid email or password. Please try again.");
+        if (error.message.includes("already registered")) {
+          toast.error("This email is already registered. Please sign in instead.");
         } else {
           toast.error(error.message);
         }
         return;
       }
 
-      navigate("/dashboard");
+      toast.success("Check your email for the confirmation link!");
+      navigate("/");
     } catch (error) {
       toast.error("An unexpected error occurred. Please try again.");
     } finally {
@@ -49,10 +50,10 @@ const Index = () => {
               Spendly
             </span>
           </h1>
-          <p className="text-gray-600">Track your expenses with ease</p>
+          <p className="text-gray-600">Create your account</p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleSignIn}>
+        <form className="space-y-6" onSubmit={handleSignUp}>
           <div>
             <Input
               type="email"
@@ -82,15 +83,15 @@ const Index = () => {
                 background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
               }}
             >
-              Sign In
+              Sign Up
             </Button>
             <p className="text-center text-sm text-gray-600">
-              No account?{" "}
+              Already have an account?{" "}
               <Link
-                to="/signup"
+                to="/"
                 className="text-blue-600 hover:text-blue-800 font-medium"
               >
-                Click here to sign up
+                Sign in here
               </Link>
             </p>
           </div>
@@ -100,4 +101,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default SignUp;

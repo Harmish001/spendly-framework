@@ -14,7 +14,7 @@ export const ExpenseFormSheet = ({ onExpenseAdded }: ExpenseFormSheetProps) => {
         <Button
           className="md:hidden rounded-[20px]"
           style={{
-            background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+            background: "linear-gradient(to right, #9333ea, #2563eb)",
             color: "white"
           }}
         >

@@ -32,7 +32,7 @@ export const MonthTabs = ({ selectedMonth, onMonthChange }: MonthTabsProps) => {
         onValueChange={onMonthChange}
         className="w-full"
       >
-        <TabsList className="h-12 items-center justify-start w-full overflow-x-scroll no-scrollbar">
+        <TabsList className="h-12 items-center justify-start w-full overflow-x-scroll no-scrollbar" style={{ scrollbarWidth: "none", background: "transparent"}}>
           {months.map((month, index) => (
             <TabsTrigger
               key={index}
@@ -41,7 +41,7 @@ export const MonthTabs = ({ selectedMonth, onMonthChange }: MonthTabsProps) => {
               data-value={(index + 1).toString().padStart(2, '0')}
               style={{
                 background: selectedMonth === (index + 1).toString().padStart(2, '0') 
-                  ? "linear-gradient(to right, #243949 0%, #517fa4 100%)" 
+                  ? "linear-gradient(to right, #9333ea, #2563eb)" 
                   : "transparent",
                 color: selectedMonth === (index + 1).toString().padStart(2, '0') ? "white" : "inherit"
               }}

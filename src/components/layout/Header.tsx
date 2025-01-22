@@ -29,7 +29,7 @@ export const Header = () => {
         </div>
         <Button
           variant="outline"
-          className="rounded-[16px] bg-gradient-to-r from-red-500 to-pink-500 text-white border-none hover:from-red-600 hover:to-pink-600"
+          className="rounded-[16px] text-white border-none hover:from-red-600 hover:to-pink-600 bg-gradient-to-r from-purple-600 to-blue-600"
           onClick={handleSignOut}
         >
           <LogOut className="h-5 w-5" />

@@ -102,7 +102,7 @@ export const ExpenseForm = ({ onExpenseAdded }: ExpenseFormProps) => {
       <Button
         type="submit"
         className="w-full rounded-[16px]"
-        style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
+        style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}
         disabled={loading}
       >
         {loading ? (

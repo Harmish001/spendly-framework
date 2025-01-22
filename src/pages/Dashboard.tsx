@@ -184,11 +184,11 @@ const Dashboard = () => {
         ) : (
           <>
             <Card className="col-span-1 md:col-span-2 mb-4 border-0 shadow-none">
-              <CardContent className="p-2">
+              <CardContent className="p-1">
                 <div className="relative h-[250px]">
                   <ResponsivePie
                     data={getPieChartData()}
-                    margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                    margin={{ top: 10, right: 20, bottom: 10, left: 20 }}
                     innerRadius={0.6}
                     padAngle={0.7}
                     cornerRadius={3}
@@ -208,8 +208,8 @@ const Dashboard = () => {
                     arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
                   />
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                    <p className="text-sm text-muted-foreground">Total Expenses</p>
-                    <p className="text-3xl font-bold">₹{totalExpense.toLocaleString('en-IN')}</p>
+                    <p className="text-sm text-muted-foreground">Total</p>
+                    <p className="text-2xl font-bold">₹{totalExpense.toLocaleString('en-IN')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -228,7 +228,7 @@ const Dashboard = () => {
                       key={expense.id}
                       className="border rounded-[16px] hover:border-gray-300 transition-colors overflow-hidden"
                       style={{
-                        background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+                        background: "linear-gradient(to right, #9333ea, #2563eb)",
                         color: "white"
                       }}
                     >
@@ -281,7 +281,7 @@ const Dashboard = () => {
             <Button
               className="rounded-full w-14 h-14 shadow-lg"
               style={{
-                background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+                background: "linear-gradient(to right, #9333ea, #2563eb)",
                 color: "white"
               }}
             >
@@ -309,7 +309,7 @@ const Dashboard = () => {
             <AlertDialogCancel className="rounded-[16px]">Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="rounded-[16px]"
-              style={{ background: "linear-gradient(to right, #ee9ca7, #ffdde1)" }}
+              style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}
               onClick={() => expenseToDelete && handleDeleteExpense(expenseToDelete)}
             >
               Delete

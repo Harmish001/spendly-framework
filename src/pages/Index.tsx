@@ -79,7 +79,7 @@ const Index = () => {
               disabled={loading}
               className="w-full rounded-[16px]"
               style={{
-                background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+                background: "linear-gradient(to right, #9333ea, #2563eb)",
               }}
             >
               Sign In

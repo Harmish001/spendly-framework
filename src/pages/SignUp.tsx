@@ -41,7 +41,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 p-4">
       <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-[24px] shadow-xl">
         <div className="text-center">
           <h1 className="text-3xl font-bold flex items-center justify-center gap-2 mb-2">
@@ -80,7 +80,7 @@ const SignUp = () => {
               disabled={loading}
               className="w-full rounded-[16px]"
               style={{
-                background: "linear-gradient(to right, #243949 0%, #517fa4 100%)",
+                background: "linear-gradient(to right, #9333ea, #2563eb)",
               }}
             >
               Sign Up

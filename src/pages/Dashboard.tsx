@@ -193,7 +193,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container py-4 md:py-8">
-        <div className="mb-6 relative" ref={tabsRef}>
+        <div className="mb-6 relative overflow-x-auto no-scrollbar" ref={tabsRef}>
           <Tabs 
             defaultValue={currentMonth}
             value={selectedMonth}

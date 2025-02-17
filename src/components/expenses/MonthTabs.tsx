@@ -25,7 +25,7 @@ export const MonthTabs = ({ selectedMonth, onMonthChange }: MonthTabsProps) => {
   }, [currentMonth]);
 
   return (
-    <div className="sticky top-0 z-50 w-full md:px-72" ref={tabsRef} style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", borderBottomRightRadius:24, borderBottomLeftRadius: 24 }}>
+    <div className="sticky top-0 z-50 w-full md:px-72 rounded-b-[24px] md:rounded-b-[0px]" ref={tabsRef} style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
       <Tabs
         defaultValue={currentMonth}
         value={selectedMonth}

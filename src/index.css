@@ -88,3 +88,7 @@
 .header {
   padding-top: env(safe-area-inset-top, 24px);
 }
+
+#root {
+  border-radius: 24px;
+}

@@ -71,7 +71,7 @@ const Dashboard = () => {
 
   const fetchExpenses = async () => {
     if (authChecking) return;
-    
+
     setLoading(true);
     try {
       let query = supabase
@@ -96,7 +96,7 @@ const Dashboard = () => {
           "Medical": "medical",
           "Others": "others"
         };
-        
+
         const mappedCategory = categoryMapping[selectedCategory];
         if (mappedCategory) {
           query = query.eq("category", mappedCategory);
@@ -107,7 +107,7 @@ const Dashboard = () => {
 
       if (error) throw error;
       setExpenses(data || []);
-      
+
       const total = (data || []).reduce((sum, expense) => sum + Number(expense.amount), 0);
       setTotalExpense(total);
     } catch (error: any) {
@@ -208,8 +208,8 @@ const Dashboard = () => {
                     arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
                   />
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                    <p className="text-sm text-muted-foreground">Total</p>
-                    <p className="text-2xl font-bold">₹{totalExpense.toLocaleString('en-IN')}</p>
+                    <p className="text-sm">Total</p>
+                    <p className="text-2xl font-bold" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{totalExpense.toLocaleString('en-IN')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -226,30 +226,26 @@ const Dashboard = () => {
                   return (
                     <Card
                       key={expense.id}
-                      className="border rounded-[16px] hover:border-gray-300 transition-colors overflow-hidden"
-                      style={{
-                        background: "linear-gradient(to right, #9333ea, #2563eb)",
-                        color: "white"
-                      }}
+                      className="border rounded-[24px] hover:border-gray-300 transition-colors overflow-hidden"
                     >
                       <CardContent className="flex items-center justify-between p-6">
                         <div className="flex items-center gap-4 flex-1 min-w-0">
-                          <div className="p-2 rounded-[16px] bg-white/10 border border-white/20 shrink-0">
-                            <CategoryIcon className="h-6 w-6" />
+                          <div className="p-2 rounded-[24px] shrink-0" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
+                            <CategoryIcon className="h-8 w-8 text-white" />
                           </div>
                           <div className="text-left min-w-0 flex-1">
                             <p className="font-semibold truncate">{expense.description || "No description"}</p>
-                            <p className="text-sm text-white/70 capitalize">{expense.category}</p>
-                            <p className="text-xs text-white/50">
+                            <p className="text-sm capitalize">{expense.category}</p>
+                            <p className="text-xs">
                               {new Date(expense.created_at).toLocaleDateString()}
                             </p>
                           </div>
                           <div className="flex items-center gap-4 shrink-0">
-                            <p className="text-xl font-bold whitespace-nowrap">₹{expense.amount}</p>
+                            <p className="text-xl font-bold whitespace-nowrap" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{expense.amount}</p>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="rounded-[16px] hover:bg-white/10 shrink-0"
+                              className="rounded-[24px] hover:bg-white/10 shrink-0"
                               onClick={() => setExpenseToDelete(expense.id)}
                             >
                               <Trash2 className="h-5 w-5" />
@@ -298,7 +294,7 @@ const Dashboard = () => {
       </div>
 
       <AlertDialog open={!!expenseToDelete} onOpenChange={() => setExpenseToDelete(null)}>
-        <AlertDialogContent className="rounded-[16px]">
+        <AlertDialogContent className="rounded-[24px]">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Expense</AlertDialogTitle>
             <AlertDialogDescription>
@@ -306,9 +302,9 @@ const Dashboard = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-[16px]">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-[24px]">Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="rounded-[16px]"
+              className="rounded-[24px]"
               style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}
               onClick={() => expenseToDelete && handleDeleteExpense(expenseToDelete)}
             >

@@ -37,7 +37,7 @@ export const MonthTabs = ({ selectedMonth, onMonthChange }: MonthTabsProps) => {
             <TabsTrigger
               key={index}
               value={(index + 1).toString().padStart(2, '0')}
-              className="min-w-[100px] rounded-full whitespace-nowrap bg-transparent"
+              className="min-w-[100px] rounded-[24px] whitespace-nowrap bg-transparent"
               data-value={(index + 1).toString().padStart(2, '0')}
               style={{
                 background: selectedMonth === (index + 1).toString().padStart(2, '0') 

@@ -17,7 +17,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="rounded-t-[24px] md:rounded-t-[0px] sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)"}}>
+    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)"}}>
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold flex items-center gap-2">

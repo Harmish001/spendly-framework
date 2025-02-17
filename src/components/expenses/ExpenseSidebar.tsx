@@ -104,20 +104,20 @@ export const ExpenseSidebar = ({
               placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="pl-8 rounded-[16px]"
+              className="pl-8 rounded-[24px]"
               required
             />
           </div>
 
           <Select value={category} onValueChange={setCategory} required>
-            <SelectTrigger className="rounded-[16px]">
+            <SelectTrigger className="rounded-[24px]">
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
-            <SelectContent className="rounded-[16px]">
+            <SelectContent className="rounded-[24px]">
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 return (
-                  <SelectItem key={cat.id} value={cat.id} className="rounded-[16px]">
+                  <SelectItem key={cat.id} value={cat.id} className="rounded-[24px]">
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4" />
                       {cat.label}
@@ -133,12 +133,12 @@ export const ExpenseSidebar = ({
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="rounded-[16px]"
+            className="rounded-[24px]"
           />
 
           <Button
             type="submit"
-            className="w-full rounded-[16px]"
+            className="w-full rounded-[24px]"
             disabled={loading}
           >
             {loading ? "Adding..." : "Add Expense"}
@@ -150,15 +150,15 @@ export const ExpenseSidebar = ({
         <h2 className="text-xl font-semibold">Filters</h2>
         <div className="space-y-4">
           <Select value={selectedMonth} onValueChange={onMonthChange}>
-            <SelectTrigger className="rounded-[16px]">
+            <SelectTrigger className="rounded-[24px]">
               <SelectValue placeholder="Select month" />
             </SelectTrigger>
-            <SelectContent className="rounded-[16px]">
+            <SelectContent className="rounded-[24px]">
               {months.map((month, index) => (
                 <SelectItem 
                   key={index} 
                   value={(index + 1).toString().padStart(2, '0')}
-                  className="rounded-[16px]"
+                  className="rounded-[24px]"
                 >
                   {month}
                 </SelectItem>
@@ -167,12 +167,12 @@ export const ExpenseSidebar = ({
           </Select>
 
           <Select value={selectedYear} onValueChange={onYearChange}>
-            <SelectTrigger className="rounded-[16px]">
+            <SelectTrigger className="rounded-[24px]">
               <SelectValue placeholder="Select year" />
             </SelectTrigger>
-            <SelectContent className="rounded-[16px]">
+            <SelectContent className="rounded-[24px]">
               {years.map((year) => (
-                <SelectItem key={year} value={year} className="rounded-[16px]">
+                <SelectItem key={year} value={year} className="rounded-[24px]">
                   {year}
                 </SelectItem>
               ))}
@@ -180,17 +180,17 @@ export const ExpenseSidebar = ({
           </Select>
 
           <Select value={selectedCategory} onValueChange={onCategoryChange}>
-            <SelectTrigger className="rounded-[16px]">
+            <SelectTrigger className="rounded-[24px]">
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
-            <SelectContent className="rounded-[16px]">
-              <SelectItem value="All Categories" className="rounded-[16px]">
+            <SelectContent className="rounded-[24px]">
+              <SelectItem value="All Categories" className="rounded-[24px]">
                 All Categories
               </SelectItem>
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 return (
-                  <SelectItem key={cat.id} value={cat.label} className="rounded-[16px]">
+                  <SelectItem key={cat.id} value={cat.label} className="rounded-[24px]">
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4" />
                       {cat.label}
@@ -203,7 +203,7 @@ export const ExpenseSidebar = ({
 
           <Button
             onClick={handleFilter}
-            className="w-full rounded-[16px]"
+            className="w-full rounded-full"
           >
             Apply Filters
           </Button>

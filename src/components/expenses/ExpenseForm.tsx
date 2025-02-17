@@ -67,20 +67,20 @@ export const ExpenseForm = ({ onExpenseAdded }: ExpenseFormProps) => {
           placeholder="0.00"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="pl-8 rounded-[16px]"
+          className="pl-8 rounded-[24px]"
           required
         />
       </div>
 
       <Select value={category} onValueChange={setCategory} required>
-        <SelectTrigger className="rounded-[16px]">
+        <SelectTrigger className="rounded-[24px]">
           <SelectValue placeholder="Select category" />
         </SelectTrigger>
-        <SelectContent className="rounded-[16px]">
+        <SelectContent className="rounded-[24px]">
           {categories.map((cat) => {
             const Icon = cat.icon;
             return (
-              <SelectItem key={cat.id} value={cat.id} className="rounded-[16px]">
+              <SelectItem key={cat.id} value={cat.id} className="rounded-[24px]">
                 <div className="flex items-center gap-2">
                   <Icon className="h-4 w-4" />
                   {cat.label}
@@ -96,12 +96,12 @@ export const ExpenseForm = ({ onExpenseAdded }: ExpenseFormProps) => {
         placeholder="Description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        className="rounded-[16px]"
+        className="rounded-[24px]"
       />
 
       <Button
         type="submit"
-        className="w-full rounded-[16px]"
+        className="w-full rounded-[24px]"
         style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}
         disabled={loading}
       >

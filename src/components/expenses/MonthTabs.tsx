@@ -25,25 +25,23 @@ export const MonthTabs = ({ selectedMonth, onMonthChange }: MonthTabsProps) => {
   }, [currentMonth]);
 
   return (
-    <div className="relative w-full" ref={tabsRef}>
-      <Tabs 
+    <div className="relative w-full md:px-72" ref={tabsRef} style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
+      <Tabs
         defaultValue={currentMonth}
         value={selectedMonth}
         onValueChange={onMonthChange}
         className="w-full"
       >
-        <TabsList className="h-12 items-center justify-start w-full overflow-x-scroll no-scrollbar" style={{ scrollbarWidth: "none", background: "transparent"}}>
+        <TabsList className="h-16 items-center justify-start w-full overflow-x-scroll no-scrollbar" style={{ scrollbarWidth: "none", background: "transparent" }}>
           {months.map((month, index) => (
             <TabsTrigger
               key={index}
               value={(index + 1).toString().padStart(2, '0')}
-              className="min-w-[100px] rounded-[24px] whitespace-nowrap bg-transparent"
+              className="min-w-[100px] rounded-[24px] whitespace-nowrap bg-transparent text-md"
               data-value={(index + 1).toString().padStart(2, '0')}
               style={{
-                background: selectedMonth === (index + 1).toString().padStart(2, '0') 
-                  ? "linear-gradient(to right, #9333ea, #2563eb)" 
-                  : "transparent",
-                color: selectedMonth === (index + 1).toString().padStart(2, '0') ? "white" : "inherit"
+                background: "transparent",
+                color: selectedMonth === (index + 1).toString().padStart(2, '0') ? "white" : "grey"
               }}
             >
               {month}

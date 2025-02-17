@@ -169,7 +169,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container py-4 md:py-8 max-w-full overflow-x-hidden">
+      <div className="pb-4 md:pb-8 max-w-full overflow-x-hidden">
         <div className="w-full overflow-hidden">
           <MonthTabs
             selectedMonth={selectedMonth}
@@ -183,7 +183,7 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            <Card className="col-span-1 md:col-span-2 mb-4 border-0 shadow-none">
+            <Card className="col-span-1 md:col-span-2 mb-4 mt-2 border-0 shadow-none">
               <CardContent className="p-1">
                 <div className="relative h-[250px]">
                   <ResponsivePie
@@ -194,12 +194,13 @@ const Dashboard = () => {
                     cornerRadius={3}
                     activeOuterRadiusOffset={8}
                     colors={[
-                      "#9b87f5",
-                      "#7E69AB",
-                      "#6E59A5",
-                      "#8B5CF6",
-                      "#D946EF",
-                      "#1EAEDB"
+                      "#9333ea",
+                      "#2563eb",
+                      "#1e4bb8",
+                      "#7b2ac5",
+                      "#b84bed",
+                      "#5b8def",
+                      "#312e81",
                     ]}
                     borderWidth={1}
                     borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
@@ -215,7 +216,7 @@ const Dashboard = () => {
               </CardContent>
             </Card>
 
-            <div className="space-y-4">
+            <div className="space-y-4 container">
               {expenses.length === 0 ? (
                 <div className="text-center text-gray-500 py-8">
                   No expenses found for the selected filters.

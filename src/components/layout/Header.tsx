@@ -32,8 +32,8 @@ export const Header = () => {
           className="rounded-full bg-transparent text-white border-none hover:from-red-600 hover:to-pink-600 "
           onClick={handleSignOut}
         > */}
-        <LogOut className="h-6 w-6 sm:hidden text-white" />
-        <span className="ml-2 text-xl font-bold hidden md:inline text-white">Sign Out</span>
+        <LogOut className="h-6 w-6 sm:hidden text-white" onClick={handleSignOut} />
+        <span onClick={handleSignOut} className="ml-2 text-xl font-bold hidden md:inline text-white">Sign Out</span>
         {/* </Button> */}
       </div>
     </header>

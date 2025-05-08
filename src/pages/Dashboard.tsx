@@ -34,6 +34,7 @@ const Dashboard = () => {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
+  const [googleConnected, setGoogleConnected] = useState(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
@@ -45,6 +46,12 @@ const Dashboard = () => {
           navigate('/');
           return;
         }
+        
+        // Check if Google is connected (user has Google provider)
+        const { data: { user } } = await supabase.auth.getUser();
+        const providers = user?.app_metadata?.providers || [];
+        setGoogleConnected(providers.includes('google'));
+        
         setAuthChecking(false);
       } catch (error) {
         console.error('Error checking auth:', error);
@@ -62,6 +69,36 @@ const Dashboard = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Check URL params for OAuth response
+  useEffect(() => {
+    const handleOAuthResponse = async () => {
+      const params = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = params.get('access_token');
+      
+      if (accessToken) {
+        // Clean URL after processing
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        try {
+          // Verify the user is now connected with Google
+          const { data: { user } } = await supabase.auth.getUser();
+          const providers = user?.app_metadata?.providers || [];
+          
+          if (providers.includes('google')) {
+            setGoogleConnected(true);
+            toast.success("Successfully connected with Google!");
+            // Here we could trigger fetching Google Pay transactions
+            // fetchGooglePayTransactions(accessToken);
+          }
+        } catch (error) {
+          console.error("Error verifying OAuth connection:", error);
+        }
+      }
+    };
+    
+    handleOAuthResponse();
+  }, []);
 
   useEffect(() => {
     if (!authChecking) {
@@ -170,6 +207,20 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="pb-4 md:pb-8 max-w-full overflow-x-hidden">
+        {googleConnected ? (
+          <div className="bg-gradient-to-r from-purple-100 to-blue-100 p-4 mb-4 rounded-lg mx-4 mt-4">
+            <p className="text-sm text-center text-gray-700">
+              Your Google account is connected! We'll automatically import your transactions.
+            </p>
+          </div>
+        ) : (
+          <div className="bg-gradient-to-r from-purple-100 to-blue-100 p-4 mb-4 rounded-lg mx-4 mt-4">
+            <p className="text-sm text-center text-gray-700">
+              Connect your Google account to automatically import your transactions.
+            </p>
+          </div>
+        )}
+
         <div className="w-full overflow-hidden">
           <MonthTabs
             selectedMonth={selectedMonth}

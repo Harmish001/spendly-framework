@@ -1,11 +1,14 @@
+
 import { Button } from "@/components/ui/button";
-import { LogOut, Wallet } from "lucide-react";
+import { LogOut, Wallet, Google } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export const Header = () => {
   const navigate = useNavigate();
+  const [connecting, setConnecting] = useState(false);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -13,6 +16,36 @@ export const Header = () => {
       toast.error("Error signing out");
     } else {
       navigate("/");
+    }
+  };
+
+  const handleConnectGoogle = async () => {
+    setConnecting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("You must be signed in to connect your Google account");
+        navigate("/");
+        return;
+      }
+
+      // Initiate Google OAuth connection
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+          scopes: 'https://www.googleapis.com/auth/paymentdata email profile',
+        }
+      });
+
+      if (error) {
+        toast.error(`Failed to connect Google: ${error.message}`);
+      }
+    } catch (error) {
+      toast.error("An error occurred while connecting to Google");
+      console.error(error);
+    } finally {
+      setConnecting(false);
     }
   };
 
@@ -27,14 +60,29 @@ export const Header = () => {
             </span>
           </h1>
         </div>
-        {/* <Button
-          variant="outline"
-          className="rounded-full bg-transparent text-white border-none hover:from-red-600 hover:to-pink-600 "
-          onClick={handleSignOut}
-        > */}
-        <LogOut className="h-6 w-6 sm:hidden text-white" onClick={handleSignOut} />
-        <span onClick={handleSignOut} className="ml-2 text-xl font-bold hidden md:inline text-white">Sign Out</span>
-        {/* </Button> */}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="hidden sm:flex items-center gap-2 bg-white text-purple-700 hover:bg-white/90 border-none"
+            onClick={handleConnectGoogle}
+            disabled={connecting}
+          >
+            <Google className="h-4 w-4" />
+            <span>{connecting ? "Connecting..." : "Connect Google"}</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="sm:hidden rounded-full p-2 bg-white text-purple-700"
+            onClick={handleConnectGoogle}
+            disabled={connecting}
+          >
+            <Google className="h-4 w-4" />
+          </Button>
+          <LogOut className="h-6 w-6 sm:hidden text-white cursor-pointer" onClick={handleSignOut} />
+          <span onClick={handleSignOut} className="ml-2 text-xl font-bold hidden md:inline text-white cursor-pointer">Sign Out</span>
+        </div>
       </div>
     </header>
   );

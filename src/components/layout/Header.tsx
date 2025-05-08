@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { LogOut, Wallet, Google } from "lucide-react";
+import { LogOut, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -68,7 +68,11 @@ export const Header = () => {
             onClick={handleConnectGoogle}
             disabled={connecting}
           >
-            <Google className="h-4 w-4" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M8 12 h8"></path>
+              <path d="M12 8 v8"></path>
+            </svg>
             <span>{connecting ? "Connecting..." : "Connect Google"}</span>
           </Button>
           <Button
@@ -78,7 +82,11 @@ export const Header = () => {
             onClick={handleConnectGoogle}
             disabled={connecting}
           >
-            <Google className="h-4 w-4" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M8 12 h8"></path>
+              <path d="M12 8 v8"></path>
+            </svg>
           </Button>
           <LogOut className="h-6 w-6 sm:hidden text-white cursor-pointer" onClick={handleSignOut} />
           <span onClick={handleSignOut} className="ml-2 text-xl font-bold hidden md:inline text-white cursor-pointer">Sign Out</span>

@@ -34,7 +34,8 @@ export const Header = () => {
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/dashboard`,
-          scopes: 'https://www.googleapis.com/auth/paymentdata email profile',
+          // Updated scopes according to latest Google Pay API documentation
+          scopes: 'email profile openid',
         }
       });
 

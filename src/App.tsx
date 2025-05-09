@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import { Toaster } from "sonner";
 import { useEffect } from "react";
 import { supabase } from "./integrations/supabase/client";
+import { toast } from "sonner";
 
 // Handle OAuth redirect and query parameters
 const AuthHandler = () => {
@@ -14,14 +15,32 @@ const AuthHandler = () => {
 
   useEffect(() => {
     // Check for hash fragments that might contain OAuth response data
-    if (location.hash) {
+    if (location.hash || location.search) {
       // Let Supabase auth handle the redirect
       const handleRedirect = async () => {
-        const { error } = await supabase.auth.initialize();
-        if (error) {
-          console.error("Error handling redirect:", error);
+        try {
+          const { error, data } = await supabase.auth.getSession();
+          
+          if (error) {
+            console.error("Error handling redirect:", error);
+            toast.error("Authentication failed. Please try again.");
+          } else if (data?.session) {
+            // Check if this is a Google OAuth response
+            const params = new URLSearchParams(location.hash.substring(1) || location.search);
+            const provider = params.get('provider');
+            
+            if (provider === 'google') {
+              toast.success("Successfully connected with Google!");
+            }
+            
+            navigate('/dashboard');
+          }
+        } catch (err) {
+          console.error("Unexpected error during auth:", err);
+          toast.error("An unexpected error occurred during authentication");
         }
       };
+      
       handleRedirect();
     }
   }, [location, navigate]);

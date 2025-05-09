@@ -13,6 +13,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
 import { MonthTabs } from "@/components/expenses/MonthTabs";
+import { GooglePayImport } from "@/components/expenses/GooglePayImport";
+import { isGoogleConnected } from "@/services/GooglePayService";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -48,9 +50,8 @@ const Dashboard = () => {
         }
         
         // Check if Google is connected (user has Google provider)
-        const { data: { user } } = await supabase.auth.getUser();
-        const providers = user?.app_metadata?.providers || [];
-        setGoogleConnected(providers.includes('google'));
+        const isConnected = await isGoogleConnected();
+        setGoogleConnected(isConnected);
         
         setAuthChecking(false);
       } catch (error) {
@@ -195,6 +196,11 @@ const Dashboard = () => {
     });
   };
 
+  const handleImportComplete = () => {
+    fetchExpenses();
+    toast.success("Google Pay transactions imported successfully");
+  };
+
   if (authChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -207,13 +213,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="pb-4 md:pb-8 max-w-full overflow-x-hidden">
-        {googleConnected ? (
-          <div className="bg-gradient-to-r from-purple-100 to-blue-100 p-4 mb-4 rounded-lg mx-4 mt-4">
-            <p className="text-sm text-center text-gray-700">
-              Your Google account is connected! We'll automatically import your transactions.
-            </p>
-          </div>
-        ) : (
+        {!googleConnected && (
           <div className="bg-gradient-to-r from-purple-100 to-blue-100 p-4 mb-4 rounded-lg mx-4 mt-4">
             <p className="text-sm text-center text-gray-700">
               Connect your Google account to automatically import your transactions.
@@ -227,6 +227,17 @@ const Dashboard = () => {
             onMonthChange={setSelectedMonth}
           />
         </div>
+
+        {/* Google Pay Import Button - Only show when connected */}
+        {googleConnected && (
+          <div className="container mt-4">
+            <GooglePayImport 
+              selectedMonth={selectedMonth}
+              selectedYear={selectedYear}
+              onImportComplete={handleImportComplete}
+            />
+          </div>
+        )}
 
         {loading ? (
           <div className="min-h-[400px] flex items-center justify-center">

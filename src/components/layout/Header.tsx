@@ -4,11 +4,29 @@ import { LogOut, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const Header = () => {
   const navigate = useNavigate();
   const [connecting, setConnecting] = useState(false);
+  const [googleConnected, setGoogleConnected] = useState(false);
+
+  // Check if user is connected to Google when component mounts
+  useEffect(() => {
+    const checkGoogleConnection = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const providers = user.app_metadata?.providers || [];
+          setGoogleConnected(providers.includes('google'));
+        }
+      } catch (error) {
+        console.error("Error checking Google connection:", error);
+      }
+    };
+    
+    checkGoogleConnection();
+  }, []);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -69,12 +87,35 @@ export const Header = () => {
             onClick={handleConnectGoogle}
             disabled={connecting}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M8 12 h8"></path>
-              <path d="M12 8 v8"></path>
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              viewBox="0 0 24 24" 
+              width="16" 
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              className="h-4 w-4"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.36 14.36c-1.43 1.43-3.34 2.23-5.36 2.23s-3.93-.79-5.36-2.23c-1.43-1.43-2.23-3.34-2.23-5.36s.79-3.93 2.23-5.36C8.07 4.21 9.98 3.41 12 3.41s3.93.79 5.36 2.23c1.43 1.43 2.23 3.34 2.23 5.36s-.79 3.93-2.23 5.36z"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M15 12H9"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 9v6"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
-            <span>{connecting ? "Connecting..." : "Connect Google"}</span>
+            <span>{connecting ? "Connecting..." : googleConnected ? "Connected" : "Connect Google"}</span>
           </Button>
           <Button
             variant="ghost"
@@ -83,10 +124,33 @@ export const Header = () => {
             onClick={handleConnectGoogle}
             disabled={connecting}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M8 12 h8"></path>
-              <path d="M12 8 v8"></path>
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              viewBox="0 0 24 24" 
+              width="16" 
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              className="h-4 w-4"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.36 14.36c-1.43 1.43-3.34 2.23-5.36 2.23s-3.93-.79-5.36-2.23c-1.43-1.43-2.23-3.34-2.23-5.36s.79-3.93 2.23-5.36C8.07 4.21 9.98 3.41 12 3.41s3.93.79 5.36 2.23c1.43 1.43 2.23 3.34 2.23 5.36s-.79 3.93-2.23 5.36z"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M15 12H9"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 9v6"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </Button>
           <LogOut className="h-6 w-6 sm:hidden text-white cursor-pointer" onClick={handleSignOut} />

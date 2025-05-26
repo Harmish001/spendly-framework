@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,8 +14,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
 import { MonthTabs } from "@/components/expenses/MonthTabs";
-import { GooglePayImport } from "@/components/expenses/GooglePayImport";
-import { isGoogleConnected } from "@/services/GooglePayService";
+import { AIExpenseCapture } from "@/components/expenses/AIExpenseCapture";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -36,7 +36,6 @@ const Dashboard = () => {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
-  const [googleConnected, setGoogleConnected] = useState(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
@@ -48,11 +47,6 @@ const Dashboard = () => {
           navigate('/');
           return;
         }
-        
-        // Check if Google is connected (user has Google provider)
-        const isConnected = await isGoogleConnected();
-        setGoogleConnected(isConnected);
-        
         setAuthChecking(false);
       } catch (error) {
         console.error('Error checking auth:', error);
@@ -70,36 +64,6 @@ const Dashboard = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
-
-  // Check URL params for OAuth response
-  useEffect(() => {
-    const handleOAuthResponse = async () => {
-      const params = new URLSearchParams(window.location.hash.substring(1));
-      const accessToken = params.get('access_token');
-      
-      if (accessToken) {
-        // Clean URL after processing
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        try {
-          // Verify the user is now connected with Google
-          const { data: { user } } = await supabase.auth.getUser();
-          const providers = user?.app_metadata?.providers || [];
-          
-          if (providers.includes('google')) {
-            setGoogleConnected(true);
-            toast.success("Successfully connected with Google!");
-            // Here we could trigger fetching Google Pay transactions
-            // fetchGooglePayTransactions(accessToken);
-          }
-        } catch (error) {
-          console.error("Error verifying OAuth connection:", error);
-        }
-      }
-    };
-    
-    handleOAuthResponse();
-  }, []);
 
   useEffect(() => {
     if (!authChecking) {
@@ -196,11 +160,6 @@ const Dashboard = () => {
     });
   };
 
-  const handleImportComplete = () => {
-    fetchExpenses();
-    toast.success("Google Pay transactions imported successfully");
-  };
-
   if (authChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -213,31 +172,12 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="pb-4 md:pb-8 max-w-full overflow-x-hidden">
-        {!googleConnected && (
-          <div className="bg-gradient-to-r from-purple-100 to-blue-100 p-4 mb-4 rounded-lg mx-4 mt-4">
-            <p className="text-sm text-center text-gray-700">
-              Connect your Google account to automatically import your transactions.
-            </p>
-          </div>
-        )}
-
         <div className="w-full overflow-hidden">
           <MonthTabs
             selectedMonth={selectedMonth}
             onMonthChange={setSelectedMonth}
           />
         </div>
-
-        {/* Google Pay Import Button - Only show when connected */}
-        {googleConnected && (
-          <div className="container mt-4">
-            <GooglePayImport 
-              selectedMonth={selectedMonth}
-              selectedYear={selectedYear}
-              onImportComplete={handleImportComplete}
-            />
-          </div>
-        )}
 
         {loading ? (
           <div className="min-h-[400px] flex items-center justify-center">
@@ -327,6 +267,9 @@ const Dashboard = () => {
 
       {/* Floating Action Buttons */}
       <div className="fixed bottom-6 flex gap-4 w-full px-6">
+        {/* AI Expense Capture Button */}
+        <AIExpenseCapture onExpenseAdded={fetchExpenses} />
+        
         <ExpenseFilters
           selectedYear={selectedYear}
           selectedCategory={selectedCategory}

@@ -45,7 +45,8 @@ serve(async (req) => {
             - date: Date in YYYY-MM-DD format (if not found, use today's date)
             - description: Brief description of the expense
             
-            Return the data in valid JSON format only. If you cannot extract the amount, return an error.
+            Return the data in valid JSON format only. Do not wrap the response in markdown code blocks.
+            If you cannot extract the amount, return an error.
             Categories mapping:
             - food/restaurant/dining = food
             - gas/fuel/taxi/uber/transport = transport
@@ -60,7 +61,7 @@ serve(async (req) => {
             content: [
               {
                 type: 'text',
-                text: 'Extract expense details from this receipt/bill image. Return only valid JSON with amount, category, date, and description fields.'
+                text: 'Extract expense details from this receipt/bill image. Return only valid JSON with amount, category, date, and description fields. Do not use markdown formatting.'
               },
               {
                 type: 'image_url',
@@ -90,12 +91,20 @@ serve(async (req) => {
 
     console.log('AI response:', content);
 
+    // Clean the response by removing markdown code blocks if present
+    let cleanedContent = content.trim();
+    if (cleanedContent.startsWith('```json')) {
+      cleanedContent = cleanedContent.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    } else if (cleanedContent.startsWith('```')) {
+      cleanedContent = cleanedContent.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    }
+
     // Try to parse the JSON response
     let extractedData;
     try {
-      extractedData = JSON.parse(content);
+      extractedData = JSON.parse(cleanedContent);
     } catch (e) {
-      console.error('Failed to parse AI response as JSON:', content);
+      console.error('Failed to parse AI response as JSON:', cleanedContent);
       throw new Error('AI could not extract expense data from the image. Please try with a clearer image.');
     }
 

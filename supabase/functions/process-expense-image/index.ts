@@ -25,6 +25,8 @@ serve(async (req) => {
       throw new Error('No image provided');
     }
 
+    console.log('Processing expense image with OpenAI...');
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -75,6 +77,7 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      console.error('OpenAI API error:', response.status, response.statusText);
       throw new Error(`OpenAI API error: ${response.status}`);
     }
 
@@ -85,12 +88,13 @@ serve(async (req) => {
       throw new Error('No response from AI');
     }
 
+    console.log('AI response:', content);
+
     // Try to parse the JSON response
     let extractedData;
     try {
       extractedData = JSON.parse(content);
     } catch (e) {
-      // If JSON parsing fails, try to extract data using regex or return default
       console.error('Failed to parse AI response as JSON:', content);
       throw new Error('AI could not extract expense data from the image. Please try with a clearer image.');
     }
@@ -102,11 +106,13 @@ serve(async (req) => {
 
     // Set defaults if missing
     const result = {
-      amount: extractedData.amount,
+      amount: parseFloat(extractedData.amount),
       category: extractedData.category || 'others',
       date: extractedData.date || new Date().toISOString().split('T')[0],
       description: extractedData.description || 'Expense from image'
     };
+
+    console.log('Processed expense data:', result);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

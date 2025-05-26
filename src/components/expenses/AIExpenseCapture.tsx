@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera, Image as ImageIcon, Upload, Loader2 } from "lucide-react";
+import { Camera, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,15 +17,24 @@ export const AIExpenseCapture = ({ onExpenseAdded }: AIExpenseCaptureProps) => {
   const processImageWithAI = async (imageFile: File) => {
     setIsProcessing(true);
     try {
+      console.log('Processing image:', imageFile.name, imageFile.size);
+      
       // Convert image to base64
       const base64Image = await convertToBase64(imageFile);
+      
+      console.log('Calling process-expense-image function...');
       
       // Call our edge function to process the image
       const { data, error } = await supabase.functions.invoke('process-expense-image', {
         body: { image: base64Image }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
+      }
+
+      console.log('Received data from AI:', data);
 
       const { amount, category, date, description } = data;
 
@@ -41,9 +50,12 @@ export const AIExpenseCapture = ({ onExpenseAdded }: AIExpenseCaptureProps) => {
         date: date || new Date().toISOString().split('T')[0]
       });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Database insert error:', insertError);
+        throw insertError;
+      }
 
-      toast.success("Expense added successfully from image!");
+      toast.success(`Expense of ₹${amount} added successfully!`);
       onExpenseAdded();
       setIsDialogOpen(false);
     } catch (error: any) {

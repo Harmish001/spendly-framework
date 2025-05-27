@@ -3,19 +3,26 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Camera, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AIExpenseCaptureProps {
-  onExpenseAdded: () => void;
+  onExpenseExtracted: (data: {
+    amount: string;
+    category: string;
+    description: string;
+    date?: string;
+  }) => void;
 }
 
-export const AIExpenseCapture = ({ onExpenseAdded }: AIExpenseCaptureProps) => {
+export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const processImageWithAI = async (imageFile: File) => {
     setIsProcessing(true);
+    setIsDrawerOpen(false);
+    
     try {
       console.log('Processing image:', imageFile.name, imageFile.size);
       
@@ -38,26 +45,20 @@ export const AIExpenseCapture = ({ onExpenseAdded }: AIExpenseCaptureProps) => {
 
       const { amount, category, date, description } = data;
 
-      // Add the expense to database
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      const { error: insertError } = await supabase.from("expenses").insert({
-        amount: parseFloat(amount),
-        description: description || "AI extracted expense",
-        category: category || "others",
-        user_id: user.id,
-        date: date || new Date().toISOString().split('T')[0]
-      });
-
-      if (insertError) {
-        console.error('Database insert error:', insertError);
-        throw insertError;
+      // Validate that we at least have an amount
+      if (!amount || isNaN(parseFloat(amount))) {
+        throw new Error("Could not extract a valid amount from the image. Please try with a clearer image.");
       }
 
-      toast.success(`Expense of ₹${amount} added successfully!`);
-      onExpenseAdded();
-      setIsDialogOpen(false);
+      // Pre-fill the sidebar form instead of directly adding to database
+      onExpenseExtracted({
+        amount: amount.toString(),
+        category: category || "others",
+        description: description || "Expense from image",
+        date: date
+      });
+
+      toast.success("Expense details extracted! Please review and confirm.");
     } catch (error: any) {
       console.error("Error processing image:", error);
       toast.error(error.message || "Failed to process image. Please try again.");
@@ -106,34 +107,43 @@ export const AIExpenseCapture = ({ onExpenseAdded }: AIExpenseCaptureProps) => {
     input.click();
   };
 
+  if (isProcessing) {
+    return (
+      <div className="fixed bottom-6 left-6 z-50">
+        <div className="bg-white rounded-full shadow-lg p-4 flex items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
+          <span className="text-sm font-medium">Processing image...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
+    <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+      <DrawerTrigger asChild>
         <Button
           variant="outline"
-          className="fixed bottom-6 left-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 hover:from-purple-600 hover:to-blue-600"
+          className="fixed bottom-6 left-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 hover:from-purple-600 hover:to-blue-600 z-50"
         >
           <Camera className="h-6 w-6" />
         </Button>
-      </DialogTrigger>
-      <DialogContent className="rounded-[24px]">
-        <DialogHeader>
-          <DialogTitle>Add Expense from Image</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 p-4">
-          <p className="text-sm text-gray-600 text-center">
-            Take a photo or select an image of your bill/receipt to automatically extract expense details
+      </DrawerTrigger>
+      <DrawerContent className="rounded-t-[24px] border-0">
+        <DrawerHeader className="text-center pb-2">
+          <DrawerTitle className="text-lg font-semibold">Add Expense from Image</DrawerTitle>
+          <p className="text-sm text-gray-600 mt-2">
+            Capture or select a photo of your bill to extract expense details
           </p>
-          
-          <div className="grid grid-cols-2 gap-4">
+        </DrawerHeader>
+        
+        <div className="px-6 pb-8">
+          <div className="grid grid-cols-2 gap-4 mt-4">
             <Button
               onClick={handleCameraCapture}
-              disabled={isProcessing}
-              className="flex flex-col items-center gap-2 h-20 rounded-[24px]"
-              style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}
+              className="flex flex-col items-center gap-3 h-24 rounded-[20px] bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0"
             >
-              <Camera className="h-6 w-6" />
-              <span className="text-sm">Camera</span>
+              <Camera className="h-8 w-8" />
+              <span className="text-sm font-medium">Camera</span>
             </Button>
             
             <label className="cursor-pointer">
@@ -142,23 +152,15 @@ export const AIExpenseCapture = ({ onExpenseAdded }: AIExpenseCaptureProps) => {
                 accept="image/*"
                 onChange={handleFileSelect}
                 className="hidden"
-                disabled={isProcessing}
               />
-              <div className="flex flex-col items-center gap-2 h-20 rounded-[24px] bg-gradient-to-r from-purple-500 to-blue-500 text-white justify-center hover:from-purple-600 hover:to-blue-600 transition-colors">
-                <ImageIcon className="h-6 w-6" />
-                <span className="text-sm">Gallery</span>
+              <div className="flex flex-col items-center gap-3 h-24 rounded-[20px] bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white justify-center transition-all duration-200 border-0">
+                <ImageIcon className="h-8 w-8" />
+                <span className="text-sm font-medium">Gallery</span>
               </div>
             </label>
           </div>
-          
-          {isProcessing && (
-            <div className="flex items-center justify-center gap-2 p-4">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              <span className="text-sm">Processing image with AI...</span>
-            </div>
-          )}
         </div>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 };

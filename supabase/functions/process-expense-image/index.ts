@@ -40,13 +40,13 @@ serve(async (req) => {
             role: 'system',
             content: `You are an AI assistant that extracts expense information from receipts and bills. 
             Analyze the image and extract the following information:
-            - amount: The total amount (number only, no currency symbols)
-            - category: One of these categories: investment, food, transport, shopping, loan, medical, others
-            - date: Date in YYYY-MM-DD format (if not found, use today's date)
-            - description: Brief description of the expense
+            - amount: The total amount (number only, no currency symbols) - THIS IS MANDATORY
+            - category: One of these categories: investment, food, transport, shopping, loan, medical, others (if unclear, use "others")
+            - date: Date in YYYY-MM-DD format (if not found, leave empty)
+            - description: Brief description of the expense (if unclear, leave empty)
             
             Return the data in valid JSON format only. Do not wrap the response in markdown code blocks.
-            If you cannot extract the amount, return an error.
+            The amount field is mandatory - if you cannot extract a valid amount, return an error.
             Categories mapping:
             - food/restaurant/dining = food
             - gas/fuel/taxi/uber/transport = transport
@@ -61,7 +61,7 @@ serve(async (req) => {
             content: [
               {
                 type: 'text',
-                text: 'Extract expense details from this receipt/bill image. Return only valid JSON with amount, category, date, and description fields. Do not use markdown formatting.'
+                text: 'Extract expense details from this receipt/bill image. Return only valid JSON with amount (mandatory), category, date, and description fields. Do not use markdown formatting. If category is unclear, use "others". If date or description are unclear, you can leave them empty.'
               },
               {
                 type: 'image_url',
@@ -108,12 +108,12 @@ serve(async (req) => {
       throw new Error('AI could not extract expense data from the image. Please try with a clearer image.');
     }
 
-    // Validate required fields
+    // Validate that we have a valid amount (this is mandatory)
     if (!extractedData.amount || isNaN(parseFloat(extractedData.amount))) {
-      throw new Error('Could not extract a valid amount from the image');
+      throw new Error('Could not extract a valid amount from the image. Please try with a clearer image.');
     }
 
-    // Set defaults if missing
+    // Set defaults for optional fields
     const result = {
       amount: parseFloat(extractedData.amount),
       category: extractedData.category || 'others',

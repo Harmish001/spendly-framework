@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -18,13 +19,29 @@ const categories = [
 
 interface ExpenseFormProps {
   onExpenseAdded: () => void;
+  prefilledData?: {
+    amount: string;
+    category: string;
+    description: string;
+    date?: string;
+  } | null;
+  onClearPrefilled?: () => void;
 }
 
-export const ExpenseForm = ({ onExpenseAdded }: ExpenseFormProps) => {
+export const ExpenseForm = ({ onExpenseAdded, prefilledData, onClearPrefilled }: ExpenseFormProps) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Handle prefilled data from AI extraction
+  useEffect(() => {
+    if (prefilledData) {
+      setAmount(prefilledData.amount);
+      setDescription(prefilledData.description);
+      setCategory(prefilledData.category);
+    }
+  }, [prefilledData]);
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +65,12 @@ export const ExpenseForm = ({ onExpenseAdded }: ExpenseFormProps) => {
       setAmount("");
       setDescription("");
       setCategory("");
+      
+      // Clear prefilled data after successful submission
+      if (onClearPrefilled) {
+        onClearPrefilled();
+      }
+      
       onExpenseAdded();
     } catch (error: any) {
       toast.error(error.message);
@@ -67,13 +90,13 @@ export const ExpenseForm = ({ onExpenseAdded }: ExpenseFormProps) => {
           placeholder="0.00"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="pl-8 rounded-[24px]"
+          className={`pl-8 rounded-[24px] ${prefilledData ? 'border-purple-300 bg-purple-50' : ''}`}
           required
         />
       </div>
 
       <Select value={category} onValueChange={setCategory} required>
-        <SelectTrigger className="rounded-[24px]">
+        <SelectTrigger className={`rounded-[24px] ${prefilledData ? 'border-purple-300 bg-purple-50' : ''}`}>
           <SelectValue placeholder="Select category" />
         </SelectTrigger>
         <SelectContent className="rounded-[24px]">
@@ -96,7 +119,7 @@ export const ExpenseForm = ({ onExpenseAdded }: ExpenseFormProps) => {
         placeholder="Description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        className="rounded-[24px]"
+        className={`rounded-[24px] ${prefilledData ? 'border-purple-300 bg-purple-50' : ''}`}
       />
 
       <Button

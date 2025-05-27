@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,11 +9,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Header } from "@/components/layout/Header";
 import { useNavigate } from "react-router-dom";
 import { ResponsivePie } from "@nivo/pie";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
 import { MonthTabs } from "@/components/expenses/MonthTabs";
 import { AIExpenseCapture } from "@/components/expenses/AIExpenseCapture";
+import { ExpenseFormSheet } from "@/components/expenses/ExpenseFormSheet";
 
 const categoryIcons: Record<string, any> = {
   "investment": Wallet,
@@ -36,6 +34,12 @@ const Dashboard = () => {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
+  const [prefilledData, setPrefilledData] = useState<{
+    amount: string;
+    category: string;
+    description: string;
+    date?: string;
+  } | null>(null);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
@@ -160,6 +164,19 @@ const Dashboard = () => {
     });
   };
 
+  const handleExpenseExtracted = (data: {
+    amount: string;
+    category: string;
+    description: string;
+    date?: string;
+  }) => {
+    setPrefilledData(data);
+  };
+
+  const handleClearPrefilled = () => {
+    setPrefilledData(null);
+  };
+
   if (authChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -268,7 +285,7 @@ const Dashboard = () => {
       {/* Floating Action Buttons */}
       <div className="fixed bottom-6 flex gap-4 w-full px-6">
         {/* AI Expense Capture Button */}
-        <AIExpenseCapture onExpenseAdded={fetchExpenses} />
+        <AIExpenseCapture onExpenseExtracted={handleExpenseExtracted} />
         
         <ExpenseFilters
           selectedYear={selectedYear}
@@ -278,25 +295,11 @@ const Dashboard = () => {
           onFilter={handleFilter}
         />
         <div className="flex-1" />
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button
-              className="rounded-full w-14 h-14 shadow-lg"
-              style={{
-                background: "linear-gradient(to right, #9333ea, #2563eb)",
-                color: "white"
-              }}
-            >
-              <PlusCircle className="h-6 w-6" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="p-4">
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold">Add New Expense</h2>
-              <ExpenseForm onExpenseAdded={fetchExpenses} />
-            </div>
-          </SheetContent>
-        </Sheet>
+        <ExpenseFormSheet 
+          onExpenseAdded={fetchExpenses} 
+          prefilledData={prefilledData}
+          onClearPrefilled={handleClearPrefilled}
+        />
       </div>
 
       <AlertDialog open={!!expenseToDelete} onOpenChange={() => setExpenseToDelete(null)}>

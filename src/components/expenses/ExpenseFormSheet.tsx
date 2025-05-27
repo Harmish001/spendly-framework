@@ -13,15 +13,19 @@ interface ExpenseFormSheetProps {
     date?: string;
   } | null;
   onClearPrefilled?: () => void;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const ExpenseFormSheet = ({ 
   onExpenseAdded, 
   prefilledData, 
-  onClearPrefilled 
+  onClearPrefilled,
+  isOpen,
+  onOpenChange
 }: ExpenseFormSheetProps) => {
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>
         <Button
           className="md:hidden rounded-[20px]"

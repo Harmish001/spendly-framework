@@ -40,6 +40,7 @@ const Dashboard = () => {
     description: string;
     date?: string;
   } | null>(null);
+  const [isExpenseSheetOpen, setIsExpenseSheetOpen] = useState(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
@@ -171,10 +172,17 @@ const Dashboard = () => {
     date?: string;
   }) => {
     setPrefilledData(data);
+    setIsExpenseSheetOpen(true); // Automatically open the sheet when AI data is extracted
   };
 
   const handleClearPrefilled = () => {
     setPrefilledData(null);
+  };
+
+  const handleExpenseAdded = () => {
+    fetchExpenses();
+    setIsExpenseSheetOpen(false); // Close the sheet after expense is added
+    setPrefilledData(null); // Clear prefilled data
   };
 
   if (authChecking) {
@@ -296,7 +304,9 @@ const Dashboard = () => {
         />
         <div className="flex-1" />
         <ExpenseFormSheet 
-          onExpenseAdded={fetchExpenses} 
+          isOpen={isExpenseSheetOpen}
+          onOpenChange={setIsExpenseSheetOpen}
+          onExpenseAdded={handleExpenseAdded} 
           prefilledData={prefilledData}
           onClearPrefilled={handleClearPrefilled}
         />
@@ -320,7 +330,7 @@ const Dashboard = () => {
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogContent>
+        </AlertDialogFooter>
       </AlertDialog>
     </div>
   );

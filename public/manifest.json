@@ -1,3 +1,4 @@
+
 {
   "name": "Spendly",
   "short_name": "Spendly",
@@ -12,5 +13,18 @@
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     }
-  ]
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "image",
+          "accept": ["image/*"]
+        }
+      ]
+    }
+  }
 }

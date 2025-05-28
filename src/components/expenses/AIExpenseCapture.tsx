@@ -1,10 +1,11 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Camera, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { supabase } from "@/integrations/supabase/client";
+import { Capacitor } from '@capacitor/core';
+import { ShareReceiver } from "@/services/ShareReceiver";
 
 interface AIExpenseCaptureProps {
   onExpenseExtracted: (data: {
@@ -18,6 +19,28 @@ interface AIExpenseCaptureProps {
 export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    // Initialize share receiver for native platforms
+    if (Capacitor.isNativePlatform()) {
+      ShareReceiver.initialize();
+    }
+
+    // Listen for shared images
+    const handleSharedImage = (event: CustomEvent) => {
+      const { file } = event.detail;
+      if (file) {
+        toast.success("Shared image received! Processing...");
+        processImageWithAI(file);
+      }
+    };
+
+    window.addEventListener('processSharedImage', handleSharedImage as EventListener);
+
+    return () => {
+      window.removeEventListener('processSharedImage', handleSharedImage as EventListener);
+    };
+  }, []);
 
   const processImageWithAI = async (imageFile: File) => {
     setIsProcessing(true);
@@ -134,6 +157,11 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
           <p className="text-sm text-gray-600 mt-2">
             Capture or select a photo of your bill to extract expense details
           </p>
+          {Capacitor.isNativePlatform() && (
+            <p className="text-xs text-blue-600 mt-1">
+              💡 You can also share screenshots directly from payment apps!
+            </p>
+          )}
         </DrawerHeader>
         
         <div className="px-6 pb-8">

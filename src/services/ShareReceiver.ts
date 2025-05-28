@@ -1,6 +1,4 @@
 
-
-
 import { Capacitor } from '@capacitor/core';
 
 export interface SharedImageData {
@@ -111,5 +109,3 @@ export class ShareReceiver {
     }
   }
 }
-
-

@@ -13,7 +13,18 @@ const config: CapacitorConfig = {
     CapacitorHttp: {
       enabled: true,
     },
+    App: {
+      handleUrl: true
+    }
   },
+  android: {
+    allowMixedContent: true,
+    webContentsDebuggingEnabled: true
+  },
+  ios: {
+    contentInset: 'automatic',
+    scrollEnabled: true
+  }
 };
 
 export default config;

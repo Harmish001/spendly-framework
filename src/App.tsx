@@ -7,6 +7,8 @@ import { Toaster } from "sonner";
 import { useEffect } from "react";
 import { supabase } from "./integrations/supabase/client";
 import { toast } from "sonner";
+import { ShareReceiver } from "./services/ShareReceiver";
+import { Capacitor } from "@capacitor/core";
 
 // Handle OAuth redirect and query parameters
 const AuthHandler = () => {
@@ -14,6 +16,11 @@ const AuthHandler = () => {
   const location = useLocation();
 
   useEffect(() => {
+    // Initialize share receiver for native platforms
+    if (Capacitor.isNativePlatform()) {
+      ShareReceiver.initialize();
+    }
+
     // Check for hash fragments that might contain OAuth response data
     if (location.hash || location.search) {
       // Let Supabase auth handle the redirect

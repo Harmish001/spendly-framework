@@ -93,10 +93,10 @@ export class ShareReceiver {
       // Create a blob from the base64 data
       const blob = await fetch(`data:image/jpeg;base64,${base64Data}`).then(r => r.blob());
       
-      // Convert blob to ArrayBuffer
+      // Convert blob to ArrayBuffer first, then create File
       const arrayBuffer = await blob.arrayBuffer();
 
-      // Create a File object from the ArrayBuffer
+      // Create a File object from the ArrayBuffer - Fixed TypeScript error
       const file = new File([arrayBuffer], imageData.name || 'shared_image.jpg', { type: 'image/jpeg' });
 
       // Trigger the AI processing

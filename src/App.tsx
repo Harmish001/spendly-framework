@@ -51,8 +51,8 @@ const AuthHandler = () => {
 function App() {
   return (
     <Router>
-      <AuthHandler />
       <Routes>
+        <Route path="/*" element={<AuthHandler />} />
         <Route path="/" element={<Index />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/dashboard" element={<Dashboard />} />

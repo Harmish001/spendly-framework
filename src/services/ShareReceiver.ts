@@ -1,5 +1,6 @@
 
 
+
 import { Capacitor } from '@capacitor/core';
 
 export interface SharedImageData {
@@ -91,9 +92,14 @@ export class ShareReceiver {
         ? imageFile.data 
         : btoa(String.fromCharCode(...new Uint8Array(imageFile.data)));
 
-      // Create a File object from the base64 data
+      // Create a blob from the base64 data
       const blob = await fetch(`data:image/jpeg;base64,${base64Data}`).then(r => r.blob());
-      const file = new File([blob], imageData.name || 'shared_image.jpg', { type: 'image/jpeg' });
+      
+      // Convert blob to ArrayBuffer
+      const arrayBuffer = await blob.arrayBuffer();
+
+      // Create a File object from the ArrayBuffer
+      const file = new File([arrayBuffer], imageData.name || 'shared_image.jpg', { type: 'image/jpeg' });
 
       // Trigger the AI processing
       window.dispatchEvent(new CustomEvent('processSharedImage', { 
@@ -105,4 +111,5 @@ export class ShareReceiver {
     }
   }
 }
+
 

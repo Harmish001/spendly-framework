@@ -1,6 +1,4 @@
 
-import { App } from '@capacitor/app';
-import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 
 export interface SharedImageData {
@@ -16,19 +14,26 @@ export class ShareReceiver {
       return;
     }
 
-    // Listen for app URL open events (when shared content is received)
-    App.addListener('appUrlOpen', async (event) => {
-      console.log('App opened with URL:', event.url);
-      await this.handleSharedContent(event.url);
-    });
+    try {
+      // Dynamic import to avoid build errors on web
+      const { App } = await import('@capacitor/app');
+      
+      // Listen for app URL open events (when shared content is received)
+      App.addListener('appUrlOpen', async (event) => {
+        console.log('App opened with URL:', event.url);
+        await this.handleSharedContent(event.url);
+      });
 
-    // Listen for app state changes
-    App.addListener('appStateChange', async (state) => {
-      if (state.isActive) {
-        // Check if app was opened with shared content
-        await this.checkForSharedContent();
-      }
-    });
+      // Listen for app state changes
+      App.addListener('appStateChange', async (state) => {
+        if (state.isActive) {
+          // Check if app was opened with shared content
+          await this.checkForSharedContent();
+        }
+      });
+    } catch (error) {
+      console.error('Error initializing ShareReceiver:', error);
+    }
   }
 
   static async handleSharedContent(url: string) {
@@ -66,6 +71,14 @@ export class ShareReceiver {
   static async processSharedImage(imageData: SharedImageData) {
     try {
       console.log('Processing shared image:', imageData);
+      
+      if (!Capacitor.isNativePlatform()) {
+        console.log('File system access not available on web');
+        return;
+      }
+
+      // Dynamic import for filesystem
+      const { Filesystem } = await import('@capacitor/filesystem');
       
       // Read the image file
       const imageFile = await Filesystem.readFile({

@@ -45,11 +45,20 @@ jobs:
     - name: Install Capacitor CLI
       run: npm install -g @capacitor/cli
 
-    - name: Add Android platform
-      run: npx cap add android
+    - name: Check and add Android platform if needed
+      run: |
+        if [ ! -d "android" ]; then
+          echo "Adding Android platform..."
+          npx cap add android
+        else
+          echo "Android platform already exists, skipping add step"
+        fi
 
     - name: Sync Capacitor
       run: npx cap sync android
+
+    - name: Make gradlew executable
+      run: chmod +x android/gradlew
 
     - name: Build Android APK
       run: |

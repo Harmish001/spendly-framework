@@ -17,9 +17,9 @@ interface ExpenseFormSheetProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export const ExpenseFormSheet = ({ 
-  onExpenseAdded, 
-  prefilledData, 
+export const ExpenseFormSheet = ({
+  onExpenseAdded,
+  prefilledData,
   onClearPrefilled,
   isOpen,
   onOpenChange
@@ -28,14 +28,10 @@ export const ExpenseFormSheet = ({
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>
         <Button
-          className="md:hidden rounded-[20px]"
-          style={{
-            background: "linear-gradient(to right, #9333ea, #2563eb)",
-            color: "white"
-          }}
+          variant="outline"
+          className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 hover:from-purple-600 hover:to-blue-600 z-50"
         >
-          <PlusCircle className="h-5 w-5 mr-2" />
-          Add Expense
+          <PlusCircle className="h-6 w-6" />
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="p-4">
@@ -53,7 +49,7 @@ export const ExpenseFormSheet = ({
               </Button>
             )}
           </div>
-          
+
           {prefilledData && (
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
               <p className="text-sm text-purple-700 font-medium">
@@ -61,9 +57,9 @@ export const ExpenseFormSheet = ({
               </p>
             </div>
           )}
-          
-          <ExpenseForm 
-            onExpenseAdded={onExpenseAdded} 
+
+          <ExpenseForm
+            onExpenseAdded={onExpenseAdded}
             prefilledData={prefilledData}
             onClearPrefilled={onClearPrefilled}
           />

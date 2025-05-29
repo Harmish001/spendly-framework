@@ -91,10 +91,11 @@ export class ShareReceiver {
         : btoa(String.fromCharCode(...new Uint8Array(imageFile.data)));
 
       // Create a blob from the base64 data
-      const blob = await fetch(`data:image/jpeg;base64,${base64Data}`).then(r => r.blob());
+      const response = await fetch(`data:image/jpeg;base64,${base64Data}`);
+      const blob = await response.blob();
       
-      // Convert blob to ArrayBuffer properly - Fixed TypeScript error
-      const arrayBuffer = await blob.arrayBuffer();
+      // Convert blob to ArrayBuffer with proper typing
+      const arrayBuffer: ArrayBuffer = await blob.arrayBuffer();
       const file = new File([arrayBuffer], imageData.name || 'shared_image.jpg', { type: 'image/jpeg' });
 
       // Trigger the AI processing

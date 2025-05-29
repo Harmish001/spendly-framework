@@ -1,0 +1,149 @@
+
+name: Build and Deploy Mobile App
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number for the release'
+        required: false
+        default: 'auto'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build web app
+      run: npm run build
+
+    - name: Setup Java for Android
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install Capacitor CLI
+      run: npm install -g @capacitor/cli
+
+    - name: Add Android platform
+      run: npx cap add android
+
+    - name: Sync Capacitor
+      run: npx cap sync android
+
+    - name: Build Android APK
+      run: |
+        cd android
+        ./gradlew assembleDebug
+        ./gradlew assembleRelease
+
+    - name: Sign APK (Optional - for production)
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      run: |
+        echo "APK built successfully!"
+        # Add signing steps here if you have keystore
+
+    - name: Generate version number
+      id: version
+      run: |
+        if [ "${{ github.event.inputs.version }}" = "auto" ] || [ -z "${{ github.event.inputs.version }}" ]; then
+          VERSION="v$(date +'%Y.%m.%d')-$(echo $GITHUB_SHA | cut -c1-7)"
+        else
+          VERSION="${{ github.event.inputs.version }}"
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Create Release
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        release_name: Spendly Mobile App ${{ steps.version.outputs.version }}
+        body: |
+          🚀 **Spendly Mobile App Release**
+          
+          📱 **Download the APK below and install on your Android device**
+          
+          ✨ **Features:**
+          - AI-powered expense tracking from receipt images
+          - Share screenshots from any app to extract expense data
+          - Native mobile experience
+          
+          📋 **Installation Instructions:**
+          1. Download the APK file below
+          2. Enable "Install from unknown sources" in your Android settings
+          3. Install the APK
+          4. Grant necessary permissions when prompted
+          
+          🔧 **Built from commit:** ${{ github.sha }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Debug APK
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./android/app/build/outputs/apk/debug/app-debug.apk
+        asset_name: spendly-debug-${{ steps.version.outputs.version }}.apk
+        asset_content_type: application/vnd.android.package-archive
+
+    - name: Upload Release APK
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./android/app/build/outputs/apk/release/app-release-unsigned.apk
+        asset_name: spendly-release-${{ steps.version.outputs.version }}.apk
+        asset_content_type: application/vnd.android.package-archive
+
+    - name: Deploy PWA to GitHub Pages
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+        cname: # Add your custom domain here if you have one
+
+  # Notify on completion
+  notify:
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - name: Notify completion
+      run: |
+        if [ "${{ needs.build.result }}" = "success" ]; then
+          echo "✅ Build completed successfully!"
+          echo "📱 APK files are available in the GitHub release"
+          echo "🌐 PWA is deployed to GitHub Pages"
+        else
+          echo "❌ Build failed. Check the logs for details."
+        fi

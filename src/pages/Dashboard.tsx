@@ -293,9 +293,7 @@ const Dashboard = () => {
 
       {/* Floating Action Buttons */}
       <div className="fixed bottom-6 flex gap-4 w-full px-6">
-        {/* AI Expense Capture Button */}
-        <AIExpenseCapture onExpenseExtracted={handleExpenseExtracted} />
-        
+        {/* Filter Button - visible on mobile */}
         <ExpenseFilters
           selectedYear={selectedYear}
           selectedCategory={selectedCategory}
@@ -303,7 +301,13 @@ const Dashboard = () => {
           onCategoryChange={setSelectedCategory}
           onFilter={handleFilter}
         />
+        
+        {/* AI Expense Capture Button */}
+        <AIExpenseCapture onExpenseExtracted={handleExpenseExtracted} />
+        
         <div className="flex-1" />
+        
+        {/* Add Expense Button */}
         <ExpenseFormSheet 
           isOpen={isExpenseSheetOpen}
           onOpenChange={setIsExpenseSheetOpen}

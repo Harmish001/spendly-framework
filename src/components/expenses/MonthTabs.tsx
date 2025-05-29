@@ -41,7 +41,7 @@ export const MonthTabs = ({ selectedMonth, onMonthChange }: MonthTabsProps) => {
               data-value={(index + 1).toString().padStart(2, '0')}
               style={{
                 background: "transparent",
-                color: selectedMonth === (index + 1).toString().padStart(2, '0') ? "white" : "grey"
+                color: selectedMonth === (index + 1).toString().padStart(2, '0') ? "yellow" : "white"
               }}
             >
               {month}

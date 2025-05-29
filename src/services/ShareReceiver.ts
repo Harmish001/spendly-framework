@@ -81,7 +81,7 @@ export class ShareReceiver {
       const { Filesystem } = await import('@capacitor/filesystem');
       
       // Read the image file
-      const imageFile = await Filesystem.readFile({
+      const imageFile:any = await Filesystem.readFile({
         path: imageData.uri
       });
 

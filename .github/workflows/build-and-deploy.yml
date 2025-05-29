@@ -45,26 +45,64 @@ jobs:
     - name: Install Capacitor CLI
       run: npm install -g @capacitor/cli
 
-    - name: Check and add Android platform if needed
+    - name: Clean and setup Android platform
       run: |
-        if [ ! -d "android" ]; then
-          echo "Adding Android platform..."
-          npx cap add android
-        else
-          echo "Android platform already exists, skipping add step"
+        echo "Cleaning up any existing Android platform..."
+        if [ -d "android" ]; then
+          echo "Removing existing android directory..."
+          rm -rf android
         fi
+        
+        echo "Adding fresh Android platform..."
+        npx cap add android
+        
+        echo "Verifying Android platform was created..."
+        if [ ! -d "android" ]; then
+          echo "Error: Android platform was not created successfully"
+          exit 1
+        fi
+        
+        echo "Checking for gradlew file..."
+        if [ ! -f "android/gradlew" ]; then
+          echo "Error: gradlew file not found in android directory"
+          ls -la android/
+          exit 1
+        fi
+        
+        echo "Making gradlew executable..."
+        chmod +x android/gradlew
+        
+        echo "Android platform setup complete!"
 
     - name: Sync Capacitor
-      run: npx cap sync android
-
-    - name: Make gradlew executable
-      run: chmod +x android/gradlew
+      run: |
+        echo "Syncing Capacitor..."
+        npx cap sync android
+        echo "Capacitor sync complete!"
 
     - name: Build Android APK
       run: |
+        echo "Building Android APK..."
         cd android
-        ./gradlew assembleDebug
-        ./gradlew assembleRelease
+        
+        echo "Running assembleDebug..."
+        ./gradlew assembleDebug --stacktrace
+        
+        echo "Running assembleRelease..."
+        ./gradlew assembleRelease --stacktrace
+        
+        echo "Verifying APK files were created..."
+        if [ ! -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+          echo "Error: Debug APK was not created"
+          exit 1
+        fi
+        
+        if [ ! -f "app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+          echo "Error: Release APK was not created"
+          exit 1
+        fi
+        
+        echo "APK build successful!"
 
     - name: Sign APK (Optional - for production)
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'

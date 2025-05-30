@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   appName: 'spendly-framework',
   webDir: 'dist',
   server: {
-    url: "https://fe3b15c3-2c15-4b04-8b99-85fefc4797f2.lovableproject.com?forceHideBadge=true",
+    url: "https://spendly-eight.vercel.app",
     cleartext: true
   },
   plugins: {

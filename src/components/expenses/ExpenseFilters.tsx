@@ -42,12 +42,13 @@ export const ExpenseFilters = ({
   const isMobile = useIsMobile();
 
   return (
-    <Drawer open={isOpen} onOpenChange={() => setIsOpen(true)}>
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger asChild>
         <Button
           variant="outline"
           className={`rounded-full ${isMobile ? 'w-14 h-14' : 'rounded-[24px]'}`}
           style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", color: "white" }}
+          onClick={() => setIsOpen(true)}
         >
           <Filter className={`h-6 w-6 ${!isMobile && 'mr-2'}`} />
           {!isMobile && 'Filters'}
@@ -83,7 +84,6 @@ export const ExpenseFilters = ({
               ))}
             </SelectContent>
           </Select>
-
           <Button
             onClick={() => {
               onFilter();

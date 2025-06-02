@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Filter } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
 interface ExpenseFiltersProps {
   selectedYear: string;
@@ -41,8 +42,8 @@ export const ExpenseFilters = ({
   const isMobile = useIsMobile();
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
+    <Drawer open={isOpen} onOpenChange={() => setIsOpen(true)}>
+      <DrawerTrigger asChild>
         <Button
           variant="outline"
           className={`rounded-full ${isMobile ? 'w-14 h-14' : 'rounded-[24px]'}`}
@@ -51,12 +52,12 @@ export const ExpenseFilters = ({
           <Filter className={`h-6 w-6 ${!isMobile && 'mr-2'}`} />
           {!isMobile && 'Filters'}
         </Button>
-      </SheetTrigger>
-      <SheetContent className="w-[300px]">
-        <SheetHeader>
+      </DrawerTrigger>
+      <DrawerContent className="rounded-t-[24px] border-0 max-h-[85vh]">
+        <DrawerHeader className="text-center pb-2">
           <SheetTitle>Filter Expenses</SheetTitle>
-        </SheetHeader>
-        <div className="space-y-4 mt-4">
+        </DrawerHeader>
+        <div className="space-y-4 mx-4">
           <Select value={selectedYear} onValueChange={onYearChange}>
             <SelectTrigger className="rounded-[24px]">
               <SelectValue placeholder="Select year" />
@@ -94,7 +95,7 @@ export const ExpenseFilters = ({
             Apply Filters
           </Button>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 };

@@ -42,9 +42,9 @@ export const MobileNavigation = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full"
+          className="bg-transparent text-white"
         >
-          <Menu className="h-6 w-6" />
+          <Menu className="h-0 w-0" />
         </Button>
       </SheetTrigger>
       <SheetContent side="top" className="h-auto">

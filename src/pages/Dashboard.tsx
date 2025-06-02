@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, MoreHorizontal, Edit } from "lucide-react";
+import { Loader2, MoreHorizontal, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { MonthTabs } from "@/components/expenses/MonthTabs";
 import { ExpenseFormSheet } from "@/components/expenses/ExpenseFormSheet";
@@ -11,7 +11,7 @@ import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { VoiceExpenseCapture } from "@/components/expenses/VoiceExpenseCapture";
 import { AIExpenseCapture } from "@/components/expenses/AIExpenseCapture";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
-import { MobileNavigation } from "@/components/navigation/MobileNavigation";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Header } from "@/components/layout/Header";
+import { ResponsivePie } from "@nivo/pie";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter, DrawerDescription, DrawerClose } from "@/components/ui/drawer";
 
 const categories = [
   { id: "investment", label: "Investment", icon: null },
@@ -51,6 +53,7 @@ const Dashboard = () => {
   } | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
   const [editingExpense, setEditingExpense] = useState<any>(null);
+  const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     fetchExpenses();
@@ -107,10 +110,43 @@ const Dashboard = () => {
     return expense.category === selectedCategory.toLowerCase().replace(/\s+/g, '');
   });
 
+  const getPieChartData = () => {
+    const categoryTotals: Record<string, number> = {};
+    expenses.forEach(expense => {
+      if (!categoryTotals[expense.category]) {
+        categoryTotals[expense.category] = 0;
+      }
+      categoryTotals[expense.category] += Number(expense.amount);
+    });
+
+    return Object.entries(categoryTotals).map(([category, value]) => ({
+      id: category,
+      label: category.charAt(0).toUpperCase() + category.slice(1),
+      value,
+    }));
+  };
+
+  const handleDeleteExpense = async (expenseId: string) => {
+    try {
+      const { error } = await supabase
+        .from("expenses")
+        .delete()
+        .eq("id", expenseId);
+
+      if (error) throw error;
+
+      toast.success("Expense deleted successfully");
+      fetchExpenses();
+      setExpenseToDelete(null);
+    } catch (error: any) {
+      toast.error("Failed to delete expense");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <div className="pb-20 md:pb-8 max-w-full overflow-x-hidden">
         {/* Month Navigation */}
         <div className="w-full overflow-hidden">
@@ -136,13 +172,36 @@ const Dashboard = () => {
 
         {/* Total Expense Card */}
         <div className="px-4 pb-4">
-          <Card className="bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0">
-            <CardContent className="p-4">
-              <h2 className="text-lg font-semibold mb-2">Total Expenses</h2>
-              <p className="text-3xl font-bold">₹{totalExpense.toLocaleString('en-IN')}</p>
-              <p className="text-sm opacity-90">
-                {monthNames[parseInt(selectedMonth) - 1]} {selectedYear}
-              </p>
+          <Card className="col-span-1 md:col-span-2 mb-4 mt-2 border-0 shadow-none">
+            <CardContent className="p-1">
+              <div className="relative h-[250px]">
+                <ResponsivePie
+                  data={getPieChartData()}
+                  margin={{ top: 10, right: 20, bottom: 10, left: 20 }}
+                  innerRadius={0.6}
+                  padAngle={0.7}
+                  cornerRadius={3}
+                  activeOuterRadiusOffset={8}
+                  colors={[
+                    "#9333ea",
+                    "#2563eb",
+                    "#1e4bb8",
+                    "#7b2ac5",
+                    "#b84bed",
+                    "#5b8def",
+                    "#312e81",
+                  ]}
+                  borderWidth={1}
+                  borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+                  enableArcLinkLabels={false}
+                  arcLabelsSkipAngle={10}
+                  arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
+                />
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                  <p className="text-sm">Total</p>
+                  <p className="text-2xl font-bold" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{totalExpense.toLocaleString('en-IN')}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -161,7 +220,7 @@ const Dashboard = () => {
             filteredExpenses.map((expense) => {
               const category = categories.find(cat => cat.id === expense.category);
               const Icon = category?.icon || MoreHorizontal;
-              
+
               return (
                 <Card
                   key={expense.id}
@@ -180,15 +239,23 @@ const Dashboard = () => {
                         </p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
+                        <p className="text-base font-bold whitespace-nowrap" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{expense.amount}</p>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEditExpense(expense)}
-                          className="h-7 w-7 p-0 rounded-full"
+                          className="h-4 w-4 p-0 rounded-full"
                         >
                           <Edit className="h-3 w-3" />
                         </Button>
-                        <p className="text-base font-bold whitespace-nowrap" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{expense.amount}</p>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="rounded-[24px] hover:bg-white/10 shrink-0"
+                          onClick={() => setExpenseToDelete(expense.id)}
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -205,7 +272,7 @@ const Dashboard = () => {
       </div>
 
       {/* Expense Filters */}
-      <div className="fixed bottom-24 left-4 z-50">
+      <div className="fixed bottom-24 right-6 z-50">
         <ExpenseFilters
           selectedYear={selectedYear}
           selectedCategory={selectedCategory}
@@ -216,15 +283,15 @@ const Dashboard = () => {
       </div>
 
       {/* Mobile Navigation */}
-      <MobileNavigation />
+      {/* <MobileNavigation /> */}
 
       {/* Edit Expense Dialog */}
       {editingExpense && (
-        <Dialog open={!!editingExpense} onOpenChange={() => setEditingExpense(null)}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
+        <Drawer open={!!editingExpense} onOpenChange={() => setEditingExpense(null)}>
+          <DrawerContent className="sm:max-w-[425px] px-3">
+            <DrawerHeader>
               <DialogTitle>Edit Expense</DialogTitle>
-            </DialogHeader>
+            </DrawerHeader>
             <ExpenseForm
               onExpenseAdded={() => {
                 handleExpenseAdded();
@@ -232,9 +299,29 @@ const Dashboard = () => {
               }}
               editingExpense={editingExpense}
             />
-          </DialogContent>
-        </Dialog>
+          </DrawerContent>
+        </Drawer>
       )}
+      <Drawer open={!!expenseToDelete} onOpenChange={() => setExpenseToDelete(null)}>
+        <DrawerContent className="rounded-[24px]">
+          <DrawerHeader>
+            <DialogTitle>Delete Expense</DialogTitle>
+            <DrawerDescription>
+              Are you sure you want to delete this expense? This action cannot be undone.
+            </DrawerDescription>
+          </DrawerHeader>
+          <DrawerFooter>
+            <Button
+              className="rounded-[24px] bg-danger"
+              style={{ background: "red" }}
+              onClick={() => expenseToDelete && handleDeleteExpense(expenseToDelete)}
+            >
+              Delete
+            </Button>
+            <DrawerClose className="rounded-[24px]">Cancel</DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 };

@@ -14,7 +14,7 @@ interface MonthlyData {
   month: string;
   amount: number;
   expenses: number;
-  [key: string]: string | number; // Index signature for BarDatum compatibility
+  [key: string]: string | number;
 }
 
 const Statistics = () => {
@@ -107,13 +107,13 @@ const Statistics = () => {
         ) : (
           <>
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-semibold">Monthly Expense Amount</CardTitle>
               </CardHeader>
-              <CardContent>
-                <ChartContainer config={chartConfig} className="h-[250px] w-full">
+              <CardContent className="p-2">
+                <ChartContainer config={chartConfig} className="h-[280px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={monthlyData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                    <BarChart data={monthlyData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
                       <XAxis 
                         dataKey="month" 
                         axisLine={false}
@@ -133,7 +133,7 @@ const Statistics = () => {
                       <Bar 
                         dataKey="amount" 
                         fill="var(--color-amount)"
-                        radius={[4, 4, 0, 0]}
+                        radius={[6, 6, 0, 0]}
                         stroke="none"
                       />
                     </BarChart>
@@ -143,13 +143,13 @@ const Statistics = () => {
             </Card>
 
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-semibold">Number of Expenses</CardTitle>
               </CardHeader>
-              <CardContent>
-                <ChartContainer config={chartConfig} className="h-[250px] w-full">
+              <CardContent className="p-2">
+                <ChartContainer config={chartConfig} className="h-[280px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={monthlyData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                    <BarChart data={monthlyData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
                       <XAxis 
                         dataKey="month" 
                         axisLine={false}
@@ -168,7 +168,7 @@ const Statistics = () => {
                       <Bar 
                         dataKey="expenses" 
                         fill="var(--color-expenses)"
-                        radius={[4, 4, 0, 0]}
+                        radius={[6, 6, 0, 0]}
                         stroke="none"
                       />
                     </BarChart>

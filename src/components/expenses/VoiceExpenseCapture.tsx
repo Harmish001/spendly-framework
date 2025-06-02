@@ -124,7 +124,7 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
 
   if (isProcessing) {
     return (
-      <div className="fixed bottom-20 left-6 z-50">
+      <div className="fixed bottom-24 left-6 z-50">
         <div className="bg-white rounded-full shadow-lg p-4 flex items-center gap-2">
           <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
           <span className="text-sm font-medium">Processing voice...</span>
@@ -134,53 +134,12 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
   }
 
   return (
-    <>
-      <Button
-        variant="outline"
-        className="fixed bottom-20 left-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 hover:from-green-600 hover:to-emerald-600 z-50"
-        onClick={isRecording ? stopRecording : startRecording}
-      >
-        {isRecording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
-      </Button>
-
-      {/* Siri-like animation overlay */}
-      {isRecording && (
-        <div className="fixed inset-0 z-40 pointer-events-none">
-          <div className="absolute inset-0 bg-black bg-opacity-30">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative">
-                {/* Animated circles */}
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute rounded-full border-2 animate-pulse"
-                    style={{
-                      width: `${(i + 1) * 60}px`,
-                      height: `${(i + 1) * 60}px`,
-                      borderColor: `hsl(${(i * 60) % 360}, 70%, 50%)`,
-                      left: `${-(i + 1) * 30}px`,
-                      top: `${-(i + 1) * 30}px`,
-                      animationDelay: `${i * 0.2}s`,
-                      animationDuration: `${2 + i * 0.5}s`
-                    }}
-                  />
-                ))}
-                
-                {/* Central microphone */}
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                  <Mic className="h-8 w-8 text-white" />
-                </div>
-              </div>
-            </div>
-            
-            <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2">
-              <p className="text-white text-center font-medium">
-                Listening... Tap to stop
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    <Button
+      variant="outline"
+      className="fixed bottom-24 left-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 hover:from-green-600 hover:to-emerald-600 z-50"
+      onClick={isRecording ? stopRecording : startRecording}
+    >
+      {isRecording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
+    </Button>
   );
 };

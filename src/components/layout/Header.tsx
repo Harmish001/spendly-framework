@@ -22,30 +22,23 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
       <div className="container flex h-14 items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1">
           {isMobile && <MobileNavigation />}
-          <h1 className="text-xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
+          <h1 className="text-xl font-bold text-white bg-clip-text text-transparent">
             Spendly
           </h1>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-          >
-            <User className="h-5 w-5" />
-          </Button>
+        <div className="flex items-center">
           <Button
             variant="ghost"
             size="icon"
             onClick={handleSignOut}
             className="rounded-full"
           >
-            <LogOut className="h-5 w-5" />
+            <LogOut className="h-5 w-5 text-white" />
           </Button>
         </div>
       </div>

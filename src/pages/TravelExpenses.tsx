@@ -134,10 +134,10 @@ const TravelExpenses = () => {
                       <p className="text-gray-500">No travel expenses found</p>
                     </div>
                   )}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                 {expenses.length > 0 && <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                     <p className="text-sm">Travel Total</p>
                     <p className="text-2xl font-bold" style={{ background: "linear-gradient(to right, #2563eb, #7c3aed)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{totalExpense.toLocaleString('en-IN')}</p>
-                  </div>
+                  </div>}
                 </div>
               </CardContent>
             </Card>

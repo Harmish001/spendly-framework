@@ -106,7 +106,7 @@ export class ShareReceiver {
       const response = await fetch(`data:image/jpeg;base64,${base64Data}`);
       const blob = await response.blob();
       
-      // Convert blob to ArrayBuffer properly
+      // Convert blob to ArrayBuffer and then create File
       const arrayBuffer = await blob.arrayBuffer();
       const file = new File([arrayBuffer], imageData.name || 'shared_image.jpg', { type: 'image/jpeg' });
 

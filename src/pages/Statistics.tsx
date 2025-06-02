@@ -6,13 +6,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { BarChart3, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { ResponsiveBar } from "@nivo/bar";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import { format, subMonths } from "date-fns";
 
 interface MonthlyData {
   month: string;
   amount: number;
   expenses: number;
+  [key: string]: string | number; // Index signature for BarDatum compatibility
 }
 
 const Statistics = () => {
@@ -67,7 +69,16 @@ const Statistics = () => {
     }
   };
 
-  const maxAmount = Math.max(...monthlyData.map(d => d.amount));
+  const chartConfig = {
+    amount: {
+      label: "Amount",
+      color: "#9333ea",
+    },
+    expenses: {
+      label: "Expenses",
+      color: "#2563eb",
+    },
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -100,52 +111,34 @@ const Statistics = () => {
                 <CardTitle className="text-lg font-semibold">Monthly Expense Amount</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px] w-full">
-                  <ResponsiveBar
-                    data={monthlyData}
-                    keys={['amount']}
-                    indexBy="month"
-                    margin={{ top: 20, right: 20, bottom: 60, left: 80 }}
-                    padding={0.3}
-                    valueScale={{ type: 'linear' }}
-                    colors={['#9333ea']}
-                    borderRadius={4}
-                    borderWidth={1}
-                    borderColor={{
-                      from: 'color',
-                      modifiers: [['darker', 0.2]]
-                    }}
-                    axisTop={null}
-                    axisRight={null}
-                    axisBottom={{
-                      tickSize: 5,
-                      tickPadding: 5,
-                      tickRotation: -45,
-                      legend: 'Month',
-                      legendPosition: 'middle',
-                      legendOffset: 50
-                    }}
-                    axisLeft={{
-                      tickSize: 5,
-                      tickPadding: 5,
-                      tickRotation: 0,
-                      legend: 'Amount (₹)',
-                      legendPosition: 'middle',
-                      legendOffset: -60,
-                      format: (value) => `₹${value.toLocaleString('en-IN')}`
-                    }}
-                    labelSkipWidth={12}
-                    labelSkipHeight={12}
-                    labelTextColor="#ffffff"
-                    role="application"
-                    ariaLabel="Monthly expense amount bar chart"
-                    tooltip={({ id, value, color }) => (
-                      <div className="bg-white p-2 shadow-lg rounded border">
-                        <strong>₹{value.toLocaleString('en-IN')}</strong>
-                      </div>
-                    )}
-                  />
-                </div>
+                <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={monthlyData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                      <XAxis 
+                        dataKey="month" 
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 12, fill: '#666' }}
+                      />
+                      <YAxis 
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 12, fill: '#666' }}
+                        tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
+                      />
+                      <ChartTooltip 
+                        content={<ChartTooltipContent />}
+                        formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, 'Amount']}
+                      />
+                      <Bar 
+                        dataKey="amount" 
+                        fill="var(--color-amount)"
+                        radius={[4, 4, 0, 0]}
+                        stroke="none"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
               </CardContent>
             </Card>
 
@@ -154,64 +147,46 @@ const Statistics = () => {
                 <CardTitle className="text-lg font-semibold">Number of Expenses</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px] w-full">
-                  <ResponsiveBar
-                    data={monthlyData}
-                    keys={['expenses']}
-                    indexBy="month"
-                    margin={{ top: 20, right: 20, bottom: 60, left: 60 }}
-                    padding={0.3}
-                    valueScale={{ type: 'linear' }}
-                    colors={['#2563eb']}
-                    borderRadius={4}
-                    borderWidth={1}
-                    borderColor={{
-                      from: 'color',
-                      modifiers: [['darker', 0.2]]
-                    }}
-                    axisTop={null}
-                    axisRight={null}
-                    axisBottom={{
-                      tickSize: 5,
-                      tickPadding: 5,
-                      tickRotation: -45,
-                      legend: 'Month',
-                      legendPosition: 'middle',
-                      legendOffset: 50
-                    }}
-                    axisLeft={{
-                      tickSize: 5,
-                      tickPadding: 5,
-                      tickRotation: 0,
-                      legend: 'Count',
-                      legendPosition: 'middle',
-                      legendOffset: -40
-                    }}
-                    labelSkipWidth={12}
-                    labelSkipHeight={12}
-                    labelTextColor="#ffffff"
-                    role="application"
-                    ariaLabel="Monthly expense count bar chart"
-                    tooltip={({ id, value, color }) => (
-                      <div className="bg-white p-2 shadow-lg rounded border">
-                        <strong>{value} expenses</strong>
-                      </div>
-                    )}
-                  />
-                </div>
+                <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={monthlyData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                      <XAxis 
+                        dataKey="month" 
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 12, fill: '#666' }}
+                      />
+                      <YAxis 
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 12, fill: '#666' }}
+                      />
+                      <ChartTooltip 
+                        content={<ChartTooltipContent />}
+                        formatter={(value) => [`${value}`, 'Expenses']}
+                      />
+                      <Bar 
+                        dataKey="expenses" 
+                        fill="var(--color-expenses)"
+                        radius={[4, 4, 0, 0]}
+                        stroke="none"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {monthlyData.map((data, index) => (
-                <Card key={data.month}>
-                  <CardContent className="p-4">
+                <Card key={data.month} className="p-3">
+                  <CardContent className="p-0">
                     <div className="text-center">
-                      <p className="text-sm text-gray-600">{data.month}</p>
-                      <p className="text-xl font-bold" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>
+                      <p className="text-sm text-gray-600 mb-1">{data.month}</p>
+                      <p className="text-lg font-bold mb-1" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>
                         ₹{data.amount.toLocaleString('en-IN')}
                       </p>
-                      <p className="text-sm text-gray-500">{data.expenses} expenses</p>
+                      <p className="text-xs text-gray-500">{data.expenses} expenses</p>
                     </div>
                   </CardContent>
                 </Card>

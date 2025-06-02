@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2, PlusCircle, Stethoscope, Receipt, Plane } from "lucide-react";
+import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Trash2, Loader2, Stethoscope, Receipt, Plane, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Header } from "@/components/layout/Header";
@@ -28,12 +27,21 @@ const categoryIcons: Record<string, any> = {
   "others": MoreHorizontal,
 };
 
+interface Expense {
+  id: string;
+  amount: number;
+  category: string;
+  description: string;
+  created_at: string;
+  date: string;
+}
+
 const Dashboard = () => {
   const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear() + '');
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
-  const [expenses, setExpenses] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [totalExpense, setTotalExpense] = useState(0);
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -45,6 +53,7 @@ const Dashboard = () => {
     date?: string;
   } | null>(null);
   const [isExpenseSheetOpen, setIsExpenseSheetOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
@@ -105,6 +114,8 @@ const Dashboard = () => {
           "Shopping": "shopping",
           "Loan": "loan",
           "Medical": "medical",
+          "Bill": "bill",
+          "Travel": "travel",
           "Others": "others"
         };
 
@@ -146,6 +157,17 @@ const Dashboard = () => {
     }
   };
 
+  const handleEditExpense = (expense: Expense) => {
+    setEditingExpense(expense);
+    setPrefilledData({
+      amount: expense.amount.toString(),
+      category: expense.category,
+      description: expense.description,
+      date: expense.date
+    });
+    setIsExpenseSheetOpen(true);
+  };
+
   const getPieChartData = () => {
     const categoryTotals: Record<string, number> = {};
     expenses.forEach(expense => {
@@ -176,17 +198,19 @@ const Dashboard = () => {
     date?: string;
   }) => {
     setPrefilledData(data);
-    setIsExpenseSheetOpen(true); // Automatically open the sheet when AI data is extracted
+    setIsExpenseSheetOpen(true);
   };
 
   const handleClearPrefilled = () => {
     setPrefilledData(null);
+    setEditingExpense(null);
   };
 
   const handleExpenseAdded = () => {
     fetchExpenses();
-    setIsExpenseSheetOpen(false); // Close the sheet after expense is added
-    setPrefilledData(null); // Clear prefilled data
+    setIsExpenseSheetOpen(false);
+    setPrefilledData(null);
+    setEditingExpense(null);
   };
 
   if (authChecking) {
@@ -247,7 +271,7 @@ const Dashboard = () => {
               </CardContent>
             </Card>
 
-            <div className="space-y-4 container">
+            <div className="space-y-3 container">
               {expenses.length === 0 ? (
                 <div className="text-center text-gray-500 py-8">
                   No expenses found for the selected filters.
@@ -258,29 +282,37 @@ const Dashboard = () => {
                   return (
                     <Card
                       key={expense.id}
-                      className="border rounded-[24px] hover:border-gray-300 transition-colors overflow-hidden"
+                      className="border rounded-[16px] hover:border-gray-300 transition-colors overflow-hidden"
                     >
-                      <CardContent className="flex items-center justify-between p-6">
-                        <div className="flex items-center gap-4 flex-1 min-w-0">
-                          <div className="p-2 rounded-[24px] shrink-0" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
-                            <CategoryIcon className="h-8 w-8 text-white" />
+                      <CardContent className="flex items-center justify-between p-4">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="p-2 rounded-[16px] shrink-0" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
+                            <CategoryIcon className="h-6 w-6 text-white" />
                           </div>
                           <div className="text-left min-w-0 flex-1">
-                            <p className="font-semibold truncate">{expense.description || "No description"}</p>
-                            <p className="text-sm capitalize">{expense.category}</p>
-                            <p className="text-xs">
+                            <p className="font-semibold truncate text-sm">{expense.description || "No description"}</p>
+                            <p className="text-xs capitalize text-gray-600">{expense.category}</p>
+                            <p className="text-xs text-gray-500">
                               {new Date(expense.created_at).toLocaleDateString()}
                             </p>
                           </div>
-                          <div className="flex items-center gap-4 shrink-0">
-                            <p className="text-xl font-bold whitespace-nowrap" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{expense.amount}</p>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <p className="text-lg font-bold whitespace-nowrap" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{expense.amount}</p>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="rounded-[24px] hover:bg-white/10 shrink-0"
+                              className="rounded-[16px] hover:bg-gray-100 shrink-0 h-8 w-8"
+                              onClick={() => handleEditExpense(expense)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-[16px] hover:bg-red-50 hover:text-red-600 shrink-0 h-8 w-8"
                               onClick={() => setExpenseToDelete(expense.id)}
                             >
-                              <Trash2 className="h-5 w-5" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
@@ -305,6 +337,9 @@ const Dashboard = () => {
           onFilter={handleFilter}
         />
         
+        {/* Voice Expense Capture Button */}
+        <VoiceExpenseCapture onExpenseExtracted={handleExpenseExtracted} />
+        
         {/* AI Expense Capture Button */}
         <AIExpenseCapture onExpenseExtracted={handleExpenseExtracted} />
         
@@ -317,6 +352,7 @@ const Dashboard = () => {
           onExpenseAdded={handleExpenseAdded} 
           prefilledData={prefilledData}
           onClearPrefilled={handleClearPrefilled}
+          editingExpense={editingExpense}
         />
       </div>
 

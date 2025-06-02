@@ -100,7 +100,7 @@ export class ShareReceiver {
       // Convert to base64 if needed
       const base64Data = typeof imageFile.data === 'string' 
         ? imageFile.data 
-        : btoa(String.fromCharCode(...new Uint8Array(imageFile.data)));
+        : btoa(String.fromCharCode(...new Uint8Array(imageFile.data as ArrayBuffer)));
 
       // Create a blob from the base64 data
       const response = await fetch(`data:image/jpeg;base64,${base64Data}`);

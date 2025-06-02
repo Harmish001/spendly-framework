@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, MoreHorizontal, Edit, Camera } from "lucide-react";
+import { Loader2, MoreHorizontal, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { MonthTabs } from "@/components/expenses/MonthTabs";
 import { ExpenseFormSheet } from "@/components/expenses/ExpenseFormSheet";
@@ -53,7 +54,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchExpenses();
-  }, [selectedMonth, selectedYear, selectedCategory]);
+  }, [selectedMonth, selectedYear]);
 
   const fetchExpenses = async () => {
     setLoading(true);
@@ -68,10 +69,6 @@ const Dashboard = () => {
         const lastDay = new Date(parseInt(selectedYear), parseInt(selectedMonth), 0).getDate();
         const endDate = `${selectedYear}-${selectedMonth.padStart(2, '0')}-${lastDay}`;
         query = query.gte("created_at", startDate).lte("created_at", endDate);
-      }
-
-      if (selectedCategory) {
-        query = query.eq("category", selectedCategory);
       }
 
       const { data, error } = await query;
@@ -95,20 +92,6 @@ const Dashboard = () => {
 
   const clearPrefilledData = () => {
     setPrefilledData(null);
-  };
-
-  const handleImageUpload = async (event: any) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      toast.error("No image selected");
-      return;
-    }
-
-    // Dispatch event to trigger AI processing
-    window.dispatchEvent(new CustomEvent('processSharedImage', {
-      detail: { file }
-    }));
   };
 
   const handleEditExpense = (expense: any) => {
@@ -172,7 +155,7 @@ const Dashboard = () => {
             </div>
           ) : filteredExpenses.length === 0 ? (
             <div className="text-center text-gray-500 py-8">
-              No expenses found for the selected filters.
+              No expenses found for the selected month.
             </div>
           ) : (
             filteredExpenses.map((expense) => {
@@ -216,31 +199,13 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Voice Expense Capture */}
-      <div className="fixed bottom-40 left-6 z-50">
+      {/* Voice Expense Capture - positioned for mobile visibility */}
+      <div className="fixed bottom-32 left-4 z-50">
         <VoiceExpenseCapture onExpenseExtracted={setPrefilledData} />
       </div>
 
-      {/* Camera Expense Capture */}
-      <Button
-        variant="outline"
-        className="fixed bottom-24 right-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-0 hover:from-blue-600 hover:to-indigo-600 z-50"
-        onClick={() => document.getElementById('expense-image-upload')?.click()}
-      >
-        <Camera className="h-6 w-6" />
-      </Button>
-
-      <input
-        id="expense-image-upload"
-        type="file"
-        accept="image/*"
-        capture="environment"
-        className="hidden"
-        onChange={handleImageUpload}
-      />
-
       {/* Expense Filters */}
-      <div className="fixed bottom-24 left-6 z-50">
+      <div className="fixed bottom-24 left-4 z-50">
         <ExpenseFilters
           selectedYear={selectedYear}
           selectedCategory={selectedCategory}

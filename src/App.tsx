@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from
 import Index from "./pages/Index";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
+import TravelExpenses from "./pages/TravelExpenses";
+import Statistics from "./pages/Statistics";
 import { Toaster } from "sonner";
 import { useEffect } from "react";
 import { supabase } from "./integrations/supabase/client";
@@ -63,6 +65,8 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/travel-expenses" element={<TravelExpenses />} />
+        <Route path="/statistics" element={<Statistics />} />
       </Routes>
       <Toaster />
     </Router>

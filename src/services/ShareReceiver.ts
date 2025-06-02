@@ -31,6 +31,9 @@ export class ShareReceiver {
           await this.checkForSharedContent();
         }
       });
+
+      // Check for shared content on app launch
+      await this.checkForSharedContent();
     } catch (error) {
       console.error('Error initializing ShareReceiver:', error);
     }
@@ -60,9 +63,17 @@ export class ShareReceiver {
 
   static async checkForSharedContent() {
     try {
-      // This would check for any pending shared content
-      // Implementation depends on the specific platform capabilities
-      console.log('Checking for shared content...');
+      if (!Capacitor.isNativePlatform()) return;
+
+      const { App } = await import('@capacitor/app');
+      const state = await App.getState();
+      
+      // Check if app was opened with intent data
+      if (state.isActive) {
+        // This is a placeholder for checking intent data
+        // The actual implementation would depend on a Capacitor plugin
+        console.log('Checking for shared content...');
+      }
     } catch (error) {
       console.error('Error checking shared content:', error);
     }
@@ -78,11 +89,12 @@ export class ShareReceiver {
       }
 
       // Dynamic import for filesystem
-      const { Filesystem } = await import('@capacitor/filesystem');
+      const { Filesystem, Directory } = await import('@capacitor/filesystem');
       
       // Read the image file
-      const imageFile:any = await Filesystem.readFile({
-        path: imageData.uri
+      const imageFile = await Filesystem.readFile({
+        path: imageData.uri,
+        directory: Directory.Cache
       });
 
       // Convert to base64 if needed
@@ -105,6 +117,16 @@ export class ShareReceiver {
 
     } catch (error) {
       console.error('Error processing shared image:', error);
+      
+      // Fallback: try to handle as regular shared content
+      try {
+        // Dispatch event with URI for fallback processing
+        window.dispatchEvent(new CustomEvent('processSharedImage', { 
+          detail: { uri: imageData.uri } 
+        }));
+      } catch (fallbackError) {
+        console.error('Fallback processing also failed:', fallbackError);
+      }
     }
   }
 }

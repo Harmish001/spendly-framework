@@ -13,6 +13,7 @@ import { ResponsivePie } from "@nivo/pie";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
 import { MonthTabs } from "@/components/expenses/MonthTabs";
 import { AIExpenseCapture } from "@/components/expenses/AIExpenseCapture";
+import { VoiceExpenseCapture } from "@/components/expenses/VoiceExpenseCapture";
 import { ExpenseFormSheet } from "@/components/expenses/ExpenseFormSheet";
 
 const categoryIcons: Record<string, any> = {

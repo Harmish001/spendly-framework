@@ -10,14 +10,14 @@ import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { VoiceExpenseCapture } from "@/components/expenses/VoiceExpenseCapture";
 import { AIExpenseCapture } from "@/components/expenses/AIExpenseCapture";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
-import { MobileNavigation } from "@/components/MobileNavigation";
+import { MobileNavigation } from "@/components/navigation/MobileNavigation";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Header } from "@/components/Header";
+import { Header } from "@/components/layout/Header";
 
 const categories = [
   { id: "investment", label: "Investment", icon: null },
@@ -48,7 +48,7 @@ const Dashboard = () => {
     description: string;
     date?: string;
   } | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
   const [editingExpense, setEditingExpense] = useState<any>(null);
 
   useEffect(() => {
@@ -115,9 +115,13 @@ const Dashboard = () => {
     setEditingExpense(expense);
   };
 
+  const handleFilter = () => {
+    fetchExpenses();
+  };
+
   const filteredExpenses = expenses.filter(expense => {
-    if (!selectedCategory) return true;
-    return expense.category === selectedCategory;
+    if (selectedCategory === "All Categories") return true;
+    return expense.category === selectedCategory.toLowerCase().replace(/\s+/g, '');
   });
 
   return (
@@ -161,7 +165,7 @@ const Dashboard = () => {
         </div>
 
         {/* Expense List */}
-        <div className="space-y-3 px-4">
+        <div className="space-y-2 px-4">
           {loading ? (
             <div className="text-center py-8">
               <Loader2 className="h-8 w-8 animate-spin mx-auto" />
@@ -178,12 +182,12 @@ const Dashboard = () => {
               return (
                 <Card
                   key={expense.id}
-                  className="border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
+                  className="border rounded-[16px] hover:border-gray-300 transition-colors overflow-hidden"
                 >
-                  <CardContent className="flex items-center justify-between p-4">
+                  <CardContent className="flex items-center justify-between p-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="p-2 rounded-[16px] shrink-0" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
-                        <Icon className="h-6 w-6 text-white" />
+                      <div className="p-2 rounded-[12px] shrink-0" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
+                        <Icon className="h-5 w-5 text-white" />
                       </div>
                       <div className="text-left min-w-0 flex-1">
                         <p className="font-semibold truncate text-sm">{expense.description || "No description"}</p>
@@ -197,11 +201,11 @@ const Dashboard = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEditExpense(expense)}
-                          className="h-8 w-8 p-0 rounded-full"
+                          className="h-7 w-7 p-0 rounded-full"
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-3 w-3" />
                         </Button>
-                        <p className="text-lg font-bold whitespace-nowrap" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{expense.amount}</p>
+                        <p className="text-base font-bold whitespace-nowrap" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{expense.amount}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -213,7 +217,9 @@ const Dashboard = () => {
       </div>
 
       {/* Voice Expense Capture */}
-      <VoiceExpenseCapture onExpenseExtracted={setPrefilledData} />
+      <div className="fixed bottom-40 left-6 z-50">
+        <VoiceExpenseCapture onExpenseExtracted={setPrefilledData} />
+      </div>
 
       {/* Camera Expense Capture */}
       <Button
@@ -234,10 +240,15 @@ const Dashboard = () => {
       />
 
       {/* Expense Filters */}
-      <ExpenseFilters
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-      />
+      <div className="fixed bottom-24 left-6 z-50">
+        <ExpenseFilters
+          selectedYear={selectedYear}
+          selectedCategory={selectedCategory}
+          onYearChange={setSelectedYear}
+          onCategoryChange={setSelectedCategory}
+          onFilter={handleFilter}
+        />
+      </div>
 
       {/* Mobile Navigation */}
       <MobileNavigation />

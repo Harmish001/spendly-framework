@@ -23,7 +23,9 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -38,7 +40,7 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
         processAudio();
       };
 
-      mediaRecorder.start();
+      mediaRecorder.start(1000); // Collect data every second
       setIsRecording(true);
       toast.success("Recording started! Speak your expense details...");
     } catch (error) {
@@ -59,23 +61,29 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
     
     try {
       // Create audio blob
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm;codecs=opus' });
       
       // Convert to base64
       const base64Audio = await blobToBase64(audioBlob);
       
+      console.log('Audio blob size:', audioBlob.size);
+      console.log('Base64 audio length:', base64Audio.length);
+
       // First convert speech to text
       const { data: transcriptionData, error: transcriptionError } = await supabase.functions.invoke('speech-to-text', {
         body: { audio: base64Audio }
       });
 
-      if (transcriptionError) throw transcriptionError;
+      if (transcriptionError) {
+        console.error('Transcription error:', transcriptionError);
+        throw transcriptionError;
+      }
 
-      const transcription = transcriptionData.text;
+      const transcription = transcriptionData?.text;
       console.log('Transcription:', transcription);
 
       if (!transcription || transcription.trim().length === 0) {
-        throw new Error("Could not understand the audio. Please try again.");
+        throw new Error("Could not understand the audio. Please try speaking clearly and try again.");
       }
 
       // Process transcription with Gemini to extract expense data
@@ -83,7 +91,10 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
         body: { transcription }
       });
 
-      if (expenseError) throw expenseError;
+      if (expenseError) {
+        console.error('Expense processing error:', expenseError);
+        throw expenseError;
+      }
 
       const { amount, category, description, date } = expenseData;
 
@@ -124,7 +135,7 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
 
   if (isProcessing) {
     return (
-      <div className="fixed bottom-24 left-6 z-50">
+      <div className="fixed bottom-32 left-4 z-50">
         <div className="bg-white rounded-full shadow-lg p-4 flex items-center gap-2">
           <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
           <span className="text-sm font-medium">Processing voice...</span>
@@ -136,7 +147,7 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
   return (
     <Button
       variant="outline"
-      className="fixed bottom-24 left-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 hover:from-green-600 hover:to-emerald-600 z-50"
+      className="fixed bottom-32 left-4 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 hover:from-green-600 hover:to-emerald-600 z-50"
       onClick={isRecording ? stopRecording : startRecording}
     >
       {isRecording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}

@@ -54,7 +54,7 @@ export const ExpenseFilters = ({
           {!isMobile && 'Filters'}
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="rounded-t-[24px] border-0 max-h-[85vh]">
+      <DrawerContent className="rounded-t-[24px] border-0 max-h-[85vh] mb-4">
         <DrawerHeader className="text-center pb-2">
           <SheetTitle>Filter Expenses</SheetTitle>
         </DrawerHeader>

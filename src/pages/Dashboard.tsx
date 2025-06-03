@@ -157,12 +157,12 @@ const Dashboard = () => {
         </div>
 
         {/* AI Expense Capture */}
-        <div className="px-4 py-4">
+        <div className="px-4 py-0">
           <AIExpenseCapture onExpenseExtracted={setPrefilledData} />
         </div>
 
         {/* Add Expense Button */}
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-0">
           <ExpenseFormSheet
             onExpenseAdded={handleExpenseAdded}
             prefilledData={prefilledData}
@@ -171,13 +171,13 @@ const Dashboard = () => {
         </div>
 
         {/* Total Expense Card */}
-        <div className="px-4 pb-4">
-          <Card className="col-span-1 md:col-span-2 mb-4 mt-2 border-0 shadow-none">
+        <div className="px-4 pb-0">
+          <Card className="col-span-1 md:col-span-2 mb-2 mt-2 border-0 shadow-none">
             <CardContent className="p-1">
               <div className="relative h-[250px]">
                 <ResponsivePie
                   data={getPieChartData()}
-                  margin={{ top: 10, right: 20, bottom: 10, left: 20 }}
+                  margin={{ top: 0, right: 20, bottom: 10, left: 20 }}
                   innerRadius={0.6}
                   padAngle={0.7}
                   cornerRadius={3}
@@ -207,7 +207,7 @@ const Dashboard = () => {
         </div>
 
         {/* Expense List */}
-        <div className="space-y-2 px-4">
+        <div className="space-y-3 px-4">
           {loading ? (
             <div className="text-center py-8">
               <Loader2 className="h-8 w-8 animate-spin mx-auto" />
@@ -224,9 +224,9 @@ const Dashboard = () => {
               return (
                 <Card
                   key={expense.id}
-                  className="border rounded-[16px] hover:border-gray-300 transition-colors overflow-hidden"
+                  className="border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
                 >
-                  <CardContent className="flex items-center justify-between p-3">
+                  <CardContent className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="p-2 rounded-[12px] shrink-0" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
                         <Icon className="h-5 w-5 text-white" />
@@ -238,24 +238,17 @@ const Dashboard = () => {
                           {new Date(expense.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1 shrink-0">
                         <p className="text-base font-bold whitespace-nowrap" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{expense.amount}</p>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEditExpense(expense)}
-                          className="h-4 w-4 p-0 rounded-full"
+                          className="rounded-full pl-2 pr-2"
                         >
-                          <Edit className="h-3 w-3" />
+                          <Edit className="h-1 w-1" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="rounded-[24px] hover:bg-white/10 shrink-0"
-                          onClick={() => setExpenseToDelete(expense.id)}
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </Button>
+                          <Trash2 className="h-4 w-4" onClick={() => setExpenseToDelete(expense.id)} />
                       </div>
                     </div>
                   </CardContent>

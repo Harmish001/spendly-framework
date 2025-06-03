@@ -1,10 +1,8 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-
 interface VoiceExpenseCaptureProps {
   onExpenseExtracted: (data: {
     amount: string;
@@ -13,33 +11,32 @@ interface VoiceExpenseCaptureProps {
     date?: string;
   }) => void;
 }
-
-export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureProps) => {
+export const VoiceExpenseCapture = ({
+  onExpenseExtracted
+}: VoiceExpenseCaptureProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true
+      });
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'audio/webm;codecs=opus'
       });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
+      mediaRecorder.ondataavailable = event => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
-
       mediaRecorder.onstop = () => {
         stream.getTracks().forEach(track => track.stop());
         processAudio();
       };
-
       mediaRecorder.start(1000); // Collect data every second
       setIsRecording(true);
       toast.success("Recording started! Speak your expense details...");
@@ -48,55 +45,63 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
       toast.error("Could not access microphone. Please check permissions.");
     }
   };
-
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
   };
-
   const processAudio = async () => {
     setIsProcessing(true);
-    
     try {
       // Create audio blob
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm;codecs=opus' });
-      
+      const audioBlob = new Blob(audioChunksRef.current, {
+        type: 'audio/webm;codecs=opus'
+      });
+
       // Convert to base64
       const base64Audio = await blobToBase64(audioBlob);
-      
       console.log('Audio blob size:', audioBlob.size);
       console.log('Base64 audio length:', base64Audio.length);
 
       // First convert speech to text
-      const { data: transcriptionData, error: transcriptionError } = await supabase.functions.invoke('speech-to-text', {
-        body: { audio: base64Audio }
+      const {
+        data: transcriptionData,
+        error: transcriptionError
+      } = await supabase.functions.invoke('speech-to-text', {
+        body: {
+          audio: base64Audio
+        }
       });
-
       if (transcriptionError) {
         console.error('Transcription error:', transcriptionError);
         throw transcriptionError;
       }
-
       const transcription = transcriptionData?.text;
       console.log('Transcription:', transcription);
-
       if (!transcription || transcription.trim().length === 0) {
         throw new Error("Could not understand the audio. Please try speaking clearly and try again.");
       }
 
       // Process transcription with Gemini to extract expense data
-      const { data: expenseData, error: expenseError } = await supabase.functions.invoke('process-voice-expense', {
-        body: { transcription }
+      const {
+        data: expenseData,
+        error: expenseError
+      } = await supabase.functions.invoke('process-voice-expense', {
+        body: {
+          transcription
+        }
       });
-
       if (expenseError) {
         console.error('Expense processing error:', expenseError);
         throw expenseError;
       }
-
-      const { amount, category, description, date } = expenseData;
+      const {
+        amount,
+        category,
+        description,
+        date
+      } = expenseData;
 
       // Validate that we at least have an amount
       if (!amount || isNaN(parseFloat(amount))) {
@@ -110,7 +115,6 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
         description: description || "Voice expense",
         date: date
       });
-
       toast.success("Expense details extracted from voice! Please review and confirm.");
     } catch (error: any) {
       console.error("Error processing voice:", error);
@@ -119,7 +123,6 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
       setIsProcessing(false);
     }
   };
-
   const blobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -132,25 +135,15 @@ export const VoiceExpenseCapture = ({ onExpenseExtracted }: VoiceExpenseCaptureP
       reader.readAsDataURL(blob);
     });
   };
-
   if (isProcessing) {
-    return (
-      <div className="fixed bottom-32 left-4 z-50">
+    return <div className="fixed bottom-32 left-4 z-50">
         <div className="bg-white rounded-full shadow-lg p-4 flex items-center gap-2">
           <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
           <span className="text-sm font-medium">Processing voice...</span>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <Button
-      variant="outline"
-      className="fixed bottom-32 left-4 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 hover:from-green-600 hover:to-emerald-600 z-50"
-      onClick={isRecording ? stopRecording : startRecording}
-    >
+  return <Button variant="outline" onClick={isRecording ? stopRecording : startRecording} className="fixed bottom-24 left-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 hover:from-green-600 hover:to-emerald-600 z-50">
       {isRecording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
-    </Button>
-  );
+    </Button>;
 };

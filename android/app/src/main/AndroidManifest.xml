@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="app.lovable.fe3b15c32c154b048b9985fefc4797f2">
@@ -20,9 +21,6 @@
     
     <!-- Camera permission -->
     <uses-permission android:name="android.permission.CAMERA" />
-    
-    <!-- Remove MANAGE_EXTERNAL_STORAGE unless absolutely necessary -->
-    <!-- <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" /> -->
     
     <!-- Features -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -49,32 +47,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             
-            <!-- Share intent filter for single images -->
-            <intent-filter android:label="@string/app_name">
+            <!-- FIXED: Share intent filter for single images -->
+            <intent-filter android:label="Spendly">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
             </intent-filter>
             
-            <!-- Share intent filter for multiple images -->
-            <intent-filter android:label="@string/app_name">
+            <!-- FIXED: Share intent filter for multiple images -->
+            <intent-filter android:label="Spendly">
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
             </intent-filter>
             
-            <!-- View intent filter for image files -->
-            <intent-filter android:label="@string/app_name">
+            <!-- FIXED: View intent filter for image files -->
+            <intent-filter android:label="Spendly">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:mimeType="image/*" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="image/*"/>
-            </intent-filter>
+            
         </activity>
         
         <provider
@@ -87,3 +81,4 @@
                 android:resource="@xml/file_paths" />
         </provider>
     </application>
+</manifest>

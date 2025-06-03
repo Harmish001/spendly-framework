@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { AndroidPermissions } from "@/utils/AndroidPermissions";
+import { Capacitor } from '@capacitor/core';
+
 interface VoiceExpenseCaptureProps {
   onExpenseExtracted: (data: {
     amount: string;
@@ -11,46 +14,92 @@ interface VoiceExpenseCaptureProps {
     date?: string;
   }) => void;
 }
+
 export const VoiceExpenseCapture = ({
   onExpenseExtracted
 }: VoiceExpenseCaptureProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+
+  useEffect(() => {
+    // Check permission on component mount
+    if (Capacitor.isNativePlatform()) {
+      checkPermissions();
+    } else {
+      setHasPermission(true); // Web platform
+    }
+  }, []);
+
+  const checkPermissions = async () => {
+    const permissions = await AndroidPermissions.checkAllPermissions();
+    setHasPermission(permissions.microphone);
+  };
+
+  const requestPermission = async () => {
+    const result = await AndroidPermissions.requestMicrophonePermission();
+    if (result.granted) {
+      setHasPermission(true);
+      toast.success("Microphone permission granted!");
+    } else {
+      toast.error(result.message);
+    }
+  };
+
   const startRecording = async () => {
+    // Check permission first on Android
+    if (Capacitor.isNativePlatform() && !hasPermission) {
+      await requestPermission();
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true
       });
+      
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'audio/webm;codecs=opus'
       });
+      
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
+
       mediaRecorder.ondataavailable = event => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
+
       mediaRecorder.onstop = () => {
         stream.getTracks().forEach(track => track.stop());
         processAudio();
       };
-      mediaRecorder.start(1000); // Collect data every second
+
+      mediaRecorder.start(1000);
       setIsRecording(true);
       toast.success("Recording started! Speak your expense details...");
     } catch (error) {
       console.error("Error starting recording:", error);
-      toast.error("Could not access microphone. Please check permissions.");
+      
+      // On Android, try to request permission again
+      if (Capacitor.isNativePlatform()) {
+        await requestPermission();
+      } else {
+        toast.error("Could not access microphone. Please check permissions.");
+      }
     }
   };
+
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
   };
+
   const processAudio = async () => {
     setIsProcessing(true);
     try {
@@ -123,6 +172,7 @@ export const VoiceExpenseCapture = ({
       setIsProcessing(false);
     }
   };
+
   const blobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -135,15 +185,25 @@ export const VoiceExpenseCapture = ({
       reader.readAsDataURL(blob);
     });
   };
+
   if (isProcessing) {
-    return <div className="fixed bottom-32 left-4 z-50">
+    return (
+      <div className="fixed bottom-32 left-4 z-50">
         <div className="bg-white rounded-full shadow-lg p-4 flex items-center gap-2">
           <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
           <span className="text-sm font-medium">Processing voice...</span>
         </div>
-      </div>;
+      </div>
+    );
   }
-  return <Button variant="outline" onClick={isRecording ? stopRecording : startRecording} className="fixed bottom-24 left-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 hover:from-green-600 hover:to-emerald-600 z-50">
+
+  return (
+    <Button
+      variant="outline"
+      onClick={isRecording ? stopRecording : startRecording}
+      className="fixed bottom-24 left-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 hover:from-green-600 hover:to-emerald-600 z-50"
+    >
       {isRecording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
-    </Button>;
+    </Button>
+  );
 };

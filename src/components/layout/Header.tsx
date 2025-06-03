@@ -1,39 +1,45 @@
 
 import { Button } from "@/components/ui/button";
-import { LogOut, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { LogOut, User } from "lucide-react";
+import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { MobileNavigation } from "@/components/navigation/MobileNavigation";
 
 export const Header = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("Error signing out");
+    } else {
       toast.success("Signed out successfully");
-      navigate('/');
-    } catch (error: any) {
-      toast.error("Error signing out: " + error.message);
+      navigate("/");
     }
   };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
       <div className="container flex h-14 items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Wallet className="pt-1 h-8 w-8 text-white rounded" />
-            <span className="text-white bg-clip-text text-transparent">
-              Spendly
-            </span>
+        <div className="flex items-center gap-1">
+          {isMobile && <MobileNavigation />}
+          <h1 className="text-xl font-bold text-white bg-clip-text text-transparent">
+            Spendly
           </h1>
         </div>
-        <div className="flex items-center space-x-2">
-          <LogOut className="h-6 w-6 sm:hidden text-white" onClick={handleSignOut} />
-          <span onClick={handleSignOut} className="ml-2 text-xl font-bold hidden md:inline text-white">Sign Out</span>
+
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleSignOut}
+            className="rounded-full"
+          >
+            <LogOut className="h-5 w-5 text-white" />
+          </Button>
         </div>
       </div>
     </header>

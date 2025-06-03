@@ -15,6 +15,14 @@ interface ExpenseFormSheetProps {
   onClearPrefilled?: () => void;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  editingExpense?: {
+    id: string;
+    amount: number;
+    category: string;
+    description: string;
+    created_at: string;
+    date: string;
+  } | null;
 }
 
 export const ExpenseFormSheet = ({
@@ -22,8 +30,11 @@ export const ExpenseFormSheet = ({
   prefilledData,
   onClearPrefilled,
   isOpen,
-  onOpenChange
+  onOpenChange,
+  editingExpense
 }: ExpenseFormSheetProps) => {
+  const isEditing = !!editingExpense;
+  
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
       <DrawerTrigger asChild>
@@ -37,8 +48,10 @@ export const ExpenseFormSheet = ({
       <DrawerContent className="rounded-t-[24px] border-0 max-h-[85vh]">
         <DrawerHeader className="text-center pb-2">
           <div className="flex items-center justify-between">
-            <DrawerTitle className="text-lg font-semibold">Add New Expense</DrawerTitle>
-            {prefilledData && (
+            <DrawerTitle className="text-lg font-semibold">
+              {isEditing ? 'Edit Expense' : 'Add New Expense'}
+            </DrawerTitle>
+            {(prefilledData || isEditing) && (
               <Button
                 variant="outline"
                 size="sm"
@@ -50,10 +63,18 @@ export const ExpenseFormSheet = ({
             )}
           </div>
 
-          {prefilledData && (
+          {prefilledData && !isEditing && (
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 mt-2">
               <p className="text-sm text-purple-700 font-medium">
                 ✨ AI extracted data - Review and confirm
+              </p>
+            </div>
+          )}
+
+          {isEditing && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
+              <p className="text-sm text-blue-700 font-medium">
+                ✏️ Editing expense - Make your changes
               </p>
             </div>
           )}
@@ -64,6 +85,7 @@ export const ExpenseFormSheet = ({
             onExpenseAdded={onExpenseAdded}
             prefilledData={prefilledData}
             onClearPrefilled={onClearPrefilled}
+            editingExpense={editingExpense}
           />
         </div>
       </DrawerContent>

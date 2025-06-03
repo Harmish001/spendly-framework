@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { Loader2, MoreHorizontal, Edit, Trash2, AlarmClockIcon } from "lucide-react";
 import { toast } from "sonner";
 import { MonthTabs } from "@/components/expenses/MonthTabs";
 import { ExpenseFormSheet } from "@/components/expenses/ExpenseFormSheet";
@@ -21,6 +21,7 @@ import {
 import { Header } from "@/components/layout/Header";
 import { ResponsivePie } from "@nivo/pie";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter, DrawerDescription, DrawerClose } from "@/components/ui/drawer";
+import { requestAllPermissions } from '../../Permissions';
 
 const categories = [
   { id: "investment", label: "Investment", icon: null },
@@ -54,6 +55,20 @@ const Dashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
   const [editingExpense, setEditingExpense] = useState<any>(null);
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
+  const [permissions, setPermissions] = useState(null);
+
+  const handleRequestAllPermissions = async () => {
+    try {
+      const result = await requestAllPermissions();
+      setPermissions(result.permissions);
+      // Log results for debugging
+      console.log('🔍 Permission Results:', result);
+
+    } catch (error) {
+      console.log(error)
+    } finally {
+    }
+  };
 
   useEffect(() => {
     fetchExpenses();
@@ -142,6 +157,27 @@ const Dashboard = () => {
       toast.error("Failed to delete expense");
     }
   };
+
+   useEffect(() => {
+    // Optional: Auto-request permissions when app starts
+    const autoRequestPermissions = async () => {
+      try {
+        console.log('🚀 App started - requesting permissions...');
+        const result = await requestAllPermissions();
+        setPermissions(result.permissions);
+      } catch (error) {
+        console.error('❌ Auto permission request failed:', error);
+      }
+    };
+
+    // Uncomment the line below if you want to auto-request on app start
+    autoRequestPermissions();
+  }, []);
+
+  const handleRequestPermissions = async () => {
+    await handleRequestAllPermissions();
+  };
+  console.log(permissions)
 
   return (
     <div className="min-h-screen bg-background">
@@ -263,6 +299,10 @@ const Dashboard = () => {
       <div className="fixed bottom-32 left-4 z-50">
         <VoiceExpenseCapture onExpenseExtracted={setPrefilledData} />
       </div>
+
+      {!permissions && <div className="fixed bottom-50 left-4 z-50">
+        <AlarmClockIcon className="h-5 w-5" onClick={handleRequestPermissions} />
+      </div>}
 
       {/* Expense Filters */}
       <div className="fixed bottom-24 right-6 z-50">

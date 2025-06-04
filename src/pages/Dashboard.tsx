@@ -174,11 +174,6 @@ const Dashboard = () => {
     autoRequestPermissions();
   }, []);
 
-  const handleRequestPermissions = async () => {
-    await handleRequestAllPermissions();
-  };
-  console.log(permissions)
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -194,7 +189,7 @@ const Dashboard = () => {
 
         {/* AI Expense Capture */}
         <div className="px-4 py-0">
-          <AIExpenseCapture onExpenseExtracted={setPrefilledData} />
+          <AIExpenseCapture onExpenseExtracted={setEditingExpense} />
         </div>
 
         {/* Add Expense Button */}
@@ -299,10 +294,6 @@ const Dashboard = () => {
       <div className="fixed bottom-32 left-4 z-50">
         <VoiceExpenseCapture onExpenseExtracted={setPrefilledData} />
       </div>
-
-      {!permissions && <div className="fixed bottom-50 left-4 z-50">
-        <AlarmClockIcon className="h-5 w-5" onClick={handleRequestPermissions} />
-      </div>}
 
       {/* Expense Filters */}
       <div className="fixed bottom-24 right-6 z-50">

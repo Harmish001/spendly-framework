@@ -47,22 +47,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             
-            <!-- FIXED: Share intent filter for single images -->
-            <intent-filter android:label="Spendly">
+            <!-- SHARE: Single image sharing -->
+            <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
             </intent-filter>
             
-            <!-- FIXED: Share intent filter for multiple images -->
-            <intent-filter android:label="Spendly">
+            <!-- SHARE: Multiple images sharing -->
+            <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
             </intent-filter>
             
-            <!-- FIXED: View intent filter for image files -->
-            <intent-filter android:label="Spendly">
+            <!-- VIEW: Open image files with the app -->
+            <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />

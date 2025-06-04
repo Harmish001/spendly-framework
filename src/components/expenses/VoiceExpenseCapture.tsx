@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Loader2 } from "lucide-react";
@@ -26,16 +27,17 @@ export const VoiceExpenseCapture = ({
 
   useEffect(() => {
     // Check permission on component mount
-    if (Capacitor.isNativePlatform()) {
-      checkPermissions();
-    } else {
-      setHasPermission(true); // Web platform
-    }
+    checkPermissions();
   }, []);
 
   const checkPermissions = async () => {
-    const permissions = await AndroidPermissions.checkAllPermissions();
-    setHasPermission(permissions.microphone);
+    if (Capacitor.isNativePlatform()) {
+      const permissions = await AndroidPermissions.checkAllPermissions();
+      setHasPermission(permissions.microphone);
+    } else {
+      // For web, assume permission is available
+      setHasPermission(true);
+    }
   };
 
   const requestPermission = async () => {
@@ -43,19 +45,23 @@ export const VoiceExpenseCapture = ({
     if (result.granted) {
       setHasPermission(true);
       toast.success("Microphone permission granted!");
+      return true;
     } else {
       toast.error(result.message);
+      return false;
     }
   };
 
   const startRecording = async () => {
-    // Check permission first on Android
-    if (Capacitor.isNativePlatform() && !hasPermission) {
-      await requestPermission();
-      return;
-    }
-
     try {
+      // On Android, always request permission first
+      if (Capacitor.isNativePlatform() && !hasPermission) {
+        const granted = await requestPermission();
+        if (!granted) {
+          return;
+        }
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true
       });
@@ -84,7 +90,7 @@ export const VoiceExpenseCapture = ({
     } catch (error) {
       console.error("Error starting recording:", error);
       
-      // On Android, try to request permission again
+      // Try to request permission again on error
       if (Capacitor.isNativePlatform()) {
         await requestPermission();
       } else {
@@ -122,12 +128,15 @@ export const VoiceExpenseCapture = ({
           audio: base64Audio
         }
       });
+      
       if (transcriptionError) {
         console.error('Transcription error:', transcriptionError);
         throw transcriptionError;
       }
+      
       const transcription = transcriptionData?.text;
       console.log('Transcription:', transcription);
+      
       if (!transcription || transcription.trim().length === 0) {
         throw new Error("Could not understand the audio. Please try speaking clearly and try again.");
       }
@@ -141,10 +150,12 @@ export const VoiceExpenseCapture = ({
           transcription
         }
       });
+      
       if (expenseError) {
         console.error('Expense processing error:', expenseError);
         throw expenseError;
       }
+      
       const {
         amount,
         category,
@@ -164,6 +175,7 @@ export const VoiceExpenseCapture = ({
         description: description || "Voice expense",
         date: date
       });
+      
       toast.success("Expense details extracted from voice! Please review and confirm.");
     } catch (error: any) {
       console.error("Error processing voice:", error);

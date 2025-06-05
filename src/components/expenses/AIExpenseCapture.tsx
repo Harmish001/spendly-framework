@@ -136,6 +136,24 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
     input.click();
   };
 
+  useEffect(() => {
+    const handleSharedImage = (event: CustomEvent) => {
+      const { imageFile } = event.detail;
+      console.log('Received shared expense image:', imageFile.name);
+      
+      // Process the shared image with your existing function
+      processImageWithAI(imageFile);
+    };
+
+    // Listen for shared image events
+    window.addEventListener('sharedExpenseImage', handleSharedImage as EventListener);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('sharedExpenseImage', handleSharedImage as EventListener);
+    };
+  }, []); 
+
   if (isProcessing) {
     return (
       <div className="fixed bottom-6 left-6 z-50">

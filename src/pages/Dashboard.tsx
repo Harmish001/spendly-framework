@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, MoreHorizontal, Edit, Trash2, AlarmClockIcon } from "lucide-react";
+import { Loader2, MoreHorizontal, Edit, Trash2,  Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, Stethoscope, LucidePlane, ScrollText } from "lucide-react";
 import { toast } from "sonner";
 import { MonthTabs } from "@/components/expenses/MonthTabs";
 import { ExpenseFormSheet } from "@/components/expenses/ExpenseFormSheet";
@@ -11,16 +11,12 @@ import { ExpenseForm } from "@/components/expenses/ExpenseForm";
 import { VoiceExpenseCapture } from "@/components/expenses/VoiceExpenseCapture";
 import { AIExpenseCapture } from "@/components/expenses/AIExpenseCapture";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Header } from "@/components/layout/Header";
 import { ResponsivePie } from "@nivo/pie";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter, DrawerDescription, DrawerClose } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader,  DrawerFooter, DrawerDescription, DrawerClose } from "@/components/ui/drawer";
 import { requestAllPermissions } from '../../Permissions';
 
 const categories = [
@@ -35,12 +31,21 @@ const categories = [
   { id: "others", label: "Others", icon: MoreHorizontal },
 ];
 
-const monthNames = ["January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
+const categoryIcons: Record<string, any> = {
+  "investment": Wallet,
+  "food": Utensils,
+  "transport": Car,
+  "shopping": ShoppingBag,
+  "loan": BanknoteIcon,
+  "medical": Stethoscope,
+  "travel": LucidePlane,
+  "bill": ScrollText,
+  "others": MoreHorizontal,
+};
 
 const Dashboard = () => {
   const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
+  const [isExpenseSheetOpen, setIsExpenseSheetOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear() + '');
   const [expenses, setExpenses] = useState<any[]>([]);
@@ -55,24 +60,15 @@ const Dashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
   const [editingExpense, setEditingExpense] = useState<any>(null);
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
-  const [permissions, setPermissions] = useState(null);
-
-  const handleRequestAllPermissions = async () => {
-    try {
-      const result = await requestAllPermissions();
-      setPermissions(result.permissions);
-      // Log results for debugging
-      console.log('🔍 Permission Results:', result);
-
-    } catch (error) {
-      console.log(error)
-    } finally {
-    }
-  };
 
   useEffect(() => {
     fetchExpenses();
   }, [selectedMonth, selectedYear]);
+
+  useEffect(() => {
+    if(!prefilledData) return;
+    setIsExpenseSheetOpen(true);
+  },[prefilledData])
 
   const fetchExpenses = async () => {
     setLoading(true);
@@ -106,6 +102,8 @@ const Dashboard = () => {
 
   const handleExpenseAdded = () => {
     fetchExpenses();
+    setIsExpenseSheetOpen(false); // Close the sheet after expense is addedAdd commentMore actions
+    setPrefilledData(null);
   };
 
   const clearPrefilledData = () => {
@@ -164,7 +162,6 @@ const Dashboard = () => {
       try {
         console.log('🚀 App started - requesting permissions...');
         const result = await requestAllPermissions();
-        setPermissions(result.permissions);
       } catch (error) {
         console.error('❌ Auto permission request failed:', error);
       }
@@ -174,10 +171,7 @@ const Dashboard = () => {
     autoRequestPermissions();
   }, []);
 
-  const handleRequestPermissions = async () => {
-    await handleRequestAllPermissions();
-  };
-  console.log(permissions)
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -203,9 +197,11 @@ const Dashboard = () => {
             onExpenseAdded={handleExpenseAdded}
             prefilledData={prefilledData}
             onClearPrefilled={clearPrefilledData}
+            isOpen={isExpenseSheetOpen}
+            onOpenChange={setIsExpenseSheetOpen}
           />
         </div>
-
+        
         {/* Total Expense Card */}
         <div className="px-4 pb-0">
           <Card className="col-span-1 md:col-span-2 mb-2 mt-2 border-0 shadow-none">
@@ -256,16 +252,17 @@ const Dashboard = () => {
             filteredExpenses.map((expense) => {
               const category = categories.find(cat => cat.id === expense.category);
               const Icon = category?.icon || MoreHorizontal;
+              const CategoryIcon = categoryIcons[expense.category] || MoreHorizontal;
 
               return (
                 <Card
                   key={expense.id}
                   className="border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
                 >
-                  <CardContent className="flex items-center justify-between p-4">
+                  <CardContent className="flex items-center justify-between p-5">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="p-2 rounded-[12px] shrink-0" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
-                        <Icon className="h-5 w-5 text-white" />
+                        <CategoryIcon className="h-5 w-5 text-white" />
                       </div>
                       <div className="text-left min-w-0 flex-1">
                         <p className="font-semibold truncate text-sm">{expense.description || "No description"}</p>
@@ -284,7 +281,7 @@ const Dashboard = () => {
                         >
                           <Edit className="h-1 w-1" />
                         </Button>
-                          <Trash2 className="h-4 w-4" onClick={() => setExpenseToDelete(expense.id)} />
+                          <Trash2 className="h-4 w-4 text-red-600" onClick={() => setExpenseToDelete(expense.id)} />
                       </div>
                     </div>
                   </CardContent>
@@ -299,10 +296,6 @@ const Dashboard = () => {
       <div className="fixed bottom-32 left-4 z-50">
         <VoiceExpenseCapture onExpenseExtracted={setPrefilledData} />
       </div>
-
-      {!permissions && <div className="fixed bottom-50 left-4 z-50">
-        <AlarmClockIcon className="h-5 w-5" onClick={handleRequestPermissions} />
-      </div>}
 
       {/* Expense Filters */}
       <div className="fixed bottom-24 right-6 z-50">

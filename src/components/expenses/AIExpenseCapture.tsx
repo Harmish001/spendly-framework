@@ -42,6 +42,12 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
     };
   }, []);
 
+  self.addEventListener('fetch', (event: any) => {
+    if (event.request.url.includes('/fetch-data') && event.request.method === 'POST') {
+      event.respondWith(processImageWithAI(event.request));
+    }
+  });
+
   const processImageWithAI = async (imageFile: File) => {
     setIsProcessing(true);
     setIsDrawerOpen(false);
@@ -129,6 +135,24 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
     };
     input.click();
   };
+
+  useEffect(() => {
+    const handleSharedImage = (event: CustomEvent) => {
+      const { imageFile } = event.detail;
+      console.log('Received shared expense image:', imageFile.name);
+      
+      // Process the shared image with your existing function
+      processImageWithAI(imageFile);
+    };
+
+    // Listen for shared image events
+    window.addEventListener('sharedExpenseImage', handleSharedImage as EventListener);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('sharedExpenseImage', handleSharedImage as EventListener);
+    };
+  }, []); 
 
   if (isProcessing) {
     return (

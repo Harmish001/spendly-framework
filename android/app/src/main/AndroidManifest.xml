@@ -1,7 +1,7 @@
 
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="app.lovable.fe3b15c32c154b048b9985fefc4797f2">
+    package="app.spendly.1">
     
     <!-- Essential Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />

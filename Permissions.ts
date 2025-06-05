@@ -1,6 +1,7 @@
 // Create file: src/utils/allPermissions.ts
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
+import { toast } from 'sonner';
 
 interface PermissionResult {
     camera: string;
@@ -32,7 +33,7 @@ export const requestAllPermissions = async (): Promise<PermissionStatus> => {
             permissions: ['camera', 'photos']
         });
 
-        console.log('📷 Camera permissions:', cameraResult);
+        toast.success(`📷 Camera permissions: ${JSON.stringify(cameraResult)}`);
 
         // 2. Request Microphone permission via getUserMedia
         let microphoneGranted = 'denied';
@@ -47,7 +48,7 @@ export const requestAllPermissions = async (): Promise<PermissionStatus> => {
             microphoneGranted = 'granted';
             console.log('🎤 Microphone permission granted');
         } catch (error) {
-            console.log('🎤 Microphone permission denied:', error);
+            toast.success('🎤 Microphone permission denied:', error);
             microphoneGranted = 'denied';
         }
 

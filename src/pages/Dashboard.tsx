@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -69,6 +68,20 @@ const Dashboard = () => {
     if(!prefilledData) return;
     setIsExpenseSheetOpen(true);
   },[prefilledData])
+
+  useEffect(() => {
+    // Add listener for shared expense events
+    const handleSharedExpense = (event: CustomEvent) => {
+      const expenseData = event.detail;
+      setPrefilledData(expenseData);
+    };
+
+    window.addEventListener('sharedExpenseProcessed', handleSharedExpense as EventListener);
+
+    return () => {
+      window.removeEventListener('sharedExpenseProcessed', handleSharedExpense as EventListener);
+    };
+  }, []);
 
   const fetchExpenses = async () => {
     setLoading(true);
@@ -156,7 +169,7 @@ const Dashboard = () => {
     }
   };
 
-   useEffect(() => {
+  useEffect(() => {
     // Optional: Auto-request permissions when app starts
     const autoRequestPermissions = async () => {
       try {
@@ -170,8 +183,6 @@ const Dashboard = () => {
     // Uncomment the line below if you want to auto-request on app start
     autoRequestPermissions();
   }, []);
-
-
 
   return (
     <div className="min-h-screen bg-background">

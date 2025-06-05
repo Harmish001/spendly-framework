@@ -1,3 +1,4 @@
+
 import {
 	BrowserRouter as Router,
 	Routes,
@@ -71,16 +72,97 @@ function App() {
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		if (params.get("shared") === "expense_image") {
-			// Fetch data from cache here
-			caches.open("shared-data-v1").then(async (cache) => {
-				const dataRes = await cache.match("shared-data-latest");
-				const imageRes = await cache.match("shared-image-latest");
-				const sharedData = dataRes && (await dataRes.json());
-				toast.success("Shared data received! Processing...");
-				// TODO: Show preview or upload flow
-			});
+			handleSharedExpenseImage();
+			// Clean URL
+			window.history.replaceState({}, document.title, window.location.pathname);
 		}
 	}, []);
+
+	const handleSharedExpenseImage = async () => {
+		try {
+			const cache = await caches.open("shared-data-v1");
+			const dataRes = await cache.match("shared-data-latest");
+			const imageRes = await cache.match("shared-image-latest");
+
+			if (dataRes && imageRes) {
+				const sharedData = await dataRes.json();
+				const imageBlob = await imageRes.blob();
+
+				// Create File object from blob
+				const imageFile = new File([imageBlob], sharedData.imageName, {
+					type: sharedData.imageType,
+					lastModified: sharedData.timestamp
+				});
+
+				// Clean up cache
+				await cache.delete("shared-data-latest");
+				await cache.delete("shared-image-latest");
+
+				// Process the image with AI to extract expense data
+				processSharedImage(imageFile);
+			} else {
+				console.error("Shared image data not found");
+				toast.error("Failed to retrieve shared image");
+			}
+		} catch (error) {
+			console.error("Error handling shared image:", error);
+			toast.error("Error processing shared image");
+		}
+	};
+
+	const processSharedImage = async (imageFile: File) => {
+		try {
+			toast.success("Processing shared image...");
+
+			// Convert image to base64
+			const base64Image = await fileToBase64(imageFile);
+
+			// Call the AI processing function
+			const { data, error } = await supabase.functions.invoke('process-expense-image', {
+				body: {
+					image: base64Image
+				}
+			});
+
+			if (error) {
+				console.error('Error processing image:', error);
+				toast.error("Failed to process the shared image");
+				return;
+			}
+
+			const { amount, category, description } = data;
+
+			// Dispatch event to open expense form with prefilled data
+			window.dispatchEvent(new CustomEvent('sharedExpenseProcessed', {
+				detail: {
+					amount: amount?.toString() || '',
+					category: category || 'others',
+					description: description || 'Shared expense',
+					date: new Date().toISOString().split('T')[0]
+				}
+			}));
+
+			toast.success("Expense data extracted from shared image!");
+
+		} catch (error) {
+			console.error("Error processing shared image:", error);
+			toast.error("Failed to process shared image");
+		}
+	};
+
+	const fileToBase64 = (file: File): Promise<string> => {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => {
+				const result = reader.result as string;
+				const base64 = result.split(',')[1];
+				resolve(base64);
+			};
+			reader.onerror = reject;
+			reader.readAsDataURL(file);
+		});
+	};
+
 	return (
 		<Router>
 			<Routes>

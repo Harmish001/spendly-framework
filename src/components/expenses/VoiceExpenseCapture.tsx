@@ -16,17 +16,66 @@ interface VoiceExpenseCaptureProps {
   }) => void;
 }
 
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
 export const VoiceExpenseCapture = ({
   onExpenseExtracted
 }: VoiceExpenseCaptureProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    // Check permission on component mount
+    // Check if browser supports speech recognition
+    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+      console.warn('Speech recognition not supported');
+      return;
+    }
+
+    // Initialize speech recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      console.log('Speech recognition started');
+      setIsRecording(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      console.log('Speech recognition result:', transcript);
+      processTranscription(transcript);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsRecording(false);
+      
+      if (event.error === 'not-allowed') {
+        toast.error("Microphone permission denied. Please allow microphone access.");
+      } else if (event.error === 'no-speech') {
+        toast.error("No speech detected. Please try again.");
+      } else {
+        toast.error("Speech recognition failed. Please try again.");
+      }
+    };
+
+    recognition.onend = () => {
+      console.log('Speech recognition ended');
+      setIsRecording(false);
+    };
+
+    recognitionRef.current = recognition;
     checkPermissions();
   }, []);
 
@@ -54,6 +103,12 @@ export const VoiceExpenseCapture = ({
 
   const startRecording = async () => {
     try {
+      // Check if speech recognition is available
+      if (!recognitionRef.current) {
+        toast.error("Speech recognition not supported in this browser");
+        return;
+      }
+
       // On Android, always request permission first
       if (Capacitor.isNativePlatform() && !hasPermission) {
         const granted = await requestPermission();
@@ -62,30 +117,7 @@ export const VoiceExpenseCapture = ({
         }
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true
-      });
-      
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
-      
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = event => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        stream.getTracks().forEach(track => track.stop());
-        processAudio();
-      };
-
-      mediaRecorder.start(1000);
-      setIsRecording(true);
+      recognitionRef.current.start();
       toast.success("Recording started! Speak your expense details...");
     } catch (error) {
       console.error("Error starting recording:", error);
@@ -100,42 +132,15 @@ export const VoiceExpenseCapture = ({
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
+    if (recognitionRef.current && isRecording) {
+      recognitionRef.current.stop();
     }
   };
 
-  const processAudio = async () => {
+  const processTranscription = async (transcription: string) => {
     setIsProcessing(true);
     try {
-      // Create audio blob
-      const audioBlob = new Blob(audioChunksRef.current, {
-        type: 'audio/webm;codecs=opus'
-      });
-
-      // Convert to base64
-      const base64Audio = await blobToBase64(audioBlob);
-      console.log('Audio blob size:', audioBlob.size);
-      console.log('Base64 audio length:', base64Audio.length);
-
-      // First convert speech to text
-      const {
-        data: transcriptionData,
-        error: transcriptionError
-      } = await supabase.functions.invoke('speech-to-text', {
-        body: {
-          audio: base64Audio
-        }
-      });
-      
-      if (transcriptionError) {
-        console.error('Transcription error:', transcriptionError);
-        throw transcriptionError;
-      }
-      
-      const transcription = transcriptionData?.text;
-      console.log('Transcription:', transcription);
+      console.log('Processing transcription:', transcription);
       
       if (!transcription || transcription.trim().length === 0) {
         throw new Error("Could not understand the audio. Please try speaking clearly and try again.");
@@ -183,19 +188,6 @@ export const VoiceExpenseCapture = ({
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const blobToBase64 = (blob: Blob): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        const base64 = result.split(',')[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
   };
 
   if (isProcessing) {

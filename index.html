@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,7 +21,7 @@
   <script type="module">
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/src/sw.js')
+        navigator.serviceWorker.register('/sw.js')
           .then(function (registration) {
             console.log('Service Worker registered successfully');
           })

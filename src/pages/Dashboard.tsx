@@ -281,7 +281,7 @@ const Dashboard = () => {
                         >
                           <Edit className="h-1 w-1" />
                         </Button>
-                          <Trash2 className="h-4 w-4" onClick={() => setExpenseToDelete(expense.id)} />
+                          <Trash2 className="h-4 w-4 text-red-600" onClick={() => setExpenseToDelete(expense.id)} />
                       </div>
                     </div>
                   </CardContent>

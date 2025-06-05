@@ -42,6 +42,12 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
     };
   }, []);
 
+  self.addEventListener('fetch', (event: any) => {
+    if (event.request.url.includes('/fetch-data') && event.request.method === 'POST') {
+      event.respondWith(processImageWithAI(event.request));
+    }
+  });
+
   const processImageWithAI = async (imageFile: File) => {
     setIsProcessing(true);
     setIsDrawerOpen(false);

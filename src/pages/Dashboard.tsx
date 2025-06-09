@@ -234,7 +234,7 @@ const Dashboard = () => {
         <div className="px-4 pb-0">
           <Card className="col-span-1 md:col-span-2 mb-2 mt-2 border-0 shadow-none">
             <CardContent className="p-1">
-              <div className="relative h-[250px]">
+              <div className="relative h-[250px] ">
                 <ResponsivePie
                   data={getPieChartData()}
                   margin={{ top: 0, right: 20, bottom: 10, left: 20 }}
@@ -285,7 +285,7 @@ const Dashboard = () => {
               return (
                 <Card
                   key={expense.id}
-                  className="border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
+                  className="shadow-md bg-gradient-to-r from-white to-gray-50/50 border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
                 >
                   <CardContent className="flex items-center justify-between p-5">
                     <div className="flex items-center gap-3 flex-1 min-w-0">

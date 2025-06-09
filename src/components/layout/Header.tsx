@@ -32,14 +32,7 @@ export const Header = () => {
         </div>
 
         <div className="flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleSignOut}
-            className="rounded-full"
-          >
-            <LogOut className="h-5 w-5 text-white" />
-          </Button>
+          <LogOut className="h-6 w-6 mt-1 text-white"   onClick={handleSignOut} />
         </div>
       </div>
     </header>

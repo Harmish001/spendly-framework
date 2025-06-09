@@ -81,8 +81,9 @@ const Statistics = () => {
   };
 
   return (
+    // bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}
     <div className="min-h-screen bg-background">
-      <div className="sticky top-0 z-40 bg-background border-b px-4 py-3">
+      <div className="sticky top-0 z-40 border-b px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -90,11 +91,11 @@ const Statistics = () => {
             onClick={() => navigate('/dashboard')}
             className="rounded-full"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-white" />
           </Button>
           <div className="flex items-center gap-2">
-            <BarChart3 className="h-6 w-6 text-purple-600" />
-            <h1 className="text-xl font-bold">Statistics</h1>
+            <BarChart3 className="h-6 w-6 text-white" />
+            <h1 className="text-xl text-white font-bold">Statistics</h1>
           </div>
         </div>
       </div>
@@ -106,7 +107,23 @@ const Statistics = () => {
           </div>
         ) : (
           <>
-            <Card>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {monthlyData.map((data, index) => (
+                <Card key={data.month} className="p-3 rounded-[20px] shadow-md bg-gradient-to-r from-white to-gray-50/50">
+                  <CardContent className="p-0">
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 mb-1">{data.month}</p>
+                      <p className="text-lg font-bold mb-1" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>
+                        ₹{data.amount.toLocaleString('en-IN')}
+                      </p>
+                      <p className="text-xs text-gray-500">{data.expenses} expenses</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <Card className="rounded-[20px] hover:shadow-lg shadow-md bg-gradient-to-r from-white to-gray-50/50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-semibold">Monthly Expense Amount</CardTitle>
               </CardHeader>
@@ -142,7 +159,7 @@ const Statistics = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-[20px] hover:shadow-lg  shadow-md bg-gradient-to-r from-white to-gray-50/50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-semibold">Number of Expenses</CardTitle>
               </CardHeader>
@@ -176,22 +193,6 @@ const Statistics = () => {
                 </ChartContainer>
               </CardContent>
             </Card>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {monthlyData.map((data, index) => (
-                <Card key={data.month} className="p-3">
-                  <CardContent className="p-0">
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600 mb-1">{data.month}</p>
-                      <p className="text-lg font-bold mb-1" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>
-                        ₹{data.amount.toLocaleString('en-IN')}
-                      </p>
-                      <p className="text-xs text-gray-500">{data.expenses} expenses</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
           </>
         )}
       </div>

@@ -18,12 +18,6 @@ export const MobileNavigation = () => {
       description: "View all your expenses"
     },
     {
-      title: "Travel Expenses",
-      icon: Plane,
-      path: "/travel-expenses",
-      description: "Track your travel expenses"
-    },
-    {
       title: "Statistics",
       icon: BarChart3,
       path: "/statistics",
@@ -39,19 +33,13 @@ export const MobileNavigation = () => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="bg-transparent text-white"
-        >
-          <Menu className="h-0 w-0" />
-        </Button>
+        <Menu className="h-6 w-6 mr-2 mt-1 text-white" />
       </SheetTrigger>
       <SheetContent side="top" className="h-auto">
         <SheetHeader>
           <SheetTitle>Navigation</SheetTitle>
         </SheetHeader>
-        <div className="grid gap-4 mt-6">
+        <div className="grid gap-3 mt-6">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -60,7 +48,7 @@ export const MobileNavigation = () => {
               <Button
                 key={item.path}
                 variant={isActive ? "default" : "outline"}
-                className={`w-full justify-start h-auto p-4 rounded-[24px] ${
+                className={`w-full justify-start h-auto p-4 rounded-[20px] ${
                   isActive 
                     ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' 
                     : ''

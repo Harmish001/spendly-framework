@@ -98,6 +98,23 @@ const Dashboard = () => {
         query = query.gte("created_at", startDate).lte("created_at", endDate);
       }
 
+       if (selectedCategory !== "All Categories") {
+        const categoryMapping: Record<string, string> = {
+          "Investment": "investment",
+          "Food and Dining": "food",
+          "Transportation": "transport",
+          "Shopping": "shopping",
+          "Loan": "loan",
+          "Medical": "medical",
+          "Others": "others"
+        };
+
+        const mappedCategory = categoryMapping[selectedCategory];
+        if (mappedCategory) {
+          query = query.eq("category", mappedCategory);
+        }
+      }
+
       const { data, error } = await query;
 
       if (error) throw error;

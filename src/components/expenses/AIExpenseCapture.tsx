@@ -87,7 +87,6 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
         date: date
       });
 
-      toast.success("Expense details extracted! Please review and confirm.");
     } catch (error: any) {
       console.error("Error processing image:", error);
       toast.error(error.message || "Failed to process image. Please try again.");

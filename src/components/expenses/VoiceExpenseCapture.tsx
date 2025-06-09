@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AndroidPermissions } from "@/utils/AndroidPermissions";
 import { Capacitor } from "@capacitor/core";
 import EnhancedAnimation from "../layout/Animation";
+import VoiceTrigger from "./VoiceDetect";
 
 interface VoiceExpenseCaptureProps {
 	onExpenseExtracted: (data: {
@@ -221,6 +222,7 @@ export const VoiceExpenseCapture = ({
 					<EnhancedAnimation isActive={isRecording} />
 				</div>
 			)}
+			<VoiceTrigger setIsListening={setIsRecording}/>
 			<Button
 				variant="outline"
 				onClick={isRecording ? stopRecording : startRecording}

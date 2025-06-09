@@ -222,7 +222,7 @@ export const VoiceExpenseCapture = ({
 					<EnhancedAnimation isActive={isRecording} />
 				</div>
 			)}
-			<VoiceTrigger setIsListening={setIsRecording}/>
+			{/* <VoiceTrigger setIsListening={setIsRecording}/> */}
 			<Button
 				variant="outline"
 				onClick={isRecording ? stopRecording : startRecording}

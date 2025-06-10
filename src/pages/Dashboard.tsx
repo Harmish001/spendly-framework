@@ -81,6 +81,7 @@ const Dashboard = () => {
 		useState<string>("All Categories");
 	const [editingExpense, setEditingExpense] = useState<any>(null);
 	const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
+	const [isAction, setIsAction] = useState(null);
 
 	useEffect(() => {
 		fetchExpenses();
@@ -148,6 +149,7 @@ const Dashboard = () => {
 				};
 
 				const mappedCategory = categoryMapping[selectedCategory];
+				console.log("mappedCategory",mappedCategory)
 				if (mappedCategory) {
 					query = query.eq("category", mappedCategory);
 				}
@@ -189,12 +191,12 @@ const Dashboard = () => {
 		fetchExpenses();
 	};
 
-	const filteredExpenses = expenses.filter((expense) => {
-		if (selectedCategory === "All Categories") return true;
-		return (
-			expense.category === selectedCategory.toLowerCase().replace(/\s+/g, "")
-		);
-	});
+	// const filteredExpenses = expenses.filter((expense) => {
+	// 	if (selectedCategory === "All Categories") return true;
+	// 	return (
+	// 		expense.category === selectedCategory.toLowerCase().replace(/\s+/g, "")
+	// 	);
+	// });
 
 	const getPieChartData = () => {
 		const categoryTotals: Record<string, number> = {};
@@ -304,7 +306,7 @@ const Dashboard = () => {
 									}}
 								/>
 								<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-									<p className="text-sm">Total</p>
+									<p className="text-sm font-bold text-gray-500">Total</p>
 									<p
 										className="text-2xl font-bold"
 										style={{
@@ -327,12 +329,12 @@ const Dashboard = () => {
 						<div className="text-center py-8">
 							<Loader2 className="h-8 w-8 animate-spin mx-auto" />
 						</div>
-					) : filteredExpenses.length === 0 ? (
+					) : expenses.length === 0 ? (
 						<div className="text-center text-gray-500 py-8">
 							No expenses found for the selected month.
 						</div>
 					) : (
-						filteredExpenses.map((expense) => {
+						expenses.map((expense) => {
 							const category = categories.find(
 								(cat) => cat.id === expense.category
 							);
@@ -344,31 +346,33 @@ const Dashboard = () => {
 								<Card
 									key={expense.id}
 									className="shadow-md bg-gradient-to-r from-white to-gray-50/50 border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
+									onClick={() => setIsAction(expense)}
 								>
 									<CardContent className="flex items-center justify-between p-5">
 										<div className="flex items-center justify-end gap-3 flex-1 min-w-0">
 											<div
-												className="p-2 rounded-[12px] shrink-0"
+												className="p-2 rounded-[14px] shrink-0"
 												style={{
 													background:
 														"linear-gradient(to right, #9333ea, #2563eb)",
 												}}
 											>
-												<CategoryIcon className="h-10 w-10 text-white" />
+												<CategoryIcon className="h-7 w-7 text-white" />
 											</div>
 											<div className="text-left min-w-0 flex-1">
 												<p className="font-semibold truncate text-sm">
 													{expense.description || "No description"}
 												</p>
-												<p className="text-xs text-gray-500">
-													{new Date(expense.created_at).toLocaleDateString()}
+												<p className="text-xs text-gray-600 font-semibold">
+													{new Date(expense.created_at).getDate()}&nbsp;
+													{new Date(expense.created_at).toLocaleString(
+														"default",
+														{ month: "long" }
+													)}
 												</p>
 											</div>
-                          <Badge
-													variant="secondary"
-													className="text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:bg-gray-200"
-												>{category?.label || expense.category}</Badge>
-											<div className="flex items-center gap-1 shrink-0">
+
+											<div className="flex items-end gap-1 shrink-0 flex-col">
 												<p
 													className="text-base font-bold whitespace-nowrap"
 													style={{
@@ -380,14 +384,18 @@ const Dashboard = () => {
 												>
 													₹{expense.amount}
 												</p>
-												<Button
-													variant="ghost"
-													size="sm"
-													onClick={() => handleEditExpense(expense)}
-													className="rounded-full pl-2 pr-2"
+												<Badge
+													variant="secondary"
+													className="text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:bg-gray-200"
 												>
-													<Edit className="h-1 w-1" />
-												</Button>
+													{category?.label || expense.category}
+												</Badge>
+											</div>
+											<div className="flex items-center gap-1 shrink-0 flex-col">
+												<Edit
+													className="h-4 w-4 mb-2"
+													onClick={() => handleEditExpense(expense)}
+												/>
 												<Trash2
 													className="h-4 w-4 text-red-600"
 													onClick={() => setExpenseToDelete(expense.id)}
@@ -445,7 +453,7 @@ const Dashboard = () => {
 				open={!!expenseToDelete}
 				onOpenChange={() => setExpenseToDelete(null)}
 			>
-				<DrawerContent className="rounded-[24px]">
+				<DrawerContent>
 					<DrawerHeader>
 						<DialogTitle>Delete Expense</DialogTitle>
 						<DrawerDescription>

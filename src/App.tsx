@@ -17,6 +17,7 @@ import { supabase } from "./integrations/supabase/client";
 import { toast } from "sonner";
 import { ShareReceiver } from "./services/ShareReceiver";
 import { Capacitor } from "@capacitor/core";
+import MonthlyAnalysis from "./components/statistics/MonthlyAnalysis";
 
 // Handle OAuth redirect and query parameters
 const AuthHandler = () => {
@@ -172,6 +173,7 @@ function App() {
 				<Route path="/dashboard" element={<Dashboard />} />
 				<Route path="/travel-expenses" element={<TravelExpenses />} />
 				<Route path="/statistics" element={<Statistics />} />
+				<Route path="/monthlyAnalysis" element={<MonthlyAnalysis />} />
 			</Routes>
 			<Toaster />
 		</Router>

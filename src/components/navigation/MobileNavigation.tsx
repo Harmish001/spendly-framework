@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, BarChart3, Plane, Home } from "lucide-react";
+import { Menu, BarChart3, Plane, Home, ChartAreaIcon } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export const MobileNavigation = () => {
@@ -22,6 +22,12 @@ export const MobileNavigation = () => {
       icon: BarChart3,
       path: "/statistics",
       description: "View expense analytics"
+    },
+    {
+      title: "Analysis",
+      icon: ChartAreaIcon,
+      path: "/monthlyAnalysis",
+      description: "View expense analysis"
     }
   ];
 

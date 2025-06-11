@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { ShareReceiver } from "./services/ShareReceiver";
 import { Capacitor } from "@capacitor/core";
 import MonthlyAnalysis from "./components/statistics/Analysis";
+import LandingPage from "./pages/LandingPage";
 
 // Handle OAuth redirect and query parameters
 const AuthHandler = () => {
@@ -168,7 +169,8 @@ function App() {
 		<Router>
 			<Routes>
 				<Route path="/*" element={<AuthHandler />} />
-				<Route path="/" element={<Index />} />
+				<Route path="/login" element={<Index />} />
+				<Route path="/" element={<LandingPage />} />
 				<Route path="/signup" element={<SignUp />} />
 				<Route path="/dashboard" element={<Dashboard />} />
 				<Route path="/travel-expenses" element={<TravelExpenses />} />

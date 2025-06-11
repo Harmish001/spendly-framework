@@ -17,7 +17,7 @@ import { supabase } from "./integrations/supabase/client";
 import { toast } from "sonner";
 import { ShareReceiver } from "./services/ShareReceiver";
 import { Capacitor } from "@capacitor/core";
-import MonthlyAnalysis from "./components/statistics/MonthlyAnalysis";
+import MonthlyAnalysis from "./components/statistics/Analysis";
 
 // Handle OAuth redirect and query parameters
 const AuthHandler = () => {

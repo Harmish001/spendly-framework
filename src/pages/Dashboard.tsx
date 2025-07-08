@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,7 +49,7 @@ const categories = [
   { id: "others", label: "Others", icon: MoreHorizontal },
 ];
 
-const categoryIcons: Record<string, any> = {
+const categoryIcons = {
   investment: Wallet,
   food: Utensils,
   transport: Car,
@@ -68,7 +68,7 @@ const Dashboard = () => {
   const [selectedYear, setSelectedYear] = useState(
     new Date().getFullYear() + ""
   );
-  const [expenses, setExpenses] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState([]);
   const [totalExpense, setTotalExpense] = useState(0);
   const [loading, setLoading] = useState(false);
   const [prefilledData, setPrefilledData] = useState<{
@@ -79,9 +79,15 @@ const Dashboard = () => {
   } | null>(null);
   const [selectedCategory, setSelectedCategory] =
     useState<string>("All Categories");
-  const [editingExpense, setEditingExpense] = useState<any>(null);
+  const [editingExpense, setEditingExpense] = useState(null);
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isAction, setIsAction] = useState(null);
+  const [translateX, setTranslateX] = useState(0);
+  const [startX, setStartX] = useState(0);
+  const [isSwiping, setIsSwiping] = useState(false);
+  const [swipedCardId, setSwipedCardId] = useState<string | null>(null);
+  const cardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const cardRef = useRef(null);
 
   useEffect(() => {
     fetchExpenses();
@@ -165,7 +171,7 @@ const Dashboard = () => {
         0
       );
       setTotalExpense(total);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching expenses:", error.message);
       toast.error("Failed to fetch expenses");
     } finally {
@@ -183,7 +189,7 @@ const Dashboard = () => {
     setPrefilledData(null);
   };
 
-  const handleEditExpense = (expense: any) => {
+  const handleEditExpense = (expense) => {
     setEditingExpense(expense);
   };
 
@@ -226,10 +232,68 @@ const Dashboard = () => {
       toast.success("Expense deleted successfully");
       fetchExpenses();
       setExpenseToDelete(null);
-    } catch (error: any) {
+    } catch (error) {
       toast.error("Failed to delete expense");
     }
   };
+
+  const SWIPE_THRESHOLD = 50;
+
+  const handleTouchStart = (e, expenseId) => {
+    setStartX(e.touches[0].clientX);
+    setIsSwiping(true);
+    setSwipedCardId(expenseId);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isSwiping) return;
+    const deltaX = e.touches[0].clientX - startX;
+    if (deltaX < 0) {
+      setTranslateX(deltaX); // only allow left swipe
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsSwiping(false);
+    if (Math.abs(translateX) > SWIPE_THRESHOLD) {
+      setTranslateX(-120); // show full delete button
+    } else {
+      setTranslateX(0);
+      setSwipedCardId(null);
+    }
+  };
+
+  useEffect(() => {
+    if (!swipedCardId) return;
+
+    const handleClickOutside = (event) => {
+      const ref = cardRefs.current[swipedCardId];
+      // Check if click is on the Remove button
+      const removeBtn = document.getElementById(`delete_${swipedCardId}`);
+      if (
+        ref &&
+        !ref.contains(event.target) &&
+        (!removeBtn || !removeBtn.contains(event.target))
+      ) {
+        setTranslateX(0);
+        setSwipedCardId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [swipedCardId]);
+
+  // const handleDelete = () => {
+  //   setTimeout(() => {
+  //     onDelete(expense.id);
+  //   }, 300); // delay for animation
+  // };
 
   useEffect(() => {
     // Optional: Auto-request permissions when app starts
@@ -302,7 +366,7 @@ const Dashboard = () => {
                   arcLabelsSkipAngle={10}
                   arcLabelsTextColor={{
                     from: "color",
-                    modifiers: [["darker", 2]],
+                    modifiers: [["brighter", 3]],
                   }}
                 />
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
@@ -343,67 +407,99 @@ const Dashboard = () => {
                 categoryIcons[expense.category] || MoreHorizontal;
 
               return (
-                <Card
-                  key={expense.id}
-                  className="shadow-md bg-gradient-to-r from-white to-gray-50/50 border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
-                  onClick={() => setIsAction(expense)}
-                >
-                  <CardContent className="flex items-center justify-between p-5">
-                    <div className="flex items-center justify-end gap-3 flex-1 min-w-0">
-                      <div
-                        className="p-2 rounded-[14px] shrink-0"
-                        style={{
-                          background:
-                            "linear-gradient(to right, #9333ea, #2563eb)",
-                        }}
-                      >
-                        <CategoryIcon className="h-7 w-7 text-white" />
-                      </div>
-                      <div className="text-left min-w-0 flex-1">
-                        <p className="font-muted truncate text-sm">
-                          {expense.description || "No description"}
-                        </p>
-                        <p className="text-xs text-gray-600 font-semibold">
-                          {new Date(expense.created_at).getDate()}&nbsp;
-                          {new Date(expense.created_at).toLocaleString(
-                            "default",
-                            { month: "long" }
-                          )}
-                        </p>
-                      </div>
+                <div className="relative overflow-hidden shadow-md rounded-[20px]">
+                  {/* Red delete background */}
+                  <div className="absolute inset-[10px] flex justify-end items-center bg-red-600 pr-6 rounded-[20px]">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteExpense(expense.id);
+                      }}
+                      className="text-white font-semibold text-sm"
+                      id={`delete_${expense.id}`}
+                    >
+                      <Trash2 className="w-5 h-5 inline mr-1" />
+                      Remove
+                    </button>
+                  </div>
+                  <div
+                    ref={(el) => (cardRefs.current[expense.id] = el)}
+                    className={
+                      "transition-transform duration-300 touch-pan-x shadow-md"
+                    }
+                    style={{
+                      transform:
+                        swipedCardId === expense.id
+                          ? `translateX(${translateX}px)`
+                          : "translateX(0px)",
+                    }}
+                    onTouchStart={(e) => handleTouchStart(e, expense.id)}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                  >
+                    <Card
+                      key={expense.id}
+                      className="shadow-md bg-gradient-to-r from-white to-gray-50/50 border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
+                      onClick={() => setIsAction(expense)}
+                    >
+                      <CardContent className="flex items-center justify-between p-5">
+                        <div className="flex items-center justify-center gap-3 flex-1 min-w-0">
+                          <div
+                            className="p-2 rounded-[14px] shrink-0"
+                            style={{
+                              background:
+                                "linear-gradient(to right, #9333ea, #2563eb)",
+                            }}
+                          >
+                            <CategoryIcon className="h-7 w-7 text-white" />
+                          </div>
+                          <div className="text-left min-w-0 flex-1">
+                            <p className="font-muted truncate font-semibold text-sm">
+                              {expense.description || "No description"}
+                            </p>
+                            <p className="text-xs text-gray-600 ">
+                              {new Date(expense.created_at).getDate()}&nbsp;
+                              {new Date(expense.created_at).toLocaleString(
+                                "default",
+                                { month: "long" }
+                              )}
+                            </p>
+                          </div>
 
-                      <div className="flex items-end gap-1 shrink-0 flex-col">
-                        <p
-                          className="text-base font-bold whitespace-nowrap"
-                          style={{
-                            background:
-                              "linear-gradient(to right, #9333ea, #2563eb)",
-                            WebkitTextFillColor: "transparent",
-                            WebkitBackgroundClip: "text",
-                          }}
-                        >
-                          ₹{expense.amount}
-                        </p>
-                        <Badge
-                          variant="secondary"
-                          className="text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:bg-gray-200"
-                        >
-                          {category?.label || expense.category}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0 flex-col">
-                        <Edit
-                          className="h-5 w-5 mb-2 text-gray-500"
-                          onClick={() => handleEditExpense(expense)}
-                        />
-                        <Trash2
+                          <div className="flex items-end gap-1 shrink-0 flex-col">
+                            <p
+                              className="text-base font-bold whitespace-nowrap"
+                              style={{
+                                background:
+                                  "linear-gradient(to right, #9333ea, #2563eb)",
+                                WebkitTextFillColor: "transparent",
+                                WebkitBackgroundClip: "text",
+                              }}
+                            >
+                              ₹{expense.amount}
+                            </p>
+                            <Badge
+                              variant="secondary"
+                              className="text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:bg-gray-200"
+                            >
+                              {category?.label || expense.category}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center flex-col justify-center">
+                            <Edit
+                              className="h-5 w-5 mb-2 text-gray-500"
+                              onClick={() => handleEditExpense(expense)}
+                            />
+                            {/* <Trash2
                           className="h-5 w-5 text-red-600"
                           onClick={() => setExpenseToDelete(expense.id)}
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                        /> */}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
               );
             })
           )}

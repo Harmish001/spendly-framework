@@ -28,6 +28,7 @@ const categories = [
   "Medical",
   "Bill",
   "Travel",
+  "HouseExpense",
   "Others"
 ];
 

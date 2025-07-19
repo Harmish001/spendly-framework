@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Loader2, Stethoscope, CalendarIcon, Receipt, Plane } from "lucide-react";
+import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Loader2, Stethoscope, CalendarIcon, Receipt, Plane, House } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -20,6 +20,7 @@ const categories = [
   { id: "medical", label: "Medical", icon: Stethoscope },
   { id: "bill", label: "Bill", icon: Receipt },
   { id: "travel", label: "Travel", icon: Plane },
+  { id: "houseExpense", label: "House Expense", icon: House },
   { id: "others", label: "Others", icon: MoreHorizontal },
 ];
 

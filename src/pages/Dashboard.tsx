@@ -15,6 +15,7 @@ import {
   Stethoscope,
   LucidePlane,
   ScrollText,
+  House
 } from "lucide-react";
 import { toast } from "sonner";
 import { MonthTabs } from "@/components/expenses/MonthTabs";
@@ -46,6 +47,7 @@ const categories = [
   { id: "medical", label: "Medical", icon: null },
   { id: "bill", label: "Bill", icon: null },
   { id: "travel", label: "Travel", icon: null },
+  { id: "houseExpense", label: "House Expense", icon: null },
   { id: "others", label: "Others", icon: MoreHorizontal },
 ];
 
@@ -59,6 +61,7 @@ const categoryIcons = {
   travel: LucidePlane,
   bill: ScrollText,
   others: MoreHorizontal,
+  houseExpense: House,
 };
 
 const Dashboard = () => {
@@ -152,10 +155,12 @@ const Dashboard = () => {
           Loan: "loan",
           Medical: "medical",
           Others: "others",
+          HouseExpense: "houseExpense",
+          Travel: "travel",
+          Bill: "bill",
         };
 
         const mappedCategory = categoryMapping[selectedCategory];
-        console.log("mappedCategory", mappedCategory);
         if (mappedCategory) {
           query = query.eq("category", mappedCategory);
         }
@@ -409,7 +414,7 @@ const Dashboard = () => {
               return (
                 <div className="relative overflow-hidden shadow-md rounded-[20px]">
                   {/* Red delete background */}
-                  <div className="absolute inset-[10px] flex justify-end items-center bg-red-600 pr-6 rounded-[20px]">
+                  {/* <div className="absolute inset-[10px] flex justify-end items-center bg-red-600 pr-6 rounded-[20px]">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -421,8 +426,8 @@ const Dashboard = () => {
                       <Trash2 className="w-5 h-5 inline mr-1" />
                       Remove
                     </button>
-                  </div>
-                  <div
+                  </div> */}
+                  {/* <div
                     ref={(el) => (cardRefs.current[expense.id] = el)}
                     className={
                       "transition-transform duration-300 touch-pan-x shadow-md"
@@ -433,10 +438,10 @@ const Dashboard = () => {
                           ? `translateX(${translateX}px)`
                           : "translateX(0px)",
                     }}
-                    onTouchStart={(e) => handleTouchStart(e, expense.id)}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                  >
+                  onTouchStart={(e) => handleTouchStart(e, expense.id)}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  > */}
                     <Card
                       key={expense.id}
                       className="shadow-md bg-gradient-to-r from-white to-gray-50/50 border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
@@ -490,15 +495,15 @@ const Dashboard = () => {
                               className="h-5 w-5 mb-2 text-gray-500"
                               onClick={() => handleEditExpense(expense)}
                             />
-                            {/* <Trash2
-                          className="h-5 w-5 text-red-600"
-                          onClick={() => setExpenseToDelete(expense.id)}
-                        /> */}
+                            <Trash2
+                              className="h-5 w-5 text-red-600"
+                              onClick={() => setExpenseToDelete(expense.id)}
+                            />
                           </div>
                         </div>
                       </CardContent>
                     </Card>
-                  </div>
+                  {/* </div> */}
                 </div>
               );
             })
@@ -507,9 +512,9 @@ const Dashboard = () => {
       </div>
 
       {/* Voice Expense Capture - positioned for mobile visibility */}
-      <div className="fixed bottom-32 left-4 z-50">
+      {/*<div className="fixed bottom-32 left-4 z-50">
         <VoiceExpenseCapture onExpenseExtracted={setPrefilledData} />
-      </div>
+      </div>*/}
 
       {/* Expense Filters */}
       <div className="fixed bottom-24 right-6 z-50">
@@ -562,7 +567,7 @@ const Dashboard = () => {
               className="rounded-[24px] bg-danger"
               style={{ background: "red" }}
               onClick={() =>
-                expenseToDelete && handleDeleteExpense(expenseToDelete)
+                handleDeleteExpense(expenseToDelete)
               }
             >
               Delete

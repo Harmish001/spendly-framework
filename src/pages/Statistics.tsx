@@ -33,7 +33,7 @@ const Statistics = () => {
       const months = [];
       
       // Get last 3 months including current month
-      for (let i = 2; i >= 0; i--) {
+      for (let i = 5; i >= 0; i--) {
         const date = subMonths(currentDate, i);
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
@@ -107,7 +107,7 @@ const Statistics = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 md:grid-cols-3 gap-3">
               {monthlyData.map((data, index) => (
                 <Card key={data.month} className="p-3 rounded-[20px] shadow-md bg-gradient-to-r from-white to-gray-50/50">
                   <CardContent className="p-0">

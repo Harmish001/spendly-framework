@@ -15,9 +15,9 @@ import {
   Stethoscope,
   Utensils,
   Wallet,
+  House
 } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
-import { Badge } from "../ui/badge";
 
 const categoryIcons = {
   investment: Wallet,
@@ -28,6 +28,7 @@ const categoryIcons = {
   medical: Stethoscope,
   travel: LucidePlane,
   bill: ScrollText,
+  houseExpense: House,
   others: MoreHorizontal,
 };
 
@@ -40,6 +41,7 @@ const categories = [
   { id: "medical", label: "Medical", icon: null },
   { id: "bill", label: "Bill", icon: null },
   { id: "travel", label: "Travel", icon: null },
+  { id: "houseExpense", label: "House Expense", icon: null },
   { id: "others", label: "Others", icon: MoreHorizontal },
 ];
 
@@ -61,7 +63,7 @@ function groupByCategory(data) {
 
 type AnalysisType = "Monthly" | "Yearly" | "Weekly";
 const MonthlyAnalysis = () => {
-  const [analysisType, setAnalysisType] = useState<AnalysisType>("Weekly");
+  const [analysisType, setAnalysisType] = useState<AnalysisType>("Monthly");
   const [loading, setLoading] = useState(false);
   const [expenses, setExpenses] = useState([]);
   const [totalExpense, setTotalExpense] = useState(0);
@@ -69,8 +71,6 @@ const MonthlyAnalysis = () => {
   const [previousExpense, setPreviousExpense] = useState([]);
 
   const compareExpenses = useMemo(() => {
-    console.log("expenses", expenses);
-    console.log("previousExpense", previousExpense);
     const result = [];
 
     const prevMap = new Map();

@@ -19,6 +19,7 @@ import { ShareReceiver } from "./services/ShareReceiver";
 import { Capacitor } from "@capacitor/core";
 import MonthlyAnalysis from "./components/statistics/Analysis";
 import LandingPage from "./pages/LandingPage";
+import PasswordManager from "./pages/PasswordManager";
 
 // Handle OAuth redirect and query parameters
 const AuthHandler = () => {
@@ -174,6 +175,7 @@ function App() {
 				<Route path="/signup" element={<SignUp />} />
 				<Route path="/dashboard" element={<Dashboard />} />
 				<Route path="/travel-expenses" element={<TravelExpenses />} />
+				<Route path="/passwords" element={<PasswordManager />} />
 				<Route path="/statistics" element={<Statistics />} />
 				<Route path="/monthlyAnalysis" element={<MonthlyAnalysis />} />
 			</Routes>

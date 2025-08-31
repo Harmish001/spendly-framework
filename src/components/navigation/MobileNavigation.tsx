@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, BarChart3, Plane, Home, ChartAreaIcon } from "lucide-react";
+import { Menu, BarChart3, Plane, Home, ChartAreaIcon, Shield } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export const MobileNavigation = () => {
@@ -16,6 +16,12 @@ export const MobileNavigation = () => {
       icon: Home,
       path: "/dashboard",
       description: "View all your expenses"
+    },
+    {
+      title: "Password Manager",
+      icon: Shield,
+      path: "/passwords",
+      description: "Secure password storage"
     },
     {
       title: "Statistics",

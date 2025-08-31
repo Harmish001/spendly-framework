@@ -1,33 +1,94 @@
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { ExpenseForm } from "./ExpenseForm";
 
 interface ExpenseFormSheetProps {
   onExpenseAdded: () => void;
+  prefilledData?: {
+    amount: string;
+    category: string;
+    description: string;
+    date?: string;
+  } | null;
+  onClearPrefilled?: () => void;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  editingExpense?: {
+    id: string;
+    amount: number;
+    category: string;
+    description: string;
+    created_at: string;
+    date: string;
+  } | null;
 }
 
-export const ExpenseFormSheet = ({ onExpenseAdded }: ExpenseFormSheetProps) => {
+export const ExpenseFormSheet = ({
+  onExpenseAdded,
+  prefilledData,
+  onClearPrefilled,
+  isOpen,
+  onOpenChange,
+  editingExpense
+}: ExpenseFormSheetProps) => {
+  const isEditing = !!editingExpense;
+  
   return (
-    <Sheet>
-      <SheetTrigger asChild>
+    <Drawer open={isOpen} onOpenChange={onOpenChange}>
+      <DrawerTrigger asChild>
         <Button
-          className="md:hidden rounded-[20px]"
-          style={{
-            background: "linear-gradient(to right, #9333ea, #2563eb)",
-            color: "white"
-          }}
+          variant="outline"
+          className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 hover:from-purple-600 hover:to-blue-600 z-50"
         >
-          <PlusCircle className="h-5 w-5 mr-2" />
-          Add Expense
+          <PlusCircle className="h-6 w-6" />
         </Button>
-      </SheetTrigger>
-      <SheetContent side="right" className="p-4">
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Add New Expense</h2>
-          <ExpenseForm onExpenseAdded={onExpenseAdded} />
+      </DrawerTrigger>
+      <DrawerContent className="rounded-t-[24px] border-0 max-h-[85vh]">
+        <DrawerHeader className="text-center pb-2">
+          <div className="flex items-center justify-between">
+            <DrawerTitle className="text-lg font-semibold">
+              {isEditing ? 'Edit Expense' : 'Add New Expense'}
+            </DrawerTitle>
+            {(prefilledData || isEditing) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onClearPrefilled}
+                className="text-xs rounded-full"
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+
+          {prefilledData && !isEditing && (
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 mt-2">
+              <p className="text-sm text-purple-700 font-medium">
+                ✨ AI extracted data - Review and confirm
+              </p>
+            </div>
+          )}
+
+          {isEditing && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
+              <p className="text-sm text-blue-700 font-medium">
+                ✏️ Editing expense - Make your changes
+              </p>
+            </div>
+          )}
+        </DrawerHeader>
+
+        <div className="px-6 pb-8 overflow-y-auto">
+          <ExpenseForm
+            onExpenseAdded={onExpenseAdded}
+            prefilledData={prefilledData}
+            onClearPrefilled={onClearPrefilled}
+            editingExpense={editingExpense}
+          />
         </div>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 };

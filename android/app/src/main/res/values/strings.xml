@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">spendly-framework</string>
+    <string name="title_activity_main">spendly-framework</string>
+    <string name="package_name">app.lovable.fe3b15c32c154b048b9985fefc4797f2</string>
+    <string name="custom_url_scheme">app.lovable.fe3b15c32c154b048b9985fefc4797f2</string>
+</resources>

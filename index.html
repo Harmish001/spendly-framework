@@ -1,16 +1,136 @@
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#517fa4" />
-    <meta name="description" content="Track your expenses with ease" />
-    <link rel="manifest" href="/manifest.json" />
-    <title>Spendly - Expense Tracker</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#517fa4" />
+  <meta name="description" content="Track your expenses with ease" />
+  <link rel="manifest" href="/manifest.json" />
+  <title>Spendly - Expense Tracker</title>
+  <!-- Add Google Pay API client library -->
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- Add Lovable script tag for enabling new features -->
+  <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+  <script type="module" src="/src/main.tsx"></script>
+  <script type="module">
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js')
+          .then(function (registration) {
+            console.log('Service Worker registered successfully');
+          })
+          .catch(function (error) {
+            console.error('Service Worker registration failed:', error);
+          });
+      });
+    }
+
+    // Handle shared content when app loads
+    window.addEventListener('load', function () {
+      const urlParams = new URLSearchParams(window.location.search);
+
+      if (urlParams.get('shared') === 'expense_image') {
+        handleSharedExpenseImage();
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    });
+
+    // Function to retrieve and process shared expense image
+    async function handleSharedExpenseImage() {
+      try {
+        const cache = await caches.open('shared-data-v1');
+
+        // Get shared data
+        const dataResponse = await cache.match('shared-data-latest');
+        const imageResponse = await cache.match('shared-image-latest');
+
+        if (dataResponse && imageResponse) {
+          const shareData = await dataResponse.json();
+          const imageBlob = await imageResponse.blob();
+
+          // Create File object from blob (similar to what you get from file input)
+          const imageFile = new File([imageBlob], shareData.imageName, {
+            type: shareData.imageType,
+            lastModified: shareData.timestamp
+          });
+
+          // Clean up cache
+          await cache.delete('shared-data-latest');
+          await cache.delete('shared-image-latest');
+
+          // Trigger your AI processing
+          processSharedExpenseImage(imageFile);
+
+        } else {
+          console.error('Shared image data not found');
+          showErrorNotification('Failed to retrieve shared image');
+        }
+      } catch (error) {
+        console.error('Error retrieving shared image:', error);
+        showErrorNotification('Error processing shared image');
+      }
+    }
+
+    // Function to process shared image with your existing AI function
+    function processSharedExpenseImage(imageFile) {
+      // Show notification that image is being processed
+      showProcessingNotification();
+
+      // Create a custom event to trigger your AIExpenseCapture component
+      const sharedImageEvent = new CustomEvent('sharedExpenseImage', {
+        detail: { imageFile: imageFile }
+      });
+
+      // Dispatch the event
+      window.dispatchEvent(sharedImageEvent);
+    }
+
+    // Utility functions for notifications
+    function showProcessingNotification() {
+      const notification = createNotification(
+        'Processing shared expense image...',
+        '#2196F3'
+      );
+      document.body.appendChild(notification);
+
+      // Remove after 3 seconds
+      setTimeout(() => notification.remove(), 3000);
+    }
+
+    function showErrorNotification(message) {
+      const notification = createNotification(message, '#f44336');
+      document.body.appendChild(notification);
+
+      // Remove after 5 seconds
+      setTimeout(() => notification.remove(), 5000);
+    }
+
+    function createNotification(message, color) {
+      const notification = document.createElement('div');
+      notification.innerHTML = `<p>${message}</p>`;
+      notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${color};
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-width: 300px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  `;
+      return notification;
+    }
+  </script>
+</body>
+
 </html>

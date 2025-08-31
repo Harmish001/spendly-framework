@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
@@ -13,6 +14,7 @@ export const supabase = createClient<Database>(
       storageKey: 'spendly-auth-token',
       autoRefreshToken: true,
       detectSessionInUrl: true,
+      flowType: 'pkce'
     }
   }
 );

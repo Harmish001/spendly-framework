@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -24,6 +24,13 @@ interface ExpenseSidebarProps {
   onMonthChange: (value: string) => void;
   onYearChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
+  prefilledData?: {
+    amount: string;
+    category: string;
+    description: string;
+    date?: string;
+  } | null;
+  onClearPrefilled?: () => void;
 }
 
 const months = [
@@ -41,12 +48,28 @@ export const ExpenseSidebar = ({
   selectedCategory,
   onMonthChange,
   onYearChange,
-  onCategoryChange
+  onCategoryChange,
+  prefilledData,
+  onClearPrefilled
 }: ExpenseSidebarProps) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Handle prefilled data from AI extraction
+  useEffect(() => {
+    if (prefilledData) {
+      setAmount(prefilledData.amount);
+      setDescription(prefilledData.description);
+      setCategory(prefilledData.category);
+      
+      // Show a highlighted state to indicate AI-extracted data
+      toast.success("AI extracted expense data! Please review and confirm.", {
+        duration: 5000,
+      });
+    }
+  }, [prefilledData]);
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +96,12 @@ export const ExpenseSidebar = ({
       setAmount("");
       setDescription("");
       setCategory("");
+      
+      // Clear prefilled data after successful submission
+      if (onClearPrefilled) {
+        onClearPrefilled();
+      }
+      
       onExpenseAdded();
     } catch (error: any) {
       toast.error(error.message, {
@@ -80,6 +109,15 @@ export const ExpenseSidebar = ({
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleClearForm = () => {
+    setAmount("");
+    setDescription("");
+    setCategory("");
+    if (onClearPrefilled) {
+      onClearPrefilled();
     }
   };
 
@@ -93,7 +131,28 @@ export const ExpenseSidebar = ({
   return (
     <div className="w-80 min-h-screen bg-sidebar p-6 space-y-8 border-r">
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold">Add New Expense</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Add New Expense</h2>
+          {prefilledData && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearForm}
+              className="text-xs"
+            >
+              Clear
+            </Button>
+          )}
+        </div>
+        
+        {prefilledData && (
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+            <p className="text-sm text-purple-700 font-medium">
+              ✨ AI extracted data - Review and confirm
+            </p>
+          </div>
+        )}
+        
         <form onSubmit={handleAddExpense} className="space-y-4">
           <div className="relative">
             <span className="absolute left-3 top-2.5 text-gray-500">₹</span>
@@ -104,13 +163,13 @@ export const ExpenseSidebar = ({
               placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="pl-8 rounded-[24px]"
+              className={`pl-8 rounded-[24px] ${prefilledData ? 'border-purple-300 bg-purple-50' : ''}`}
               required
             />
           </div>
 
           <Select value={category} onValueChange={setCategory} required>
-            <SelectTrigger className="rounded-[24px]">
+            <SelectTrigger className={`rounded-[24px] ${prefilledData ? 'border-purple-300 bg-purple-50' : ''}`}>
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent className="rounded-[24px]">
@@ -133,7 +192,7 @@ export const ExpenseSidebar = ({
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="rounded-[24px]"
+            className={`rounded-[24px] ${prefilledData ? 'border-purple-300 bg-purple-50' : ''}`}
           />
 
           <Button

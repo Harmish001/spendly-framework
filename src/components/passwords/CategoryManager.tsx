@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Plus, Edit, Trash2, Save, X, Palette } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
 
 interface Category {
   id: string;
@@ -134,21 +135,15 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Manage Categories</DialogTitle>
-        </DialogHeader>
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="p-3">
+        <DrawerHeader>
+          <DrawerTitle className="text-xl font-semibold">Manage Categories</DrawerTitle>
+        </DrawerHeader>
 
         <div className="space-y-6">
           {/* Create New Category */}
-          <Card className="border-2 border-dashed border-muted-foreground/25 rounded-xl">
-            <CardHeader>
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Plus className="h-5 w-5" />
-                Create New Category
-              </h3>
-            </CardHeader>
+          <Card className="p-3 rounded-xl">
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="categoryName">Category Name</Label>
@@ -157,7 +152,7 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
                   value={newCategory.name}
                   onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g., Social Media"
-                  className="rounded-lg"
+                  className="rounded-lg mb-2"
                 />
               </div>
               
@@ -214,7 +209,7 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-3">
+              <div className="grid gap-3 max-h-[200px] overflow-y-auto">
                 {categories.map((category) => (
                   <Card key={category.id} className="rounded-xl">
                     <CardContent className="p-4">
@@ -303,13 +298,7 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
             )}
           </div>
         </div>
-
-        <div className="flex justify-end pt-4">
-          <Button onClick={() => onOpenChange(false)} variant="outline" className="rounded-lg">
-            Close
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 };

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +8,12 @@ import { Switch } from "@/components/ui/switch";
 import { Eye, EyeOff, Shuffle, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 
 interface Category {
   id: string;
@@ -148,170 +153,172 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="px-4">
+        <DrawerHeader>
+          <DrawerTitle className="text-xl font-semibold">
             {password?.id ? "Edit Password" : "Add New Password"}
-          </DialogTitle>
-        </DialogHeader>
+          </DrawerTitle>
+        </DrawerHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="title">Title *</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="e.g., Gmail Account"
-              className="rounded-lg"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="category">Category</Label>
-            <Select 
-              value={formData.category_id || ""} 
-              onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value || null }))}
-            >
-              <SelectTrigger className="rounded-lg">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-3 h-3 rounded-full" 
-                        style={{ backgroundColor: category.color }}
-                      />
-                      {category.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              value={formData.username || ""}
-              onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-              placeholder="Username"
-              className="rounded-lg"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email || ""}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              placeholder="email@example.com"
-              className="rounded-lg"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="password">Password *</Label>
-            <div className="relative">
+        <div className="p-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="title">Title *</Label>
               <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={formData.password_encrypted}
-                onChange={(e) => setFormData(prev => ({ ...prev, password_encrypted: e.target.value }))}
-                placeholder="Password"
-                className="rounded-lg pr-20"
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="e.g., Gmail Account"
+                className="rounded-[24px]"
               />
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="h-8 w-8 p-0"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={generatePassword}
-                  className="h-8 w-8 p-0"
-                  title="Generate password"
-                >
-                  <Shuffle className="h-4 w-4" />
-                </Button>
+            </div>
+
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select 
+                value={formData.category_id || ""} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value || null }))}
+              >
+                <SelectTrigger className="rounded-[24px]">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: category.color }}
+                        />
+                        {category.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                value={formData.username || ""}
+                onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                placeholder="Username"
+                className="rounded-[24px]"
+              />
+            </div>
+
+            {/* <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email || ""}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="email@example.com"
+                className="rounded-[24px]"
+              />
+            </div> */}
+
+            <div>
+              <Label htmlFor="password">Password *</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password_encrypted}
+                  onChange={(e) => setFormData(prev => ({ ...prev, password_encrypted: e.target.value }))}
+                  placeholder="Password"
+                  className="rounded-[24px] pr-20"
+                />
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="h-8 w-8 p-0"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={generatePassword}
+                    className="h-8 w-8 p-0"
+                    title="Generate password"
+                  >
+                    <Shuffle className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div>
-            <Label htmlFor="website">Website URL</Label>
-            <Input
-              id="website"
-              type="url"
-              value={formData.website_url || ""}
-              onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
-              placeholder="https://example.com"
-              className="rounded-lg"
-            />
-          </div>
+            <div>
+              <Label htmlFor="website">Website URL</Label>
+              <Input
+                id="website"
+                type="url"
+                value={formData.website_url || ""}
+                onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
+                placeholder="https://example.com"
+                className="rounded-[24px]"
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes || ""}
-              onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-              placeholder="Additional notes..."
-              className="rounded-lg"
-              rows={3}
-            />
-          </div>
+            {/* <div>
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                value={formData.notes || ""}
+                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                placeholder="Additional notes..."
+                className="rounded-[24px]"
+                rows={3}
+              />
+            </div> */}
 
-          <div className="flex items-center justify-between">
-            <Label htmlFor="favorite" className="text-sm font-medium">
-              Add to favorites
-            </Label>
-            <Switch
-              id="favorite"
-              checked={formData.is_favorite}
-              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_favorite: checked }))}
-            />
-          </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="favorite" className="text-sm font-medium">
+                Add to favorites
+              </Label>
+              <Switch
+                id="favorite"
+                checked={formData.is_favorite}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_favorite: checked }))}
+              />
+            </div>
 
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="flex-1 rounded-lg"
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="submit" 
-              disabled={loading}
-              className="flex-1 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-            >
-              {loading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  {password?.id ? "Update" : "Save"}
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="rounded-full flex-1"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={loading}
+                className="flex-1 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+              >
+                {loading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    {password?.id ? "Update" : "Save"}
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 };

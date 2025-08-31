@@ -198,37 +198,14 @@ const PasswordManager = () => {
       
       <div className="container mx-auto px-4 py-6 space-y-6">
         {/* Header Section */}
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Shield className="h-8 w-8 text-primary" />
+          <div className="flex items-center justify-center gap-2">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Password Manager
             </h1>
-          </div>
-          <p className="text-muted-foreground">Secure storage for all your passwords</p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button 
-            onClick={() => setShowPasswordForm(true)}
-            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-xl h-12"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Password
-          </Button>
-          <Button 
-            variant="outline"
-            onClick={() => setShowCategoryManager(true)}
-            className="rounded-xl h-12 border-2"
-          >
-            <Grid3X3 className="h-4 w-4 mr-2" />
-            Manage Categories
-          </Button>
         </div>
 
         {/* Search and Filter Section */}
-        <Card className="border-0 shadow-lg rounded-2xl bg-white/80 backdrop-blur-sm">
+        <Card className="border-0 shadow-lg h-100 rounded-2xl bg-white/80 backdrop-blur-sm">
           <CardContent className="p-6">
             <div className="flex flex-col space-y-4">
               {/* Search Bar */}
@@ -238,45 +215,26 @@ const PasswordManager = () => {
                   placeholder="Search passwords..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 rounded-xl border-2 h-12"
+                  className="pl-10 rounded-full border-2 h-12"
                 />
               </div>
 
               {/* Filters */}
               <div className="flex flex-col sm:flex-row gap-3 items-center">
                 <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="flex-1">
-                  <TabsList className="grid grid-cols-3 lg:grid-cols-6 w-full rounded-xl bg-muted/50">
-                    <TabsTrigger value="all" className="rounded-lg">All</TabsTrigger>
-                    <TabsTrigger value="favorites" onClick={() => setShowFavorites(!showFavorites)} className="rounded-lg">
+                  <TabsList className="grid grid-cols-3 lg:grid-cols-6 w-full rounded-full bg-muted/50">
+                    <TabsTrigger value="all" className="rounded-full">All</TabsTrigger>
+                    <TabsTrigger value="favorites" onClick={() => setShowFavorites(!showFavorites)} className="rounded-full">
                       <Heart className="h-4 w-4 mr-1" />
                       Favorites ({favoriteCount})
                     </TabsTrigger>
-                    {categories.slice(0, 4).map(category => (
-                      <TabsTrigger key={category.id} value={category.id} className="rounded-lg">
+                    {/* {categories.slice(0, 4).map(category => (
+                      <TabsTrigger key={category.id} value={category.id} className="rounded-full">
                         {category.name}
                       </TabsTrigger>
-                    ))}
+                    ))} */}
                   </TabsList>
                 </Tabs>
-
-                <div className="flex gap-2">
-                  <Button
-                    variant={viewMode === 'grid' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setViewMode('grid')}
-                    className="rounded-lg"
-                  >
-                    <Grid3X3 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setViewMode('list')}
-                    className="rounded-lg"
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </div>
               </div>
             </div>
           </CardContent>
@@ -292,7 +250,7 @@ const PasswordManager = () => {
                 {searchQuery ? "Try adjusting your search criteria" : "Add your first password to get started"}
               </p>
               {!searchQuery && (
-                <Button onClick={() => setShowPasswordForm(true)} className="rounded-xl">
+                <Button onClick={() => setShowPasswordForm(true)} className="rounded-full">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Password
                 </Button>
@@ -318,7 +276,7 @@ const PasswordManager = () => {
                       {password.password_categories && (
                         <Badge 
                           variant="secondary" 
-                          className="rounded-lg"
+                          className="rounded-full"
                           style={{ 
                             backgroundColor: `${password.password_categories.color}20`,
                             color: password.password_categories.color 
@@ -332,9 +290,28 @@ const PasswordManager = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleFavorite(password.id, password.is_favorite)}
-                      className="rounded-lg"
+                      className="rounded-full"
                     >
                       <Heart className={`h-4 w-4 ${password.is_favorite ? 'fill-red-500 text-red-500' : ''}`} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                     onClick={() => {
+                        setEditingPassword(password);
+                        setShowPasswordForm(true);
+                      }}
+                      className="rounded-full"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deletePassword(password.id)}
+                      className="rounded-full"
+                    >
+                      <Trash2 className="flex-1 rounded-full text-destructive hover:bg-destructive/10" />
                     </Button>
                   </div>
                 </CardHeader>
@@ -427,35 +404,32 @@ const PasswordManager = () => {
                       <p className="text-sm mt-1">{password.notes}</p>
                     </div>
                   )}
-
-                  <div className="flex gap-2 pt-3 border-t">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setEditingPassword(password);
-                        setShowPasswordForm(true);
-                      }}
-                      className="flex-1 rounded-lg"
-                    >
-                      <Edit className="h-4 w-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => deletePassword(password.id)}
-                      className="flex-1 rounded-lg text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      Delete
-                    </Button>
-                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         )}
+      </div>
+
+      <div className="fixed bottom-4 right-4 z-50">
+        <Button
+          variant="outline"
+          className={`rounded-full w-14 h-14`}
+          style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", color: "white" }}
+          onClick={() => setShowPasswordForm(true)}
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+       <div className="fixed bottom-4 left-4 z-50">
+        <Button
+          variant="outline"
+          className={`rounded-full w-14 h-14`}
+          style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", color: "white" }}
+          onClick={() => setShowCategoryManager(true)}
+        >
+          <Grid3X3 className="h-4 w-4" />
+        </Button>
       </div>
 
       {/* Password Form Modal */}
@@ -471,7 +445,7 @@ const PasswordManager = () => {
         }}
       />
 
-      {/* Category Manager Modal */}
+      {/* Category Manager Sheet */}
       <CategoryManager
         open={showCategoryManager}
         onOpenChange={setShowCategoryManager}

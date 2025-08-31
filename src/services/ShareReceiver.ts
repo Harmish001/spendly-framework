@@ -90,7 +90,7 @@ export class ShareReceiver {
 
       const base64Data = typeof imageFile.data === 'string' 
         ? imageFile.data 
-        : btoa(String.fromCharCode(...new Uint8Array(imageFile.data as ArrayBuffer)));
+        : btoa(String.fromCharCode(...new Uint8Array(imageFile.data as unknown as ArrayBuffer)));
 
       const response = await fetch(`data:image/jpeg;base64,${base64Data}`);
       const blob = await response.blob();

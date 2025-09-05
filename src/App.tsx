@@ -20,6 +20,7 @@ import { Capacitor } from "@capacitor/core";
 import MonthlyAnalysis from "./components/statistics/Analysis";
 import LandingPage from "./pages/LandingPage";
 import PasswordManager from "./pages/PasswordManager";
+import MCPExpenses from "./pages/MCPExpenses";
 
 // Handle OAuth redirect and query parameters
 const AuthHandler = () => {
@@ -178,6 +179,7 @@ function App() {
 				<Route path="/passwords" element={<PasswordManager />} />
 				<Route path="/statistics" element={<Statistics />} />
 				<Route path="/monthlyAnalysis" element={<MonthlyAnalysis />} />
+				<Route path="/mcp-expenses" element={<MCPExpenses />} />
 			</Routes>
 			<Toaster />
 		</Router>

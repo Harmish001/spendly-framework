@@ -187,16 +187,6 @@ function App() {
 
 			</Routes>
 			
-			{/* Global Floating Chatbot */}
-			<FloatingChatButton 
-				onClick={() => setIsChatBotOpen(!isChatBotOpen)}
-			/>
-			{createPortal(
-				<FloatingChatBot 
-					isOpen={isChatBotOpen} 
-					onToggle={() => setIsChatBotOpen(!isChatBotOpen)}
-				/>,document.body)}
-			
 			<Toaster />
 		</Router>
 	);

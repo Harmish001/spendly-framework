@@ -21,8 +21,6 @@ import MonthlyAnalysis from "./components/statistics/Analysis";
 import LandingPage from "./pages/LandingPage";
 import PasswordManager from "./pages/PasswordManager";
 import ChatBotTest from "./pages/ChatBotTest";
-import { FloatingChatBot } from "./components/chatbot/FloatingChatBot";
-import { FloatingChatButton } from "./components/chatbot/FloatingChatButton";
 import { createPortal } from "react-dom";
 
 

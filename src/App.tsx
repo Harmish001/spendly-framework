@@ -12,7 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import TravelExpenses from "./pages/TravelExpenses";
 import Statistics from "./pages/Statistics";
 import { Toaster } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
 import { toast } from "sonner";
 import { ShareReceiver } from "./services/ShareReceiver";
@@ -20,7 +20,11 @@ import { Capacitor } from "@capacitor/core";
 import MonthlyAnalysis from "./components/statistics/Analysis";
 import LandingPage from "./pages/LandingPage";
 import PasswordManager from "./pages/PasswordManager";
-import MCPExpenses from "./pages/MCPExpenses";
+import ChatBotTest from "./pages/ChatBotTest";
+import { FloatingChatBot } from "./components/chatbot/FloatingChatBot";
+import { FloatingChatButton } from "./components/chatbot/FloatingChatButton";
+import { createPortal } from "react-dom";
+
 
 // Handle OAuth redirect and query parameters
 const AuthHandler = () => {
@@ -73,6 +77,8 @@ const AuthHandler = () => {
 };
 
 function App() {
+	const [isChatBotOpen, setIsChatBotOpen] = useState(false);
+	
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		if (params.get("shared") === "expense_image") {
@@ -179,8 +185,20 @@ function App() {
 				<Route path="/passwords" element={<PasswordManager />} />
 				<Route path="/statistics" element={<Statistics />} />
 				<Route path="/monthlyAnalysis" element={<MonthlyAnalysis />} />
-				<Route path="/mcp-expenses" element={<MCPExpenses />} />
+				<Route path="/chatbot-test" element={<ChatBotTest />} />
+
 			</Routes>
+			
+			{/* Global Floating Chatbot */}
+			<FloatingChatButton 
+				onClick={() => setIsChatBotOpen(!isChatBotOpen)}
+			/>
+			{createPortal(
+				<FloatingChatBot 
+					isOpen={isChatBotOpen} 
+					onToggle={() => setIsChatBotOpen(!isChatBotOpen)}
+				/>,document.body)}
+			
 			<Toaster />
 		</Router>
 	);

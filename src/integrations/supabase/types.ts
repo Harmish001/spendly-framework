@@ -14,6 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_conversations: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          user_id: string
+          role: string
+          content: string
+          expense_extracted: boolean | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          user_id: string
+          role: string
+          content: string
+          expense_extracted?: boolean | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          user_id?: string
+          role?: string
+          content?: string
+          expense_extracted?: boolean | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_extracted_expenses: {
+        Row: {
+          id: string
+          message_id: string
+          user_id: string
+          amount: number
+          description: string
+          category: string
+          confidence: number
+          approved: boolean | null
+          created_at: string
+          added_to_expenses: boolean | null
+          expense_id: string | null
+        }
+        Insert: {
+          id?: string
+          message_id: string
+          user_id: string
+          amount: number
+          description: string
+          category: string
+          confidence?: number
+          approved?: boolean | null
+          created_at?: string
+          added_to_expenses?: boolean | null
+          expense_id?: string | null
+        }
+        Update: {
+          id?: string
+          message_id?: string
+          user_id?: string
+          amount?: number
+          description?: string
+          category?: string
+          confidence?: number
+          approved?: boolean | null
+          created_at?: string
+          added_to_expenses?: boolean | null
+          expense_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_extracted_expenses_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_extracted_expenses_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expenses: {
         Row: {
           amount: number

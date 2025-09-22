@@ -21,8 +21,9 @@ import MonthlyAnalysis from "./components/statistics/Analysis";
 import LandingPage from "./pages/LandingPage";
 import PasswordManager from "./pages/PasswordManager";
 import ChatBotTest from "./pages/ChatBotTest";
+import { FloatingChatBot } from "./components/chatbot/FloatingChatBot";
+import { FloatingChatButton } from "./components/chatbot/FloatingChatButton";
 import { createPortal } from "react-dom";
-
 
 // Handle OAuth redirect and query parameters
 const AuthHandler = () => {
@@ -76,7 +77,7 @@ const AuthHandler = () => {
 
 function App() {
 	const [isChatBotOpen, setIsChatBotOpen] = useState(false);
-	
+
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		if (params.get("shared") === "expense_image") {
@@ -186,7 +187,15 @@ function App() {
 				<Route path="/chatbot-test" element={<ChatBotTest />} />
 
 			</Routes>
-			
+			{/* Global Floating Chatbot */}
+			<FloatingChatButton
+				onClick={() => setIsChatBotOpen(!isChatBotOpen)}
+			/>
+			{createPortal(
+				<FloatingChatBot
+					isOpen={isChatBotOpen}
+					onToggle={() => setIsChatBotOpen(!isChatBotOpen)}
+				/>, document.body)}
 			<Toaster />
 		</Router>
 	);

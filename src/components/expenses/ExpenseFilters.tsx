@@ -13,6 +13,7 @@ interface ExpenseFiltersProps {
   onYearChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
   onFilter: () => void;
+  showCategoryFilter?: boolean;
 }
 
 const currentYear = new Date().getFullYear();
@@ -37,7 +38,8 @@ export const ExpenseFilters = ({
   selectedCategory,
   onYearChange,
   onCategoryChange,
-  onFilter
+  onFilter,
+  showCategoryFilter = true
 }: ExpenseFiltersProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -73,18 +75,20 @@ export const ExpenseFilters = ({
             </SelectContent>
           </Select>
 
-          <Select value={selectedCategory} onValueChange={onCategoryChange}>
-            <SelectTrigger className="rounded-[24px]">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent className="rounded-[24px]">
-              {categories.map((category) => (
-                <SelectItem key={category} value={category} className="rounded-[24px]">
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {showCategoryFilter && (
+            <Select value={selectedCategory} onValueChange={onCategoryChange}>
+              <SelectTrigger className="rounded-[24px]">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent className="rounded-[24px]">
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category} className="rounded-[24px]">
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           <Button
             onClick={() => {
               onFilter();

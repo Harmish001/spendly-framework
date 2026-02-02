@@ -3,7 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Eye, EyeOff, Shuffle, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,7 +48,13 @@ interface PasswordFormProps {
   onSuccess: () => void;
 }
 
-export const PasswordForm = ({ open, onOpenChange, password, categories, onSuccess }: PasswordFormProps) => {
+export const PasswordForm = ({
+  open,
+  onOpenChange,
+  password,
+  categories,
+  onSuccess,
+}: PasswordFormProps) => {
   const [formData, setFormData] = useState<Password>({
     title: "",
     username: "",
@@ -75,35 +87,39 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
 
   const generatePassword = () => {
     const length = 16;
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
+    const charset =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
     let password = "";
-    
+
     // Ensure at least one character from each type
     const lowercase = "abcdefghijklmnopqrstuvwxyz";
     const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const numbers = "0123456789";
     const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-    
+
     password += lowercase[Math.floor(Math.random() * lowercase.length)];
     password += uppercase[Math.floor(Math.random() * uppercase.length)];
     password += numbers[Math.floor(Math.random() * numbers.length)];
     password += symbols[Math.floor(Math.random() * symbols.length)];
-    
+
     // Fill the rest randomly
     for (let i = 4; i < length; i++) {
       password += charset[Math.floor(Math.random() * charset.length)];
     }
-    
+
     // Shuffle the password
-    const shuffled = password.split('').sort(() => Math.random() - 0.5).join('');
-    
-    setFormData(prev => ({ ...prev, password_encrypted: shuffled }));
+    const shuffled = password
+      .split("")
+      .sort(() => Math.random() - 0.5)
+      .join("");
+
+    setFormData((prev) => ({ ...prev, password_encrypted: shuffled }));
     toast.success("Secure password generated!");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title || !formData.password_encrypted) {
       toast.error("Title and password are required");
       return;
@@ -112,11 +128,21 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
+      // Exclude password_categories as it's a relationship, not a column
+      const {
+        password_categories,
+        id,
+        created_at,
+        ...formDataWithoutRelations
+      } = formData as any;
+
       const passwordData = {
-        ...formData,
+        ...formDataWithoutRelations,
         user_id: user.id,
         username: formData.username || null,
         email: formData.email || null,
@@ -127,25 +153,25 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
       if (password?.id) {
         // Update existing password
         const { error } = await supabase
-          .from('passwords')
+          .from("passwords")
           .update(passwordData)
-          .eq('id', password.id);
-        
+          .eq("id", password.id);
+
         if (error) throw error;
         toast.success("Password updated successfully!");
       } else {
         // Create new password
         const { error } = await supabase
-          .from('passwords')
+          .from("passwords")
           .insert([passwordData]);
-        
+
         if (error) throw error;
         toast.success("Password saved successfully!");
       }
 
       onSuccess();
     } catch (error) {
-      console.error('Error saving password:', error);
+      console.error("Error saving password:", error);
       toast.error("Failed to save password");
     } finally {
       setLoading(false);
@@ -168,7 +194,9 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
               <Input
                 id="title"
                 value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, title: e.target.value }))
+                }
                 placeholder="e.g., Gmail Account"
                 className="rounded-[24px]"
               />
@@ -176,9 +204,14 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
 
             <div>
               <Label htmlFor="category">Category</Label>
-              <Select 
-                value={formData.category_id || ""} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value || null }))}
+              <Select
+                value={formData.category_id || ""}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    category_id: value || null,
+                  }))
+                }
               >
                 <SelectTrigger className="rounded-[24px]">
                   <SelectValue placeholder="Select a category" />
@@ -187,8 +220,8 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       <div className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full" 
+                        <div
+                          className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: category.color }}
                         />
                         {category.name}
@@ -204,7 +237,9 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
               <Input
                 id="username"
                 value={formData.username || ""}
-                onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, username: e.target.value }))
+                }
                 placeholder="Username"
                 className="rounded-[24px]"
               />
@@ -229,7 +264,12 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={formData.password_encrypted}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password_encrypted: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      password_encrypted: e.target.value,
+                    }))
+                  }
                   placeholder="Password"
                   className="rounded-[24px] pr-20"
                 />
@@ -241,7 +281,11 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
                     onClick={() => setShowPassword(!showPassword)}
                     className="h-8 w-8 p-0"
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                   <Button
                     type="button"
@@ -263,7 +307,12 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
                 id="website"
                 type="url"
                 value={formData.website_url || ""}
-                onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    website_url: e.target.value,
+                  }))
+                }
                 placeholder="https://example.com"
                 className="rounded-[24px]"
               />
@@ -288,7 +337,9 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
               <Switch
                 id="favorite"
                 checked={formData.is_favorite}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_favorite: checked }))}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({ ...prev, is_favorite: checked }))
+                }
               />
             </div>
 
@@ -301,8 +352,8 @@ export const PasswordForm = ({ open, onOpenChange, password, categories, onSucce
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={loading}
                 className="flex-1 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
               >

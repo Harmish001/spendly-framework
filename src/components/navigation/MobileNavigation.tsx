@@ -34,7 +34,8 @@ export const MobileNavigation = () => {
       icon: ChartAreaIcon,
       path: "/monthlyAnalysis",
       description: "View expense analysis"
-    }
+    },
+
   ];
 
   const handleNavigation = (path: string) => {

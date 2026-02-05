@@ -143,6 +143,8 @@ const MonthlyAnalysis = () => {
         className="pt-8 px-8 px-4"
         style={{
           background: "linear-gradient(to right, #9333ea, #2563eb)",
+          marginBottom: "-2px",
+          marginTop: "-2px",
         }}
       >
         <h1 className="text-2xl font-bold mb-2 text-white flex justify-center">
@@ -164,7 +166,7 @@ const MonthlyAnalysis = () => {
           WebkitBackgroundClip: "text",
         }}
       >
-        Category wise Expense
+        Expenses
       </p>
       {loading && (
         <div className="w-full flex justify-center align-items-center">

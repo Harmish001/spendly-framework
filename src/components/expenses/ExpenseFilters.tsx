@@ -1,11 +1,29 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Filter } from "lucide-react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { GRADIENTS } from "@/constants/theme";
 
 interface ExpenseFiltersProps {
   selectedYear: string;
@@ -17,7 +35,9 @@ interface ExpenseFiltersProps {
 }
 
 const currentYear = new Date().getFullYear();
-const years = Array.from({ length: 5 }, (_, i) => (currentYear - 2 + i).toString());
+const years = Array.from({ length: 5 }, (_, i) =>
+  (currentYear - 2 + i).toString(),
+);
 
 const categories = [
   "All Categories",
@@ -30,7 +50,7 @@ const categories = [
   "Bill",
   "Travel",
   "HouseExpense",
-  "Others"
+  "Others",
 ];
 
 export const ExpenseFilters = ({
@@ -39,7 +59,7 @@ export const ExpenseFilters = ({
   onYearChange,
   onCategoryChange,
   onFilter,
-  showCategoryFilter = true
+  showCategoryFilter = true,
 }: ExpenseFiltersProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -49,12 +69,12 @@ export const ExpenseFilters = ({
       <DrawerTrigger asChild>
         <Button
           variant="outline"
-          className={`rounded-full ${isMobile ? 'w-14 h-14' : 'rounded-[24px]'}`}
-          style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", color: "white" }}
+          className={`rounded-full ${isMobile ? "w-14 h-14" : "rounded-[24px]"}`}
+          style={{ background: GRADIENTS.PRIMARY, color: "white" }}
           onClick={() => setIsOpen(true)}
         >
-          <Filter className={`h-6 w-6 ${!isMobile && 'mr-2'}`} />
-          {!isMobile && 'Filters'}
+          <Filter className={`h-6 w-6 ${!isMobile && "mr-2"}`} />
+          {!isMobile && "Filters"}
         </Button>
       </DrawerTrigger>
       <DrawerContent className="rounded-t-[24px] border-0 max-h-[85vh] mb-4">
@@ -82,7 +102,11 @@ export const ExpenseFilters = ({
               </SelectTrigger>
               <SelectContent className="rounded-[24px]">
                 {categories.map((category) => (
-                  <SelectItem key={category} value={category} className="rounded-[24px]">
+                  <SelectItem
+                    key={category}
+                    value={category}
+                    className="rounded-[24px]"
+                  >
                     {category}
                   </SelectItem>
                 ))}
@@ -95,7 +119,7 @@ export const ExpenseFilters = ({
               setIsOpen(false);
             }}
             className="w-full rounded-[24px]"
-            style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}
+            style={{ background: GRADIENTS.PRIMARY }}
           >
             Apply Filters
           </Button>

@@ -15,7 +15,7 @@ import {
   Stethoscope,
   LucidePlane,
   ScrollText,
-  House
+  House,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MonthTabs } from "@/components/expenses/MonthTabs";
@@ -37,6 +37,11 @@ import {
 } from "@/components/ui/drawer";
 import { requestAllPermissions } from "../../Permissions";
 import { Badge } from "@/components/ui/badge";
+import {
+  GRADIENTS,
+  getTextGradientStyle,
+  getBackgroundGradientStyle,
+} from "@/constants/theme";
 
 const categories = [
   { id: "investment", label: "Investment", icon: null },
@@ -69,7 +74,7 @@ const Dashboard = () => {
   const [isExpenseSheetOpen, setIsExpenseSheetOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(
-    new Date().getFullYear() + ""
+    new Date().getFullYear() + "",
   );
   const [expenses, setExpenses] = useState([]);
   const [totalExpense, setTotalExpense] = useState(0);
@@ -110,13 +115,13 @@ const Dashboard = () => {
 
     window.addEventListener(
       "sharedExpenseProcessed",
-      handleSharedExpense as EventListener
+      handleSharedExpense as EventListener,
     );
 
     return () => {
       window.removeEventListener(
         "sharedExpenseProcessed",
-        handleSharedExpense as EventListener
+        handleSharedExpense as EventListener,
       );
     };
   }, []);
@@ -132,16 +137,16 @@ const Dashboard = () => {
       if (selectedMonth && selectedYear) {
         const startDate = `${selectedYear}-${selectedMonth.padStart(
           2,
-          "0"
+          "0",
         )}-01`;
         const lastDay = new Date(
           parseInt(selectedYear),
           parseInt(selectedMonth),
-          0
+          0,
         ).getDate();
         const endDate = `${selectedYear}-${selectedMonth.padStart(
           2,
-          "0"
+          "0",
         )}-${lastDay}`;
         query = query.gte("created_at", startDate).lte("created_at", endDate);
       }
@@ -173,7 +178,7 @@ const Dashboard = () => {
 
       const total = (data || []).reduce(
         (sum, expense) => sum + Number(expense.amount),
-        0
+        0,
       );
       setTotalExpense(total);
     } catch (error) {
@@ -357,13 +362,12 @@ const Dashboard = () => {
                   cornerRadius={3}
                   activeOuterRadiusOffset={8}
                   colors={[
-                    "#9333ea",
-                    "#2563eb",
-                    "#1e4bb8",
-                    "#7b2ac5",
-                    "#b84bed",
-                    "#5b8def",
-                    "#312e81",
+                    "#f59e42", // Start - warm orange
+                    "#f7934d",
+                    "#f98858",
+                    "#fb7d63",
+                    "#fd726e",
+                    "#ff6b6b", // End - coral/rose
                   ]}
                   borderWidth={1}
                   borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
@@ -378,11 +382,7 @@ const Dashboard = () => {
                   <p className="text-sm font-bold text-gray-500">Total</p>
                   <p
                     className="text-2xl font-bold"
-                    style={{
-                      background: "linear-gradient(to right, #9333ea, #2563eb)",
-                      WebkitTextFillColor: "transparent",
-                      WebkitBackgroundClip: "text",
-                    }}
+                    style={getTextGradientStyle(GRADIENTS.PRIMARY)}
                   >
                     ₹{totalExpense.toLocaleString("en-IN")}
                   </p>
@@ -405,7 +405,7 @@ const Dashboard = () => {
           ) : (
             expenses.map((expense) => {
               const category = categories.find(
-                (cat) => cat.id === expense.category
+                (cat) => cat.id === expense.category,
               );
               const Icon = category?.icon || MoreHorizontal;
               const CategoryIcon =
@@ -442,67 +442,62 @@ const Dashboard = () => {
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
                   > */}
-                    <Card
-                      key={expense.id}
-                      className="shadow-md bg-gradient-to-r from-white to-gray-50/50 border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
-                      onClick={() => setIsAction(expense)}
-                    >
-                      <CardContent className="flex items-center justify-between p-5">
-                        <div className="flex items-center justify-center gap-3 flex-1 min-w-0">
-                          <div
-                            className="p-2 rounded-[14px] shrink-0"
-                            style={{
-                              background:
-                                "linear-gradient(to right, #9333ea, #2563eb)",
-                            }}
-                          >
-                            <CategoryIcon className="h-7 w-7 text-white" />
-                          </div>
-                          <div className="text-left min-w-0 flex-1">
-                            <p className="font-muted truncate font-semibold text-sm">
-                              {expense.description || "No description"}
-                            </p>
-                            <p className="text-xs text-gray-600 ">
-                              {new Date(expense.created_at).getDate()}&nbsp;
-                              {new Date(expense.created_at).toLocaleString(
-                                "default",
-                                { month: "long" }
-                              )}
-                            </p>
-                          </div>
-
-                          <div className="flex items-end gap-1 shrink-0 flex-col">
-                            <p
-                              className="text-base font-bold whitespace-nowrap"
-                              style={{
-                                background:
-                                  "linear-gradient(to right, #9333ea, #2563eb)",
-                                WebkitTextFillColor: "transparent",
-                                WebkitBackgroundClip: "text",
-                              }}
-                            >
-                              ₹{expense.amount}
-                            </p>
-                            <Badge
-                              variant="secondary"
-                              className="text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:bg-gray-200"
-                            >
-                              {category?.label || expense.category}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center flex-col justify-center">
-                            <Edit
-                              className="h-5 w-5 mb-2 text-gray-500"
-                              onClick={() => handleEditExpense(expense)}
-                            />
-                            <Trash2
-                              className="h-5 w-5 text-red-600"
-                              onClick={() => setExpenseToDelete(expense.id)}
-                            />
-                          </div>
+                  <Card
+                    key={expense.id}
+                    className="shadow-md from-white to-gray-50/50 border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
+                    onClick={() => setIsAction(expense)}
+                  >
+                    <CardContent className="flex items-center justify-between p-5">
+                      <div className="flex items-center justify-center gap-3 flex-1 min-w-0">
+                        <div
+                          className="p-2 rounded-[14px] shrink-0"
+                          style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
+                        >
+                          <CategoryIcon className="h-7 w-7 text-white" />
                         </div>
-                      </CardContent>
-                    </Card>
+                        <div className="text-left min-w-0 flex-1">
+                          <p className="font-muted truncate font-semibold text-sm">
+                            {expense.description || "No description"}
+                          </p>
+                          <p className="text-xs text-gray-600 ">
+                            {new Date(expense.created_at).getDate()}&nbsp;
+                            {new Date(expense.created_at).toLocaleString(
+                              "default",
+                              { month: "long" },
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="flex items-end gap-1 shrink-0 flex-col">
+                          <p
+                            className="text-base font-bold whitespace-nowrap"
+                            style={getTextGradientStyle(GRADIENTS.PRIMARY)}
+                          >
+                            ₹{expense.amount}
+                          </p>
+                          <Badge
+                            variant="secondary"
+                            className="text-xs font-medium text-white hover:bg-gray-200"
+                            style={getBackgroundGradientStyle(
+                              GRADIENTS.PRIMARY,
+                            )}
+                          >
+                            {category?.label || expense.category}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center flex-col justify-center">
+                          <Edit
+                            className="h-5 w-5 mb-2 text-gray-500"
+                            onClick={() => handleEditExpense(expense)}
+                          />
+                          <Trash2
+                            className="h-5 w-5 text-red-600"
+                            onClick={() => setExpenseToDelete(expense.id)}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                   {/* </div> */}
                 </div>
               );
@@ -566,9 +561,7 @@ const Dashboard = () => {
             <Button
               className="rounded-[24px] bg-danger"
               style={{ background: "red" }}
-              onClick={() =>
-                handleDeleteExpense(expenseToDelete)
-              }
+              onClick={() => handleDeleteExpense(expenseToDelete)}
             >
               Delete
             </Button>

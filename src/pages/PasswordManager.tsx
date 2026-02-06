@@ -25,6 +25,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PasswordForm } from "@/components/passwords/PasswordForm";
 import { CategoryManager } from "@/components/passwords/CategoryManager";
+import {
+  getBackgroundGradientStyle,
+  getTextGradientStyle,
+  GRADIENTS,
+} from "@/constants/theme";
 
 interface Category {
   id: string;
@@ -194,7 +199,7 @@ const PasswordManager = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen">
         <Header />
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -210,7 +215,10 @@ const PasswordManager = () => {
       <div className="container mx-auto px-4 py-6 space-y-6">
         {/* Header Section */}
         <div className="flex items-center justify-center gap-2">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <h1
+            className="text-3xl font-bold bg-clip-text"
+            style={getTextGradientStyle(GRADIENTS.PRIMARY)}
+          >
             Password Manager
           </h1>
         </div>
@@ -303,7 +311,10 @@ const PasswordManager = () => {
                   <div className="flex items-start justify-between">
                     <div className="space-y-1 flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-lg">
+                        <h3
+                          className="font-semibold text-lg"
+                          style={getTextGradientStyle(GRADIENTS.PRIMARY)}
+                        >
                           {password.title}
                         </h3>
                         {password.is_favorite && (
@@ -479,7 +490,7 @@ const PasswordManager = () => {
           variant="outline"
           className={`rounded-full w-14 h-14`}
           style={{
-            background: "linear-gradient(to right, #9333ea, #2563eb)",
+            background: GRADIENTS.PRIMARY,
             color: "white",
           }}
           onClick={() => {
@@ -495,7 +506,7 @@ const PasswordManager = () => {
           variant="outline"
           className={`rounded-full w-14 h-14`}
           style={{
-            background: "linear-gradient(to right, #9333ea, #2563eb)",
+            background: GRADIENTS.PRIMARY,
             color: "white",
           }}
           onClick={() => setShowCategoryManager(true)}

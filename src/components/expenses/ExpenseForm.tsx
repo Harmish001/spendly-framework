@@ -1,15 +1,38 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal, Loader2, Stethoscope, CalendarIcon, Receipt, Plane, House } from "lucide-react";
+import {
+  Wallet,
+  Utensils,
+  Car,
+  ShoppingBag,
+  BanknoteIcon,
+  MoreHorizontal,
+  Loader2,
+  Stethoscope,
+  CalendarIcon,
+  Receipt,
+  Plane,
+  House,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { GRADIENTS } from "@/constants/theme";
 
 const categories = [
   { id: "investment", label: "Investment", icon: Wallet },
@@ -43,7 +66,12 @@ interface ExpenseFormProps {
   } | null;
 }
 
-export const ExpenseForm = ({ onExpenseAdded, prefilledData, onClearPrefilled, editingExpense }: ExpenseFormProps) => {
+export const ExpenseForm = ({
+  onExpenseAdded,
+  prefilledData,
+  onClearPrefilled,
+  editingExpense,
+}: ExpenseFormProps) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
@@ -74,12 +102,14 @@ export const ExpenseForm = ({ onExpenseAdded, prefilledData, onClearPrefilled, e
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) throw new Error("No user found");
 
       // Format the date to match the database format
-      const formattedDate = format(date, 'yyyy-MM-dd');
+      const formattedDate = format(date, "yyyy-MM-dd");
 
       if (isEditing && editingExpense) {
         // Update existing expense
@@ -115,12 +145,12 @@ export const ExpenseForm = ({ onExpenseAdded, prefilledData, onClearPrefilled, e
       setDescription("");
       setCategory("");
       setDate(new Date());
-      
+
       // Clear prefilled data after successful submission
       if (onClearPrefilled) {
         onClearPrefilled();
       }
-      
+
       onExpenseAdded();
     } catch (error: any) {
       toast.error(error.message);
@@ -140,20 +170,26 @@ export const ExpenseForm = ({ onExpenseAdded, prefilledData, onClearPrefilled, e
           placeholder="0.00"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className={`pl-8 rounded-[24px] ${prefilledData || editingExpense ? 'border-purple-300 bg-purple-50' : ''}`}
+          className={`pl-8 rounded-[24px] ${prefilledData || editingExpense ? "border-purple-300 bg-purple-50" : ""}`}
           required
         />
       </div>
 
       <Select value={category} onValueChange={setCategory} required>
-        <SelectTrigger className={`rounded-[24px] ${prefilledData || editingExpense ? 'border-purple-300 bg-purple-50' : ''}`}>
+        <SelectTrigger
+          className={`rounded-[24px] ${prefilledData || editingExpense ? "border-purple-300 bg-purple-50" : ""}`}
+        >
           <SelectValue placeholder="Select category" />
         </SelectTrigger>
         <SelectContent className="rounded-[24px]">
           {categories.map((cat) => {
             const Icon = cat.icon;
             return (
-              <SelectItem key={cat.id} value={cat.id} className="rounded-[24px]">
+              <SelectItem
+                key={cat.id}
+                value={cat.id}
+                className="rounded-[24px]"
+              >
                 <div className="flex items-center gap-2">
                   <Icon className="h-4 w-4" />
                   {cat.label}
@@ -169,7 +205,7 @@ export const ExpenseForm = ({ onExpenseAdded, prefilledData, onClearPrefilled, e
         placeholder="Description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        className={`rounded-[24px] ${prefilledData || editingExpense ? 'border-purple-300 bg-purple-50' : ''}`}
+        className={`rounded-[24px] ${prefilledData || editingExpense ? "border-purple-300 bg-purple-50" : ""}`}
       />
 
       <Popover>
@@ -179,7 +215,9 @@ export const ExpenseForm = ({ onExpenseAdded, prefilledData, onClearPrefilled, e
             className={cn(
               "w-full justify-start text-left font-normal rounded-[24px]",
               !date && "text-muted-foreground",
-              prefilledData || editingExpense ? 'border-purple-300 bg-purple-50' : ''
+              prefilledData || editingExpense
+                ? "border-purple-300 bg-purple-50"
+                : "",
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
@@ -200,13 +238,17 @@ export const ExpenseForm = ({ onExpenseAdded, prefilledData, onClearPrefilled, e
       <Button
         type="submit"
         className="w-full rounded-[24px]"
-        style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}
+        style={{ background: GRADIENTS.PRIMARY }}
         disabled={loading}
       >
-        {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-        ) : null}
-        {loading ? (isEditing ? "Updating..." : "Adding...") : (isEditing ? "Update Expense" : "Add Expense")}
+        {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+        {loading
+          ? isEditing
+            ? "Updating..."
+            : "Adding..."
+          : isEditing
+            ? "Update Expense"
+            : "Add Expense"}
       </Button>
     </form>
   );

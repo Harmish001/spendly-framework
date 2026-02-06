@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +14,7 @@ import { Plus, Edit, Trash2, Save, X, Palette } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import { getBackgroundGradientStyle, GRADIENTS } from "@/constants/theme";
 
 interface Category {
   id: string;
@@ -26,14 +32,38 @@ interface CategoryManagerProps {
 }
 
 const colorPalette = [
-  '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
-  '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
-  '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
-  '#ec4899', '#f43f5e', '#64748b', '#374151', '#1f2937'
+  "#ef4444",
+  "#f97316",
+  "#f59e0b",
+  "#eab308",
+  "#84cc16",
+  "#22c55e",
+  "#10b981",
+  "#14b8a6",
+  "#06b6d4",
+  "#0ea5e9",
+  "#3b82f6",
+  "#6366f1",
+  "#8b5cf6",
+  "#a855f7",
+  "#d946ef",
+  "#ec4899",
+  "#f43f5e",
+  "#64748b",
+  "#374151",
+  "#1f2937",
 ];
 
-export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: CategoryManagerProps) => {
-  const [newCategory, setNewCategory] = useState({ name: "", color: "#6366f1" });
+export const CategoryManager = ({
+  open,
+  onOpenChange,
+  categories,
+  onSuccess,
+}: CategoryManagerProps) => {
+  const [newCategory, setNewCategory] = useState({
+    name: "",
+    color: "#6366f1",
+  });
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -56,17 +86,19 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
 
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      const { error } = await supabase
-        .from('password_categories')
-        .insert([{
+      const { error } = await supabase.from("password_categories").insert([
+        {
           user_id: user.id,
           name: newCategory.name.trim(),
           color: newCategory.color,
-          icon: 'Folder'
-        }]);
+          icon: "Folder",
+        },
+      ]);
 
       if (error) throw error;
 
@@ -74,7 +106,7 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
       resetForm();
       onSuccess();
     } catch (error) {
-      console.error('Error creating category:', error);
+      console.error("Error creating category:", error);
       toast.error("Failed to create category");
     } finally {
       setLoading(false);
@@ -90,12 +122,12 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
     setLoading(true);
     try {
       const { error } = await supabase
-        .from('password_categories')
+        .from("password_categories")
         .update({
           name: editingCategory.name.trim(),
-          color: editingCategory.color
+          color: editingCategory.color,
         })
-        .eq('id', editingCategory.id);
+        .eq("id", editingCategory.id);
 
       if (error) throw error;
 
@@ -103,7 +135,7 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
       resetForm();
       onSuccess();
     } catch (error) {
-      console.error('Error updating category:', error);
+      console.error("Error updating category:", error);
       toast.error("Failed to update category");
     } finally {
       setLoading(false);
@@ -111,23 +143,27 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
-    if (!confirm("Are you sure you want to delete this category? Passwords in this category will become uncategorized.")) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this category? Passwords in this category will become uncategorized.",
+      )
+    ) {
       return;
     }
 
     setLoading(true);
     try {
       const { error } = await supabase
-        .from('password_categories')
+        .from("password_categories")
         .delete()
-        .eq('id', categoryId);
+        .eq("id", categoryId);
 
       if (error) throw error;
 
       toast.success("Category deleted successfully!");
       onSuccess();
     } catch (error) {
-      console.error('Error deleting category:', error);
+      console.error("Error deleting category:", error);
       toast.error("Failed to delete category");
     } finally {
       setLoading(false);
@@ -138,7 +174,9 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="p-3">
         <DrawerHeader>
-          <DrawerTitle className="text-xl font-semibold">Manage Categories</DrawerTitle>
+          <DrawerTitle className="text-xl font-semibold">
+            Manage Categories
+          </DrawerTitle>
         </DrawerHeader>
 
         <div className="space-y-6">
@@ -150,12 +188,17 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
                 <Input
                   id="categoryName"
                   value={newCategory.name}
-                  onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setNewCategory((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
                   placeholder="e.g., Social Media"
                   className="rounded-lg mb-2"
                 />
               </div>
-              
+
               <div>
                 <Label>Color</Label>
                 <div className="grid grid-cols-10 gap-2 mt-2">
@@ -164,26 +207,33 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
                       key={color}
                       type="button"
                       className={`w-8 h-8 rounded-lg border-2 transition-all hover:scale-110 ${
-                        newCategory.color === color ? 'border-gray-800 shadow-lg' : 'border-gray-300'
+                        newCategory.color === color
+                          ? "border-gray-800 shadow-lg"
+                          : "border-gray-300"
                       }`}
                       style={{ backgroundColor: color }}
-                      onClick={() => setNewCategory(prev => ({ ...prev, color }))}
+                      onClick={() =>
+                        setNewCategory((prev) => ({ ...prev, color }))
+                      }
                     />
                   ))}
                 </div>
                 <div className="flex items-center gap-2 mt-2">
-                  <div 
-                    className="w-6 h-6 rounded border" 
+                  <div
+                    className="w-6 h-6 rounded border"
                     style={{ backgroundColor: newCategory.color }}
                   />
-                  <span className="text-sm text-muted-foreground">Selected: {newCategory.color}</span>
+                  <span className="text-sm text-muted-foreground">
+                    Selected: {newCategory.color}
+                  </span>
                 </div>
               </div>
 
-              <Button 
+              <Button
                 onClick={handleCreateCategory}
                 disabled={loading || !newCategory.name.trim()}
-                className="w-full rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                className="w-full rounded-full"
+                style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
@@ -199,13 +249,17 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
 
           {/* Existing Categories */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Existing Categories ({categories.length})</h3>
-            
+            <h3 className="text-lg font-semibold">
+              Existing Categories ({categories.length})
+            </h3>
+
             {categories.length === 0 ? (
               <Card className="rounded-xl">
                 <CardContent className="p-8 text-center">
                   <Palette className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-muted-foreground">No categories created yet</p>
+                  <p className="text-muted-foreground">
+                    No categories created yet
+                  </p>
                 </CardContent>
               </Card>
             ) : (
@@ -217,9 +271,11 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
                         <div className="space-y-3">
                           <Input
                             value={editingCategory.name}
-                            onChange={(e) => setEditingCategory(prev => 
-                              prev ? { ...prev, name: e.target.value } : null
-                            )}
+                            onChange={(e) =>
+                              setEditingCategory((prev) =>
+                                prev ? { ...prev, name: e.target.value } : null,
+                              )
+                            }
                             className="rounded-lg"
                           />
                           <div className="grid grid-cols-10 gap-1">
@@ -228,12 +284,16 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
                                 key={color}
                                 type="button"
                                 className={`w-6 h-6 rounded border-2 transition-all hover:scale-110 ${
-                                  editingCategory.color === color ? 'border-gray-800' : 'border-gray-300'
+                                  editingCategory.color === color
+                                    ? "border-gray-800"
+                                    : "border-gray-300"
                                 }`}
                                 style={{ backgroundColor: color }}
-                                onClick={() => setEditingCategory(prev => 
-                                  prev ? { ...prev, color } : null
-                                )}
+                                onClick={() =>
+                                  setEditingCategory((prev) =>
+                                    prev ? { ...prev, color } : null,
+                                  )
+                                }
                               />
                             ))}
                           </div>
@@ -261,13 +321,16 @@ export const CategoryManager = ({ open, onOpenChange, categories, onSuccess }: C
                       ) : (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div 
-                              className="w-4 h-4 rounded-full" 
+                            <div
+                              className="w-4 h-4 rounded-full"
                               style={{ backgroundColor: category.color }}
                             />
                             <span className="font-medium">{category.name}</span>
                             <Badge variant="secondary" className="text-xs">
-                              {category.created_at && new Date(category.created_at).toLocaleDateString()}
+                              {category.created_at &&
+                                new Date(
+                                  category.created_at,
+                                ).toLocaleDateString()}
                             </Badge>
                           </div>
                           <div className="flex gap-2">

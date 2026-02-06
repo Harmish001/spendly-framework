@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,9 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { BarChart3, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import { format, subMonths } from "date-fns";
+import { getBackgroundGradientStyle, GRADIENTS } from "@/constants/theme";
 
 interface MonthlyData {
   month: string;
@@ -31,13 +35,13 @@ const Statistics = () => {
     try {
       const currentDate = new Date();
       const months = [];
-      
+
       // Get last 3 months including current month
       for (let i = 5; i >= 0; i--) {
         const date = subMonths(currentDate, i);
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
-        const monthStr = month.toString().padStart(2, '0');
+        const monthStr = month.toString().padStart(2, "0");
         const startDate = `${year}-${monthStr}-01`;
         const lastDay = new Date(year, month, 0).getDate();
         const endDate = `${year}-${monthStr}-${lastDay}`;
@@ -50,13 +54,16 @@ const Statistics = () => {
 
         if (error) throw error;
 
-        const totalAmount = (data || []).reduce((sum, expense) => sum + Number(expense.amount), 0);
+        const totalAmount = (data || []).reduce(
+          (sum, expense) => sum + Number(expense.amount),
+          0,
+        );
         const expenseCount = data?.length || 0;
 
         months.push({
-          month: format(date, 'MMM yyyy'),
+          month: format(date, "MMM yyyy"),
           amount: totalAmount,
-          expenses: expenseCount
+          expenses: expenseCount,
         });
       }
 
@@ -72,23 +79,25 @@ const Statistics = () => {
   const chartConfig = {
     amount: {
       label: "Amount",
-      color: "#9333ea",
+      color: "#f59e42",
     },
     expenses: {
       label: "Expenses",
-      color: "#2563eb",
+      color: "#ff6b6b",
     },
   };
 
   return (
-    // bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}
     <div className="min-h-screen bg-background">
-      <div className="sticky top-0 z-40 border-b px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)" }}>
+      <div
+        className="sticky top-0 z-40 border-b px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
+      >
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate("/dashboard")}
             className="rounded-full"
           >
             <ArrowLeft className="h-5 w-5 text-white" />
@@ -109,14 +118,26 @@ const Statistics = () => {
           <>
             <div className="grid grid-cols-3 md:grid-cols-3 gap-3">
               {monthlyData.map((data, index) => (
-                <Card key={data.month} className="p-3 rounded-[20px] shadow-md bg-gradient-to-r from-white to-gray-50/50">
+                <Card
+                  key={data.month}
+                  className="p-3 rounded-[20px] shadow-md bg-gradient-to-r from-white to-gray-50/50"
+                >
                   <CardContent className="p-0">
                     <div className="text-center">
                       <p className="text-sm text-gray-600 mb-1">{data.month}</p>
-                      <p className="text-lg font-bold mb-1" style={{ background: "linear-gradient(to right, #9333ea, #2563eb)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>
-                        ₹{data.amount.toLocaleString('en-IN')}
+                      <p
+                        className="text-lg font-bold mb-1"
+                        style={{
+                          ...getBackgroundGradientStyle(GRADIENTS.PRIMARY),
+                          WebkitTextFillColor: "transparent",
+                          WebkitBackgroundClip: "text",
+                        }}
+                      >
+                        ₹{data.amount.toLocaleString("en-IN")}
                       </p>
-                      <p className="text-xs text-gray-500">{data.expenses} expenses</p>
+                      <p className="text-xs text-gray-500">
+                        {data.expenses} expenses
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -125,30 +146,43 @@ const Statistics = () => {
 
             <Card className="rounded-[20px] hover:shadow-lg shadow-md bg-gradient-to-r from-white to-gray-50/50">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold">Monthly Expense Amount</CardTitle>
+                <CardTitle className="text-lg font-semibold">
+                  Monthly Expense Amount
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-2">
-                <ChartContainer config={chartConfig} className="h-[280px] w-full">
+                <ChartContainer
+                  config={chartConfig}
+                  className="h-[280px] w-full"
+                >
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={monthlyData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-                      <XAxis 
-                        dataKey="month" 
+                    <BarChart
+                      data={monthlyData}
+                      margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                    >
+                      <XAxis
+                        dataKey="month"
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 12, fill: '#666' }}
+                        tick={{ fontSize: 12, fill: "#666" }}
                       />
-                      <YAxis 
+                      <YAxis
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 12, fill: '#666' }}
-                        tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
+                        tick={{ fontSize: 12, fill: "#666" }}
+                        tickFormatter={(value) =>
+                          `₹${value.toLocaleString("en-IN")}`
+                        }
                       />
-                      <ChartTooltip 
+                      <ChartTooltip
                         content={<ChartTooltipContent />}
-                        formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, 'Amount']}
+                        formatter={(value) => [
+                          `₹${value.toLocaleString("en-IN")}`,
+                          "Amount",
+                        ]}
                       />
-                      <Bar 
-                        dataKey="amount" 
+                      <Bar
+                        dataKey="amount"
                         fill="var(--color-amount)"
                         radius={[6, 6, 0, 0]}
                         stroke="none"
@@ -161,29 +195,37 @@ const Statistics = () => {
 
             <Card className="rounded-[20px] hover:shadow-lg  shadow-md bg-gradient-to-r from-white to-gray-50/50">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold">Number of Expenses</CardTitle>
+                <CardTitle className="text-lg font-semibold">
+                  Number of Expenses
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-2">
-                <ChartContainer config={chartConfig} className="h-[280px] w-full">
+                <ChartContainer
+                  config={chartConfig}
+                  className="h-[280px] w-full"
+                >
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={monthlyData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-                      <XAxis 
-                        dataKey="month" 
+                    <BarChart
+                      data={monthlyData}
+                      margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                    >
+                      <XAxis
+                        dataKey="month"
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 12, fill: '#666' }}
+                        tick={{ fontSize: 12, fill: "#666" }}
                       />
-                      <YAxis 
+                      <YAxis
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 12, fill: '#666' }}
+                        tick={{ fontSize: 12, fill: "#666" }}
                       />
-                      <ChartTooltip 
+                      <ChartTooltip
                         content={<ChartTooltipContent />}
-                        formatter={(value) => [`${value}`, 'Expenses']}
+                        formatter={(value) => [`${value}`, "Expenses"]}
                       />
-                      <Bar 
-                        dataKey="expenses" 
+                      <Bar
+                        dataKey="expenses"
                         fill="var(--color-expenses)"
                         radius={[6, 6, 0, 0]}
                         stroke="none"

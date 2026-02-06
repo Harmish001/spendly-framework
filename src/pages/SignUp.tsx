@@ -12,6 +12,7 @@ import {
   Sparkles,
   Wallet,
 } from "lucide-react";
+import { GRADIENTS, getBackgroundGradientStyle } from "@/constants/theme";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const SignUp = () => {
       if (error) {
         if (error.message.includes("already registered")) {
           toast.error(
-            "This email is already registered. Please sign in instead."
+            "This email is already registered. Please sign in instead.",
           );
         } else {
           toast.error(error.message);
@@ -51,64 +52,10 @@ const SignUp = () => {
   };
 
   return (
-    // <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-600 p-4">
-    //   <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-[24px] shadow-xl">
-    //     <div className="text-center">
-    //       <h1 className="text-3xl font-bold flex items-center justify-center gap-2 mb-2">
-    //         <Wallet className="h-8 w-8 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded p-1" />
-    //         <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-    //           Spendly
-    //         </span>
-    //       </h1>
-    //       <p className="text-gray-600">Create your account</p>
-    //     </div>
-
-    //     <form className="space-y-6" onSubmit={handleSignUp}>
-    //       <div>
-    //         <Input
-    //           type="email"
-    //           placeholder="Email"
-    //           value={email}
-    //           onChange={(e) => setEmail(e.target.value)}
-    //           required
-    //           className="rounded-[16px]"
-    //         />
-    //       </div>
-    //       <div>
-    //         <Input
-    //           type="password"
-    //           placeholder="Password"
-    //           value={password}
-    //           onChange={(e) => setPassword(e.target.value)}
-    //           required
-    //           className="rounded-[16px]"
-    //         />
-    //       </div>
-    //       <div className="flex flex-col gap-4">
-    //         <Button
-    //           type="submit"
-    //           disabled={loading}
-    //           className="w-full rounded-[16px]"
-    //           style={{
-    //             background: "linear-gradient(to right, #9333ea, #2563eb)",
-    //           }}
-    //         >
-    //           Sign Up
-    //         </Button>
-    //         <p className="text-center text-sm text-gray-600">
-    //           Already have an account?{" "}
-    //           <Link
-    //             to="/"
-    //             className="text-blue-600 hover:text-blue-800 font-medium"
-    //           >
-    //             Sign in here
-    //           </Link>
-    //         </p>
-    //       </div>
-    //     </form>
-    //   </div>
-    // </div>
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 relative overflow-hidden">
+    <div
+      className="min-h-screen relative overflow-hidden"
+      style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
+    >
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full animate-pulse"></div>
@@ -159,14 +106,17 @@ const SignUp = () => {
                 {/* Username Field */}
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full"></div>
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
+                    ></div>
                   </div>
                   <Input
                     type="text"
                     placeholder="Username"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 pr-4 py-6 bg-white/10 border-white/20 rounded-2xl text-white placeholder:text-white/60 focus:bg-white/20 focus:border-white/40 transition-all duration-300 text-lg"
+                    className="w-full pl-12 pr-12 py-3 bg-white/20 border border-white/30 rounded-full text-white placeholder-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/50 focus:ring-2 focus:ring-white/30 transition-all duration-300"
                   />
                   <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
                     <div
@@ -180,14 +130,17 @@ const SignUp = () => {
                 {/* Password Field */}
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
+                    ></div>
                   </div>
                   <Input
                     type={showPassword ? "text" : "password"}
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-12 py-6 bg-white/10 border-white/20 rounded-2xl text-white placeholder:text-white/60 focus:bg-white/20 focus:border-white/40 transition-all duration-300 text-lg"
+                    className="w-full pl-12 pr-12 py-3 bg-white/20 border border-white/30 rounded-full text-white placeholder-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/50 focus:ring-2 focus:ring-white/30 transition-all duration-300"
                   />
                   <button
                     type="button"
@@ -205,8 +158,11 @@ const SignUp = () => {
 
               {/* Login Button */}
               <Button
-                className="w-full py-6 bg-white text-purple-600 hover:bg-white/90 rounded-2xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                className="w-full py-3 bg-white/25 hover:bg-white/35 border border-white/40 text-white font-semibold rounded-full shadow-lg backdrop-blur-sm hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                 disabled={!email || !password}
+                style={{
+                  background: GRADIENTS.PRIMARY,
+                }}
               >
                 Sign In to Spendly
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -214,10 +170,6 @@ const SignUp = () => {
 
               {/* Additional Options */}
               <div className="text-center space-y-4">
-                <button className="text-white/80 hover:text-white transition-colors text-sm underline underline-offset-4">
-                  Forgot your password?
-                </button>
-
                 <div className="flex items-center justify-center space-x-2 text-white/70 text-sm">
                   <span>Don't have an account?</span>
                   <button

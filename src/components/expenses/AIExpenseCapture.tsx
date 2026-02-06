@@ -2,10 +2,17 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Camera, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { supabase } from "@/integrations/supabase/client";
-import { Capacitor } from '@capacitor/core';
+import { Capacitor } from "@capacitor/core";
 import { ShareReceiver } from "@/services/ShareReceiver";
+import { getBackgroundGradientStyle, GRADIENTS } from "@/constants/theme";
 
 interface AIExpenseCaptureProps {
   onExpenseExtracted: (data: {
@@ -16,7 +23,9 @@ interface AIExpenseCaptureProps {
   }) => void;
 }
 
-export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) => {
+export const AIExpenseCapture = ({
+  onExpenseExtracted,
+}: AIExpenseCaptureProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -35,15 +44,24 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
       }
     };
 
-    window.addEventListener('processSharedImage', handleSharedImage as EventListener);
+    window.addEventListener(
+      "processSharedImage",
+      handleSharedImage as EventListener,
+    );
 
     return () => {
-      window.removeEventListener('processSharedImage', handleSharedImage as EventListener);
+      window.removeEventListener(
+        "processSharedImage",
+        handleSharedImage as EventListener,
+      );
     };
   }, []);
 
-  self.addEventListener('fetch', (event: any) => {
-    if (event.request.url.includes('/fetch-data') && event.request.method === 'POST') {
+  self.addEventListener("fetch", (event: any) => {
+    if (
+      event.request.url.includes("/fetch-data") &&
+      event.request.method === "POST"
+    ) {
       event.respondWith(processImageWithAI(event.request));
     }
   });
@@ -51,32 +69,37 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
   const processImageWithAI = async (imageFile: File) => {
     setIsProcessing(true);
     setIsDrawerOpen(false);
-    
+
     try {
-      console.log('Processing image:', imageFile.name, imageFile.size);
-      
+      console.log("Processing image:", imageFile.name, imageFile.size);
+
       // Convert image to base64
       const base64Image = await convertToBase64(imageFile);
-      
-      console.log('Calling process-expense-image function...');
-      
+
+      console.log("Calling process-expense-image function...");
+
       // Call our edge function to process the image
-      const { data, error } = await supabase.functions.invoke('process-expense-image', {
-        body: { image: base64Image }
-      });
+      const { data, error } = await supabase.functions.invoke(
+        "process-expense-image",
+        {
+          body: { image: base64Image },
+        },
+      );
 
       if (error) {
-        console.error('Edge function error:', error);
+        console.error("Edge function error:", error);
         throw error;
       }
 
-      console.log('Received data from AI:', data);
+      console.log("Received data from AI:", data);
 
       const { amount, category, date, description } = data;
 
       // Validate that we at least have an amount
       if (!amount || isNaN(parseFloat(amount))) {
-        throw new Error("Could not extract a valid amount from the image. Please try with a clearer image.");
+        throw new Error(
+          "Could not extract a valid amount from the image. Please try with a clearer image.",
+        );
       }
 
       // Pre-fill the sidebar form instead of directly adding to database
@@ -84,12 +107,13 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
         amount: amount.toString(),
         category: category || "others",
         description: description || "Expense from image",
-        date: date
+        date: date,
       });
-
     } catch (error: any) {
       console.error("Error processing image:", error);
-      toast.error(error.message || "Failed to process image. Please try again.");
+      toast.error(
+        error.message || "Failed to process image. Please try again.",
+      );
     } finally {
       setIsProcessing(false);
     }
@@ -102,17 +126,17 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
       reader.onload = () => {
         const result = reader.result as string;
         // Remove the data:image/jpeg;base64, part
-        const base64 = result.split(',')[1];
+        const base64 = result.split(",")[1];
         resolve(base64);
       };
-      reader.onerror = error => reject(error);
+      reader.onerror = (error) => reject(error);
     });
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.type.startsWith('image/')) {
+      if (file.type.startsWith("image/")) {
         processImageWithAI(file);
       } else {
         toast.error("Please select an image file");
@@ -122,10 +146,10 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
 
   const handleCameraCapture = () => {
     // For web, we'll use file input with camera capture
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment'; // Use rear camera
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.capture = "environment"; // Use rear camera
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
@@ -138,20 +162,26 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
   useEffect(() => {
     const handleSharedImage = (event: CustomEvent) => {
       const { imageFile } = event.detail;
-      console.log('Received shared expense image:', imageFile.name);
-      
+      console.log("Received shared expense image:", imageFile.name);
+
       // Process the shared image with your existing function
       processImageWithAI(imageFile);
     };
 
     // Listen for shared image events
-    window.addEventListener('sharedExpenseImage', handleSharedImage as EventListener);
+    window.addEventListener(
+      "sharedExpenseImage",
+      handleSharedImage as EventListener,
+    );
 
     // Cleanup
     return () => {
-      window.removeEventListener('sharedExpenseImage', handleSharedImage as EventListener);
+      window.removeEventListener(
+        "sharedExpenseImage",
+        handleSharedImage as EventListener,
+      );
     };
-  }, []); 
+  }, []);
 
   if (isProcessing) {
     return (
@@ -169,14 +199,17 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
       <DrawerTrigger asChild>
         <Button
           variant="outline"
-          className="fixed bottom-6 left-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 hover:from-purple-600 hover:to-blue-600 z-50"
+          className="fixed bottom-6 left-6 rounded-full w-14 h-14 shadow-lg text-white border-0 hover:from-purple-600 hover:to-blue-600 z-50"
+          style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
         >
           <Camera className="h-6 w-6" />
         </Button>
       </DrawerTrigger>
       <DrawerContent className="rounded-t-[24px] border-0">
         <DrawerHeader className="text-center pb-2">
-          <DrawerTitle className="text-lg font-semibold">Add Expense from Image</DrawerTitle>
+          <DrawerTitle className="text-lg font-semibold">
+            Add Expense from Image
+          </DrawerTitle>
           <p className="text-sm text-gray-600 mt-2">
             Capture or select a photo of your bill to extract expense details
           </p>
@@ -186,17 +219,18 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
             </p>
           )}
         </DrawerHeader>
-        
+
         <div className="px-6 pb-8">
           <div className="grid grid-cols-2 gap-4 mt-4">
             <Button
               onClick={handleCameraCapture}
-              className="flex flex-col items-center gap-3 h-24 rounded-[20px] bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0"
+              className="flex flex-col items-center gap-3 h-24 rounded-[20px] text-white border-0"
+              style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
             >
               <Camera className="h-8 w-8" />
               <span className="text-sm font-medium">Camera</span>
             </Button>
-            
+
             <label className="cursor-pointer">
               <input
                 type="file"
@@ -204,7 +238,10 @@ export const AIExpenseCapture = ({ onExpenseExtracted }: AIExpenseCaptureProps) 
                 onChange={handleFileSelect}
                 className="hidden"
               />
-              <div className="flex flex-col items-center gap-3 h-24 rounded-[20px] bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white justify-center transition-all duration-200 border-0">
+              <div
+                className="flex flex-col items-center gap-3 h-24 rounded-[20px] text-white justify-center transition-all duration-200 border-0"
+                style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
+              >
                 <ImageIcon className="h-8 w-8" />
                 <span className="text-sm font-medium">Gallery</span>
               </div>

@@ -58,13 +58,13 @@ export const MobileNavigation = () => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Menu className="h-6 w-6 mr-2 mt-1 text-white" />
+        <Menu className="h-6 w-6 mr-2 text-white" />
       </SheetTrigger>
       <SheetContent side="top" className="h-auto">
         <SheetHeader>
           <SheetTitle>Navigation</SheetTitle>
         </SheetHeader>
-        <div className="grid gap-3 mt-6">
+        <div className="grid gap-1 mt-2">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -73,10 +73,11 @@ export const MobileNavigation = () => {
               <Button
                 key={item.path}
                 variant={isActive ? "default" : "outline"}
-                className={`w-full justify-start h-auto p-4 rounded-[20px]`}
+                className={`w-full justify-start h-auto p-4 rounded-full`}
                 style={{
                   background: isActive ? GRADIENTS.PRIMARY : "",
                   color: isActive ? "white" : "inherit",
+                  border: "none",
                 }}
                 onClick={() => handleNavigation(item.path)}
               >
@@ -84,7 +85,6 @@ export const MobileNavigation = () => {
                   <Icon className="h-6 w-6" />
                   <div className="text-left">
                     <p className="font-semibold">{item.title}</p>
-                    <p className="text-sm opacity-80">{item.description}</p>
                   </div>
                 </div>
               </Button>

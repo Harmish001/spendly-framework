@@ -1,9 +1,22 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, BarChart3, Plane, Home, ChartAreaIcon, Shield } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Menu,
+  BarChart3,
+  Plane,
+  Home,
+  ChartAreaIcon,
+  Shield,
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getBackgroundGradientStyle, GRADIENTS } from "@/constants/theme";
 
 export const MobileNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,27 +28,26 @@ export const MobileNavigation = () => {
       title: "Dashboard",
       icon: Home,
       path: "/dashboard",
-      description: "View all your expenses"
+      description: "View all your expenses",
     },
     {
       title: "Password Manager",
       icon: Shield,
       path: "/passwords",
-      description: "Secure password storage"
+      description: "Secure password storage",
     },
     {
       title: "Statistics",
       icon: BarChart3,
       path: "/statistics",
-      description: "View expense analytics"
+      description: "View expense analytics",
     },
     {
       title: "Analysis",
       icon: ChartAreaIcon,
       path: "/monthlyAnalysis",
-      description: "View expense analysis"
+      description: "View expense analysis",
     },
-
   ];
 
   const handleNavigation = (path: string) => {
@@ -56,16 +68,16 @@ export const MobileNavigation = () => {
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
-            
+
             return (
               <Button
                 key={item.path}
                 variant={isActive ? "default" : "outline"}
-                className={`w-full justify-start h-auto p-4 rounded-[20px] ${
-                  isActive 
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' 
-                    : ''
-                }`}
+                className={`w-full justify-start h-auto p-4 rounded-[20px]`}
+                style={{
+                  background: isActive ? GRADIENTS.PRIMARY : "",
+                  color: isActive ? "white" : "inherit",
+                }}
                 onClick={() => handleNavigation(item.path)}
               >
                 <div className="flex items-center gap-3 w-full">

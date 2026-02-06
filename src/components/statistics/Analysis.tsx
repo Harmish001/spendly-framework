@@ -19,6 +19,11 @@ import {
 import { Card, CardContent } from "../ui/card";
 import { MonthTabs } from "../expenses/MonthTabs";
 import { ExpenseFilters } from "../expenses/ExpenseFilters";
+import {
+  GRADIENTS,
+  getTextGradientStyle,
+  getBackgroundGradientStyle,
+} from "@/constants/theme";
 
 const categoryIcons = {
   investment: Wallet,
@@ -142,8 +147,8 @@ const MonthlyAnalysis = () => {
       <div
         className="pt-8 px-8 px-4"
         style={{
-          background: "linear-gradient(to right, #9333ea, #2563eb)",
-          marginBottom: "-2px",
+          ...getBackgroundGradientStyle(GRADIENTS.PRIMARY),
+          marginBottom: "-1px",
           marginTop: "-2px",
         }}
       >
@@ -160,11 +165,7 @@ const MonthlyAnalysis = () => {
       />
       <p
         className="text-2xl font-bold mt-2 ml-8 mb-3"
-        style={{
-          background: "linear-gradient(to right, #9333ea, #2563eb)",
-          WebkitTextFillColor: "transparent",
-          WebkitBackgroundClip: "text",
-        }}
+        style={getTextGradientStyle(GRADIENTS.PRIMARY)}
       >
         Expenses
       </p>
@@ -189,10 +190,7 @@ const MonthlyAnalysis = () => {
                       <div className="flex items-center gap-3">
                         <div
                           className="p-2 rounded-[14px] shrink-0"
-                          style={{
-                            background:
-                              "linear-gradient(to right, #9333ea, #2563eb)",
-                          }}
+                          style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
                         >
                           <CategoryIcon className="h-7 w-7 text-white" />
                         </div>
@@ -208,12 +206,7 @@ const MonthlyAnalysis = () => {
                         <div className="flex items-end gap-1 flex-col">
                           <p
                             className="text-base font-bold whitespace-nowrap"
-                            style={{
-                              background:
-                                "linear-gradient(to right, #9333ea, #2563eb)",
-                              WebkitTextFillColor: "transparent",
-                              WebkitBackgroundClip: "text",
-                            }}
+                            style={getTextGradientStyle(GRADIENTS.PRIMARY)}
                           >
                             ₹{expense.total}
                           </p>
@@ -258,12 +251,7 @@ const MonthlyAnalysis = () => {
                           </div>
                           <p
                             className="text-sm font-bold whitespace-nowrap ml-3"
-                            style={{
-                              background:
-                                "linear-gradient(to right, #9333ea, #2563eb)",
-                              WebkitTextFillColor: "transparent",
-                              WebkitBackgroundClip: "text",
-                            }}
+                            style={getTextGradientStyle(GRADIENTS.PRIMARY)}
                           >
                             ₹{individualExpense.amount}
                           </p>

@@ -20,6 +20,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import { getBackgroundGradientStyle, GRADIENTS } from "@/constants/theme";
 
 interface Category {
   id: string;
@@ -355,7 +356,8 @@ export const PasswordForm = ({
               <Button
                 type="submit"
                 disabled={loading}
-                className="flex-1 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                className="flex-1 rounded-full"
+                style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />

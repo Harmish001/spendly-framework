@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,9 +9,11 @@ import { MonthTabs } from "@/components/expenses/MonthTabs";
 import { ResponsivePie } from "@nivo/pie";
 
 const TravelExpenses = () => {
-  const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
+  const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, "0");
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear() + '');
+  const [selectedYear, setSelectedYear] = useState(
+    new Date().getFullYear() + "",
+  );
   const [expenses, setExpenses] = useState<any[]>([]);
   const [totalExpense, setTotalExpense] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -32,9 +33,13 @@ const TravelExpenses = () => {
         .order("created_at", { ascending: false });
 
       if (selectedMonth && selectedYear) {
-        const startDate = `${selectedYear}-${selectedMonth.padStart(2, '0')}-01`;
-        const lastDay = new Date(parseInt(selectedYear), parseInt(selectedMonth), 0).getDate();
-        const endDate = `${selectedYear}-${selectedMonth.padStart(2, '0')}-${lastDay}`;
+        const startDate = `${selectedYear}-${selectedMonth.padStart(2, "0")}-01`;
+        const lastDay = new Date(
+          parseInt(selectedYear),
+          parseInt(selectedMonth),
+          0,
+        ).getDate();
+        const endDate = `${selectedYear}-${selectedMonth.padStart(2, "0")}-${lastDay}`;
         query = query.gte("created_at", startDate).lte("created_at", endDate);
       }
 
@@ -43,7 +48,10 @@ const TravelExpenses = () => {
       if (error) throw error;
       setExpenses(data || []);
 
-      const total = (data || []).reduce((sum, expense) => sum + Number(expense.amount), 0);
+      const total = (data || []).reduce(
+        (sum, expense) => sum + Number(expense.amount),
+        0,
+      );
       setTotalExpense(total);
     } catch (error: any) {
       console.error("Error fetching travel expenses:", error.message);
@@ -55,7 +63,7 @@ const TravelExpenses = () => {
 
   const getPieChartData = () => {
     const descriptions: Record<string, number> = {};
-    expenses.forEach(expense => {
+    expenses.forEach((expense) => {
       const desc = expense.description || "No description";
       if (!descriptions[desc]) {
         descriptions[desc] = 0;
@@ -77,7 +85,7 @@ const TravelExpenses = () => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate("/dashboard")}
             className="rounded-full"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -115,29 +123,46 @@ const TravelExpenses = () => {
                       cornerRadius={3}
                       activeOuterRadiusOffset={8}
                       colors={[
-                        "#2563eb",
-                        "#1e4bb8",
-                        "#5b8def",
-                        "#312e81",
-                        "#7c3aed",
-                        "#a855f7",
-                        "#c084fc",
+                        "#f59e42", // Start - warm orange
+                        "#f7934d",
+                        "#f98858",
+                        "#fb7d63",
+                        "#fd726e",
+                        "#ff6b6b", // End - coral/rose
                       ]}
                       borderWidth={1}
-                      borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+                      borderColor={{
+                        from: "color",
+                        modifiers: [["darker", 0.2]],
+                      }}
                       enableArcLinkLabels={false}
                       arcLabelsSkipAngle={10}
-                      arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
+                      arcLabelsTextColor={{
+                        from: "color",
+                        modifiers: [["darker", 2]],
+                      }}
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full">
                       <p className="text-gray-500">No travel expenses found</p>
                     </div>
                   )}
-                 {expenses.length > 0 && <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                    <p className="text-sm">Travel Total</p>
-                    <p className="text-2xl font-bold" style={{ background: "linear-gradient(to right, #2563eb, #7c3aed)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{totalExpense.toLocaleString('en-IN')}</p>
-                  </div>}
+                  {expenses.length > 0 && (
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                      <p className="text-sm">Travel Total</p>
+                      <p
+                        className="text-2xl font-bold"
+                        style={{
+                          background:
+                            "linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%)",
+                          WebkitTextFillColor: "transparent",
+                          WebkitBackgroundClip: "text",
+                        }}
+                      >
+                        ₹{totalExpense.toLocaleString("en-IN")}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -155,18 +180,36 @@ const TravelExpenses = () => {
                   >
                     <CardContent className="flex items-center justify-between p-6">
                       <div className="flex items-center gap-4 flex-1 min-w-0">
-                        <div className="p-2 rounded-[24px] shrink-0" style={{ background: "linear-gradient(to right, #2563eb, #7c3aed)" }}>
+                        <div
+                          className="p-2 rounded-[24px] shrink-0"
+                          style={{
+                            background:
+                              "linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%)",
+                          }}
+                        >
                           <Plane className="h-8 w-8 text-white" />
                         </div>
                         <div className="text-left min-w-0 flex-1">
-                          <p className="font-semibold truncate">{expense.description || "No description"}</p>
+                          <p className="font-semibold truncate">
+                            {expense.description || "No description"}
+                          </p>
                           <p className="text-sm capitalize">Travel</p>
                           <p className="text-xs">
                             {new Date(expense.created_at).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="flex items-center gap-4 shrink-0">
-                          <p className="text-xl font-bold whitespace-nowrap" style={{ background: "linear-gradient(to right, #2563eb, #7c3aed)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>₹{expense.amount}</p>
+                          <p
+                            className="text-xl font-bold whitespace-nowrap"
+                            style={{
+                              background:
+                                "linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%)",
+                              WebkitTextFillColor: "transparent",
+                              WebkitBackgroundClip: "text",
+                            }}
+                          >
+                            ₹{expense.amount}
+                          </p>
                         </div>
                       </div>
                     </CardContent>

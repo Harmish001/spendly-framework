@@ -1,8 +1,14 @@
-
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { ExpenseForm } from "./ExpenseForm";
+import { getBackgroundGradientStyle, GRADIENTS } from "@/constants/theme";
 
 interface ExpenseFormSheetProps {
   onExpenseAdded: () => void;
@@ -31,16 +37,17 @@ export const ExpenseFormSheet = ({
   onClearPrefilled,
   isOpen,
   onOpenChange,
-  editingExpense
+  editingExpense,
 }: ExpenseFormSheetProps) => {
   const isEditing = !!editingExpense;
-  
+
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
       <DrawerTrigger asChild>
         <Button
           variant="outline"
-          className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 hover:from-purple-600 hover:to-blue-600 z-50"
+          className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg text-white border-0 hover:from-purple-600 hover:to-blue-600 z-50"
+          style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
         >
           <PlusCircle className="h-6 w-6" />
         </Button>
@@ -49,7 +56,7 @@ export const ExpenseFormSheet = ({
         <DrawerHeader className="text-center pb-2">
           <div className="flex items-center justify-between">
             <DrawerTitle className="text-lg font-semibold">
-              {isEditing ? 'Edit Expense' : 'Add New Expense'}
+              {isEditing ? "Edit Expense" : "Add New Expense"}
             </DrawerTitle>
             {(prefilledData || isEditing) && (
               <Button

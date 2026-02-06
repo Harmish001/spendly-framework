@@ -15,6 +15,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { Label } from "@radix-ui/react-label";
+import { getBackgroundGradientStyle, GRADIENTS } from "@/constants/theme";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -80,7 +81,10 @@ const Index = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 relative overflow-hidden">
+      <div
+        className="min-h-screen relative overflow-hidden"
+        style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
+      >
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
           <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full animate-pulse"></div>
@@ -131,7 +135,10 @@ const Index = () => {
                   {/* Username Field */}
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full"></div>
+                      <div
+                        className="w-2 h-2 rounded-full"
+                        style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
+                      ></div>
                     </div>
                     <Input
                       type="text"
@@ -152,7 +159,10 @@ const Index = () => {
                   {/* Password Field */}
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
+                      <div
+                        className="w-2 h-2 rounded-full"
+                        style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
+                      ></div>
                     </div>
                     <Input
                       type={showPassword ? "text" : "password"}
@@ -179,7 +189,7 @@ const Index = () => {
                 <Button
                   className="w-full py-3 bg-white/25 hover:bg-white/35 border border-white/40 text-white font-semibold rounded-full shadow-lg backdrop-blur-sm hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                   style={{
-                    background: "linear-gradient(to right, #9333ea, #2563eb)",
+                    background: GRADIENTS.PRIMARY,
                   }}
                   disabled={!email || !password}
                   onClick={handleSignIn}

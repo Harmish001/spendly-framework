@@ -1,197 +1,539 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
 import { toast } from "sonner";
-import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  IndianRupee,
-  Sparkles,
-  Wallet,
-} from "lucide-react";
+import { Eye, EyeOff, UserPlus, IndianRupee } from "lucide-react";
 import { GRADIENTS, getBackgroundGradientStyle } from "@/constants/theme";
+
+const CSS = `
+@keyframes drift {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33%      { transform: translate(-18px,20px) scale(1.04); }
+  66%      { transform: translate(14px,-16px) scale(0.97); }
+}
+@keyframes orbit {
+  from { transform: rotate(0deg)   translateX(44px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(44px) rotate(-360deg); }
+}
+@keyframes orbit2 {
+  from { transform: rotate(120deg)  translateX(44px) rotate(-120deg); }
+  to   { transform: rotate(480deg)  translateX(44px) rotate(-480deg); }
+}
+@keyframes orbit3 {
+  from { transform: rotate(240deg)  translateX(44px) rotate(-240deg); }
+  to   { transform: rotate(600deg)  translateX(44px) rotate(-600deg); }
+}
+@keyframes pulseRing {
+  0%   { transform: scale(0.85); opacity: 0.5; }
+  70%  { transform: scale(1.3);  opacity: 0; }
+  100% { transform: scale(1.3);  opacity: 0; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scanLine {
+  0%   { left: -100%; }
+  100% { left: 130%; }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  50%     { transform: translateY(-10px) rotate(-6deg); }
+}
+@keyframes strengthPop {
+  0%   { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+.su-slide-up  { animation: slideUp 0.55s cubic-bezier(.22,1,.36,1) both; }
+.su-fade-in   { animation: fadeIn 0.4s ease both; }
+.su-d1  { animation-delay: 0.08s; }
+.su-d2  { animation-delay: 0.16s; }
+.su-d3  { animation-delay: 0.24s; }
+.su-d4  { animation-delay: 0.32s; }
+.su-d5  { animation-delay: 0.40s; }
+.su-d6  { animation-delay: 0.48s; }
+.su-d7  { animation-delay: 0.56s; }
+.su-d8  { animation-delay: 0.64s; }
+`;
+
+function strengthInfo(pwd: string): {
+  score: number;
+  label: string;
+  color: string;
+} {
+  const len = pwd.length;
+  if (!len) return { score: 0, label: "", color: "transparent" };
+  let s = 0;
+  if (len >= 6) s++;
+  if (len >= 10) s++;
+  if (/[A-Z]/.test(pwd) && /[0-9]/.test(pwd)) s++;
+  if (/[^A-Za-z0-9]/.test(pwd)) s++;
+  const map = [
+    { score: 1, label: "Weak", color: "#ef4444" },
+    { score: 2, label: "Fair", color: "#f59e0b" },
+    { score: 3, label: "Good", color: "#3b82f6" },
+    { score: 4, label: "Strong", color: "#22c55e" },
+  ];
+  return { ...(map[s - 1] ?? map[0]), score: s };
+}
 
 const SignUp = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
+  const [emailFocus, setEmailFocus] = useState(false);
+  const [pwdFocus, setPwdFocus] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    setTimeout(() => setMounted(true), 50);
+  }, []);
+
+  const handleSignUp = async () => {
+    if (!email || !password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
     setLoading(true);
-
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
+      const { error } = await supabase.auth.signUp({ email, password });
       if (error) {
-        if (error.message.includes("already registered")) {
-          toast.error(
-            "This email is already registered. Please sign in instead.",
-          );
-        } else {
-          toast.error(error.message);
-        }
+        toast.error(
+          error.message.includes("already registered")
+            ? "Email already registered."
+            : error.message,
+        );
         return;
       }
-
-      toast.success("Check your email for the confirmation link!");
+      toast.success("Account created! Check your email for confirmation.");
       navigate("/");
-    } catch (error) {
-      toast.error("An unexpected error occurred. Please try again.");
+    } catch {
+      toast.error("Unexpected error. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const str = strengthInfo(password);
+  const canSubmit = Boolean(email && password);
+
   return (
-    <div
-      className="min-h-screen relative overflow-hidden"
-      style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
-    >
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-16 h-16 bg-white/5 rounded-full animate-bounce delay-1000"></div>
-        <div className="absolute bottom-32 left-20 w-24 h-24 bg-white/10 rounded-full animate-pulse delay-500"></div>
-        <div className="absolute bottom-20 right-10 w-12 h-12 bg-white/5 rounded-full animate-bounce"></div>
-        <div className="absolute top-1/2 left-1/4 w-8 h-8 bg-white/10 rounded-full animate-ping delay-700"></div>
-        <div className="absolute top-1/3 right-1/3 w-6 h-6 bg-white/5 rounded-full animate-pulse delay-300"></div>
-      </div>
+    <>
+      <style>{CSS}</style>
 
-      {/* Floating Rupee Symbols */}
-      <div className="absolute inset-0 pointer-events-none">
-        <IndianRupee className="absolute top-16 left-1/4 w-6 h-6 text-white/20 animate-bounce delay-200" />
-        <IndianRupee className="absolute top-1/3 right-1/4 w-4 h-4 text-white/15 animate-pulse delay-1000" />
-        <IndianRupee className="absolute bottom-1/4 left-1/3 w-5 h-5 text-white/10 animate-bounce delay-700" />
-        <Sparkles className="absolute top-1/4 right-1/2 w-4 h-4 text-white/20 animate-ping delay-500" />
-        <Sparkles className="absolute bottom-1/3 right-1/4 w-3 h-3 text-white/15 animate-pulse delay-300" />
-      </div>
+      <div
+        className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center px-4 py-8"
+        style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
+      >
+        {/* blobs */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div
+            style={{
+              position: "absolute",
+              bottom: "-12%",
+              right: "-18%",
+              width: "58vw",
+              height: "58vw",
+              borderRadius: "55% 45% 40% 60% / 60% 40% 55% 45%",
+              background:
+                "radial-gradient(circle, rgba(255,200,100,0.07) 0%, transparent 70%)",
+              animation: "drift 14s ease-in-out infinite",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: "-20%",
+              right: "-8%",
+              width: "52vw",
+              height: "52vw",
+              borderRadius: "45% 55% 60% 40% / 40% 60% 45% 55%",
+              background:
+                "radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)",
+              animation: "drift 10s ease-in-out infinite reverse",
+            }}
+          />
+        </div>
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          {/* Logo and Brand */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm mb-6 shadow-2xl">
-              <IndianRupee className="w-10 h-10 text-white" />
+        {/* floating symbols */}
+        {[
+          { top: "6%", right: "11%", dur: "4.5s", delay: "0.3s" },
+          { top: "22%", left: "8%", dur: "5.5s", delay: "1s" },
+          { bottom: "25%", left: "10%", dur: "6s", delay: "0s" },
+          { bottom: "14%", right: "14%", dur: "5s", delay: "1.5s" },
+        ].map((s, i) => (
+          <IndianRupee
+            key={i}
+            className="absolute w-4 h-4 text-white/12 pointer-events-none"
+            style={{
+              ...s,
+              animation: `float ${s.dur} ${s.delay} ease-in-out infinite`,
+            }}
+          />
+        ))}
+
+        <div className="relative z-10 w-full max-w-[360px]">
+          {/* ── logo orbit ──────────────────────────────────── */}
+          <div
+            className={`flex justify-center mb-6 ${mounted ? "su-slide-up" : "opacity-0"}`}
+          >
+            <div className="relative" style={{ width: 84, height: 84 }}>
+              <div
+                className="absolute inset-0 rounded-full bg-white/15"
+                style={{ animation: "pulseRing 2.6s ease-out infinite" }}
+              />
+              <div
+                className="absolute inset-0 rounded-full bg-white/8"
+                style={{ animation: "pulseRing 2.6s 1s ease-out infinite" }}
+              />
+              <div
+                className="absolute inset-0 rounded-full flex items-center justify-center"
+                style={{
+                  background:
+                    "linear-gradient(145deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%)",
+                  border: "1.5px solid rgba(255,255,255,0.28)",
+                  backdropFilter: "blur(12px)",
+                  boxShadow: "0 12px 40px rgba(0,0,0,0.25)",
+                }}
+              >
+                <UserPlus className="w-9 h-9 text-white" />
+              </div>
+              {/* orbit dots */}
+              {[
+                {
+                  anim: "orbit  7s linear infinite",
+                  icon: "✦",
+                  col: "rgba(255,210,100,0.9)",
+                },
+                {
+                  anim: "orbit2 7s linear infinite",
+                  icon: "₹",
+                  col: "rgba(255,255,255,0.7)",
+                },
+                {
+                  anim: "orbit3 7s linear infinite",
+                  icon: "✦",
+                  col: "rgba(100,240,160,0.75)",
+                },
+              ].map((d, i) => (
+                <div
+                  key={i}
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ animation: d.anim }}
+                >
+                  <div
+                    style={{
+                      width: 18,
+                      height: 18,
+                      borderRadius: "50%",
+                      background: "rgba(255,255,255,0.1)",
+                      border: "1px solid rgba(255,255,255,0.28)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 8,
+                      color: d.col,
+                      backdropFilter: "blur(4px)",
+                      boxShadow: `0 0 6px ${d.col}`,
+                    }}
+                  >
+                    {d.icon}
+                  </div>
+                </div>
+              ))}
             </div>
-            <h1 className="text-4xl font-bold text-white mb-2">
-              Welcome to Spendly
+          </div>
+
+          {/* headline */}
+          <div
+            className={`text-center mb-5 ${mounted ? "su-slide-up su-d1" : "opacity-0"}`}
+          >
+            <h1
+              className="text-3xl font-bold tracking-tight"
+              style={{
+                background:
+                  "linear-gradient(135deg, #ffffff 0%, rgba(255,220,100,0.9) 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Join Spendly
             </h1>
-            <p className="text-white/80 text-lg">
-              Your smart expense companion
+            <p className="text-white/50 text-sm mt-1">
+              Start your financial journey
             </p>
           </div>
 
-          {/* Login Form */}
-          <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/20">
-            <div className="space-y-6">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-semibold text-white mb-2">
-                  Sign Up
+          {/* ═══ GLASS CARD ═══════════════════════════════════ */}
+          <div
+            className={`relative rounded-[28px] overflow-hidden ${mounted ? "su-slide-up su-d3" : "opacity-0"}`}
+            style={{
+              background:
+                "linear-gradient(160deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.06) 100%)",
+              border: "1.5px solid rgba(255,255,255,0.2)",
+              backdropFilter: "blur(28px)",
+              boxShadow:
+                "0 32px 64px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+            }}
+          >
+            <div
+              style={{
+                height: 2,
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)",
+              }}
+            />
+
+            {/* corner dots */}
+            <div className="absolute top-4 right-4 flex gap-1.5">
+              {[
+                "rgba(255,100,100,0.5)",
+                "rgba(255,180,50,0.5)",
+                "rgba(100,220,100,0.5)",
+              ].map((c, i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: "50%",
+                    background: c,
+                  }}
+                />
+              ))}
+            </div>
+
+            <div className="p-7 space-y-4">
+              <div className={`${mounted ? "su-slide-up su-d4" : "opacity-0"}`}>
+                <h2 className="text-lg font-semibold text-white">
+                  Create account
                 </h2>
-                <p className="text-white/70">
-                  Enter your credentials to continue
+                <p className="text-white/40 text-xs mt-0.5">
+                  Free forever · no card needed
                 </p>
               </div>
 
-              <div className="space-y-6">
-                {/* Username Field */}
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              {/* email */}
+              <div className={`${mounted ? "su-slide-up su-d5" : "opacity-0"}`}>
+                <div
+                  className="relative overflow-hidden"
+                  style={{
+                    borderRadius: 16,
+                    border: `1.5px solid ${emailFocus ? "rgba(255,220,130,0.55)" : "rgba(255,255,255,0.18)"}`,
+                    background: emailFocus
+                      ? "rgba(255,255,255,0.14)"
+                      : "rgba(255,255,255,0.08)",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  {emailFocus && (
                     <div
-                      className="w-2 h-2 rounded-full"
-                      style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
-                    ></div>
-                  </div>
-                  <Input
-                    type="text"
-                    placeholder="Username"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-12 py-3 bg-white/20 border border-white/30 rounded-full text-white placeholder-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/50 focus:ring-2 focus:ring-white/30 transition-all duration-300"
-                  />
-                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-                    <div
-                      className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                        email ? "bg-green-400" : "bg-white/30"
-                      }`}
-                    ></div>
-                  </div>
-                </div>
-
-                {/* Password Field */}
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <div
-                      className="w-2 h-2 rounded-full"
-                      style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
-                    ></div>
-                  </div>
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-12 py-3 bg-white/20 border border-white/30 rounded-full text-white placeholder-white/60 backdrop-blur-sm focus:bg-white/25 focus:border-white/50 focus:ring-2 focus:ring-white/30 transition-all duration-300"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/60 hover:text-white transition-colors"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        bottom: 0,
+                        width: "60%",
+                        background:
+                          "linear-gradient(90deg, transparent, rgba(255,220,130,0.15), transparent)",
+                        pointerEvents: "none",
+                        zIndex: 1,
+                        animation: "scanLine 1.4s ease forwards",
+                      }}
+                    />
+                  )}
+                  <div className="flex items-center px-4 gap-3">
+                    <input
+                      type="email"
+                      placeholder="Email address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onFocus={() => setEmailFocus(true)}
+                      onBlur={() => setEmailFocus(false)}
+                      style={{
+                        flex: 1,
+                        background: "transparent",
+                        border: "none",
+                        outline: "none",
+                        color: "white",
+                        fontSize: 14,
+                        padding: "13px 0",
+                        fontFamily: "inherit",
+                      }}
+                      className="placeholder-white/30"
+                    />
+                    {email && (
+                      <div
+                        style={{
+                          width: 7,
+                          height: 7,
+                          borderRadius: "50%",
+                          background: "#4ade80",
+                          boxShadow: "0 0 8px rgba(74,222,128,0.8)",
+                          flexShrink: 0,
+                        }}
+                      />
                     )}
-                  </button>
+                  </div>
                 </div>
               </div>
 
-              {/* Login Button */}
-              <Button
-                className="w-full py-3 bg-white/25 hover:bg-white/35 border border-white/40 text-white font-semibold rounded-full shadow-lg backdrop-blur-sm hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-                disabled={!email || !password}
-                style={{
-                  background: GRADIENTS.PRIMARY,
-                }}
+              {/* password */}
+              <div className={`${mounted ? "su-slide-up su-d6" : "opacity-0"}`}>
+                <div
+                  className="relative overflow-hidden"
+                  style={{
+                    borderRadius: 16,
+                    border: `1.5px solid ${pwdFocus ? "rgba(255,220,130,0.55)" : "rgba(255,255,255,0.18)"}`,
+                    background: pwdFocus
+                      ? "rgba(255,255,255,0.14)"
+                      : "rgba(255,255,255,0.08)",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  {pwdFocus && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        bottom: 0,
+                        width: "60%",
+                        background:
+                          "linear-gradient(90deg, transparent, rgba(255,220,130,0.15), transparent)",
+                        pointerEvents: "none",
+                        zIndex: 1,
+                        animation: "scanLine 1.4s ease forwards",
+                      }}
+                    />
+                  )}
+                  <div className="flex items-center px-4 gap-3">
+                    <input
+                      type={showPwd ? "text" : "password"}
+                      placeholder="Create a password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onFocus={() => setPwdFocus(true)}
+                      onBlur={() => setPwdFocus(false)}
+                      style={{
+                        flex: 1,
+                        background: "transparent",
+                        border: "none",
+                        outline: "none",
+                        color: "white",
+                        fontSize: 14,
+                        padding: "13px 0",
+                        fontFamily: "inherit",
+                      }}
+                      className="placeholder-white/30"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPwd(!showPwd)}
+                      className="text-white/40 hover:text-white/80 transition-colors flex-shrink-0"
+                    >
+                      {showPwd ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* strength bars */}
+                {password && (
+                  <div className="flex items-center gap-2 mt-2 px-1">
+                    <div className="flex gap-1 flex-1">
+                      {[1, 2, 3, 4].map((n) => (
+                        <div
+                          key={n}
+                          className="flex-1 h-1 rounded-full overflow-hidden"
+                          style={{ background: "rgba(255,255,255,0.12)" }}
+                        >
+                          {str.score >= n && (
+                            <div
+                              style={{
+                                height: "100%",
+                                background: str.color,
+                                borderRadius: "inherit",
+                                animation: "strengthPop 0.3s ease forwards",
+                                transformOrigin: "left",
+                              }}
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <span
+                      className="text-xs font-medium"
+                      style={{ color: str.color, minWidth: 36 }}
+                    >
+                      {str.label}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* slide */}
+              <div
+                className={`pt-1 ${mounted ? "su-slide-up su-d7" : "opacity-0"}`}
               >
-                Sign In to Spendly
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-
-              {/* Additional Options */}
-              <div className="text-center space-y-4">
-                <div className="flex items-center justify-center space-x-2 text-white/70 text-sm">
-                  <span>Don't have an account?</span>
-                  <button
-                    className="text-white hover:text-white/80 transition-colors font-medium underline underline-offset-4"
-                    onClick={() => navigate("/login")}
-                  >
-                    Sign In
-                  </button>
-                </div>
+                <SlideToConfirm
+                  label="Slide to Sign Up"
+                  onConfirm={handleSignUp}
+                  disabled={!canSubmit}
+                  loading={loading}
+                  isWhiteText
+                  variant="confirm"
+                />
               </div>
-            </div>
-          </div>
 
-          {/* Bottom Text */}
-          <div className="text-center mt-8">
-            <p className="text-white/60 text-sm">
-              Secure login powered by advanced encryption
-            </p>
+              {/* divider */}
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex-1 h-px"
+                  style={{ background: "rgba(255,255,255,0.1)" }}
+                />
+                <span className="text-white/30 text-xs">or</span>
+                <div
+                  className="flex-1 h-px"
+                  style={{ background: "rgba(255,255,255,0.1)" }}
+                />
+              </div>
+
+              {/* sign in link */}
+              <p
+                className={`text-center text-white/50 text-sm pb-1 ${mounted ? "su-slide-up su-d8" : "opacity-0"}`}
+              >
+                Already a member?{" "}
+                <button
+                  onClick={() => navigate("/")}
+                  className="font-semibold transition-colors"
+                  style={{ color: "rgba(255,210,100,0.95)" }}
+                >
+                  Sign in
+                </button>
+              </p>
+            </div>
+
+            <div
+              style={{
+                height: 1,
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
+              }}
+            />
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

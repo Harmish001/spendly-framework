@@ -10,6 +10,7 @@ interface SlideToConfirmProps {
   disabled?: boolean;
   loading?: boolean;
   variant?: SlideVariant;
+  isWhiteText?: boolean;
 }
 
 const THUMB_SIZE = 52; // px
@@ -41,7 +42,7 @@ const VARIANT_STYLES: Record<
     thumbGradient: GRADIENTS.PRIMARY,
     thumbShadowDrag: "0 6px 20px rgba(123,63,30,0.45)",
     thumbShadowIdle: "0 3px 10px rgba(123,63,30,0.3)",
-    successGradient: "linear-gradient(135deg, #16a34a 0%, #4ade80 100%)",
+    successGradient: "linear-gradient(135deg, #2e2010 0%, #7B3F1E 100%)",
   },
   danger: {
     trackBg:
@@ -63,6 +64,7 @@ export const SlideToConfirm = ({
   disabled = false,
   loading = false,
   variant = "confirm",
+  isWhiteText = false,
 }: SlideToConfirmProps) => {
   const styles = VARIANT_STYLES[variant];
 
@@ -180,7 +182,7 @@ export const SlideToConfirm = ({
           style={{
             background: styles.labelGradient,
             WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
+            WebkitTextFillColor: isWhiteText ? "#ffdc82e6" : "transparent",
             backgroundClip: "text",
           }}
         >

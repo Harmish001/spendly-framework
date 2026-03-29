@@ -72,7 +72,7 @@ export const MonthTabs = ({
                 background: "transparent",
                 color:
                   selectedMonth === (index + 1).toString().padStart(2, "0")
-                    ? "#1f0058ff"
+                    ? "#ffdc82e6"
                     : "white",
               }}
             >

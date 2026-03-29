@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Plus,
   Search,
@@ -14,22 +14,15 @@ import {
   EyeOff,
   Edit,
   Trash2,
-  Filter,
   Grid3X3,
-  List,
   Heart,
-  Shield,
   Lock,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PasswordForm } from "@/components/passwords/PasswordForm";
 import { CategoryManager } from "@/components/passwords/CategoryManager";
-import {
-  getBackgroundGradientStyle,
-  getTextGradientStyle,
-  GRADIENTS,
-} from "@/constants/theme";
+import { getTextGradientStyle, GRADIENTS } from "@/constants/theme";
 import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
 import {
   Drawer,
@@ -38,7 +31,6 @@ import {
   DrawerTitle,
   DrawerDescription,
   DrawerFooter,
-  DrawerClose,
 } from "@/components/ui/drawer";
 
 interface Category {

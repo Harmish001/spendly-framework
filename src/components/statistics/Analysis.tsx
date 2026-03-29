@@ -143,26 +143,28 @@ const MonthlyAnalysis = () => {
 
   return (
     <>
-      <Header />
-      <div
-        className="pt-8 px-8 px-4"
-        style={{
-          ...getBackgroundGradientStyle(GRADIENTS.PRIMARY),
-          marginBottom: "-1px",
-          marginTop: "-2px",
-        }}
-      >
-        <h1 className="text-2xl font-bold mb-2 text-white flex justify-center">
-          {analysisType}&nbsp;Analysis
-        </h1>
-        <p className="text-2xl font-bold text-white flex justify-center">
-          ₹{totalExpense.toLocaleString("en-IN")}{" "}
-        </p>
+      <div style={{ ...getBackgroundGradientStyle(GRADIENTS.PRIMARY) }}>
+        <Header isTransparent />
+        <div
+          className="pt-8 px-8 px-4"
+          style={{
+            marginBottom: "-1px",
+            marginTop: "-2px",
+          }}
+        >
+          <h1 className="text-2xl font-bold mb-2 text-white flex justify-center">
+            {analysisType}&nbsp;Analysis
+          </h1>
+          <p className="text-2xl font-bold text-white flex justify-center">
+            ₹{totalExpense.toLocaleString("en-IN")}{" "}
+          </p>
+        </div>
+        <MonthTabs
+          selectedMonth={selectedMonth}
+          onMonthChange={(value) => setSelectedMonth(value)}
+          isTransparent
+        />
       </div>
-      <MonthTabs
-        selectedMonth={selectedMonth}
-        onMonthChange={(value) => setSelectedMonth(value)}
-      />
       <p
         className="text-2xl font-bold mt-2 ml-8 mb-3"
         style={getTextGradientStyle(GRADIENTS.PRIMARY)}

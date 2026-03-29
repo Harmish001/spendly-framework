@@ -362,12 +362,12 @@ const Dashboard = () => {
                   cornerRadius={3}
                   activeOuterRadiusOffset={8}
                   colors={[
-                    "#f59e42", // Start - warm orange
-                    "#f7934d",
-                    "#f98858",
-                    "#fb7d63",
-                    "#fd726e",
-                    "#ff6b6b", // End - coral/rose
+                    "#2E2010", // Start - warm orange
+                    "#422d14ff",
+                    "#503615ff",
+                    "#572c16ff",
+                    "#683418ff",
+                    "#7B3F1E", // End - coral/rose
                   ]}
                   borderWidth={1}
                   borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}

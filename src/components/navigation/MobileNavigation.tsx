@@ -14,6 +14,7 @@ import {
   Home,
   ChartAreaIcon,
   Shield,
+  CheckSquare,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getBackgroundGradientStyle, GRADIENTS } from "@/constants/theme";
@@ -35,6 +36,12 @@ export const MobileNavigation = () => {
       icon: Shield,
       path: "/passwords",
       description: "Secure password storage",
+    },
+    {
+      title: "Todos",
+      icon: CheckSquare,
+      path: "/todos",
+      description: "Manage your tasks",
     },
     {
       title: "Statistics",

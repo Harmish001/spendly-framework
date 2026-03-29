@@ -42,6 +42,7 @@ import {
   getTextGradientStyle,
   getBackgroundGradientStyle,
 } from "@/constants/theme";
+import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
 
 const categories = [
   { id: "investment", label: "Investment", icon: null },
@@ -557,15 +558,12 @@ const Dashboard = () => {
               be undone.
             </DrawerDescription>
           </DrawerHeader>
-          <DrawerFooter>
-            <Button
-              className="rounded-[24px] bg-danger"
-              style={{ background: "red" }}
-              onClick={() => handleDeleteExpense(expenseToDelete)}
-            >
-              Delete
-            </Button>
-            <DrawerClose className="rounded-[24px]">Cancel</DrawerClose>
+          <DrawerFooter className="pb-8">
+            <SlideToConfirm
+              label="Slide to delete"
+              onConfirm={() => handleDeleteExpense(expenseToDelete)}
+              variant="danger"
+            />
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

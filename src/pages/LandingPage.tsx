@@ -138,13 +138,13 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {/* Placeholder for your first image */}
-            <img src="images/ss-1.jpg" alt="" />
+            <img src="images/ss-1.png" alt="" />
 
             {/* Placeholder for your second image */}
-            <img src="images/ss-2.jpg" alt="" />
+            <img src="images/ss-2.png" alt="" />
 
             {/* Placeholder for your third image */}
-            <img src="images/ss-3.jpg" alt="" />
+            <img src="images/ss-3.png" alt="" />
           </div>
         </div>
       </section>

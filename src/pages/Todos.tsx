@@ -315,12 +315,6 @@ const Todos = () => {
                 if (todoToDelete) handleDelete(todoToDelete);
               }}
             />
-            <button
-              onClick={() => setTodoToDelete(null)}
-              className="w-full text-sm text-gray-400 py-2 hover:text-gray-600 transition-colors"
-            >
-              Cancel
-            </button>
           </div>
         </DrawerContent>
       </Drawer>

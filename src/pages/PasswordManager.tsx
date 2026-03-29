@@ -30,6 +30,16 @@ import {
   getTextGradientStyle,
   GRADIENTS,
 } from "@/constants/theme";
+import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerClose,
+} from "@/components/ui/drawer";
 
 interface Category {
   id: string;
@@ -72,6 +82,7 @@ const PasswordManager = () => {
   const [editingPassword, setEditingPassword] = useState<Password | null>(null);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [passwordToDelete, setPasswordToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -164,8 +175,6 @@ const PasswordManager = () => {
   };
 
   const deletePassword = async (passwordId: string) => {
-    if (!confirm("Are you sure you want to delete this password?")) return;
-
     try {
       const { error } = await supabase
         .from("passwords")
@@ -175,6 +184,7 @@ const PasswordManager = () => {
       if (error) throw error;
 
       setPasswords((prev) => prev.filter((p) => p.id !== passwordId));
+      setPasswordToDelete(null);
       toast.success("Password deleted successfully");
     } catch (error) {
       toast.error("Failed to delete password");
@@ -360,7 +370,7 @@ const PasswordManager = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => deletePassword(password.id)}
+                      onClick={() => setPasswordToDelete(password.id)}
                       className="rounded-full"
                     >
                       <Trash2 className="flex-1 rounded-full text-destructive hover:bg-destructive/10" />
@@ -514,6 +524,29 @@ const PasswordManager = () => {
           <Grid3X3 className="h-4 w-4" />
         </Button>
       </div>
+
+      {/* Delete Password Drawer */}
+      <Drawer
+        open={!!passwordToDelete}
+        onOpenChange={() => setPasswordToDelete(null)}
+      >
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Delete Password</DrawerTitle>
+            <DrawerDescription>
+              Are you sure you want to delete this password? This action cannot
+              be undone.
+            </DrawerDescription>
+          </DrawerHeader>
+          <DrawerFooter className="pb-8">
+            <SlideToConfirm
+              label="Slide to delete"
+              onConfirm={() => deletePassword(passwordToDelete!)}
+              variant="danger"
+            />
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
 
       {/* Password Form Modal */}
       <PasswordForm

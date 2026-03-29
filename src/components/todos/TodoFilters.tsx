@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GRADIENTS } from "@/constants/theme";
+import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
 
 export type TodoStatusFilter = "all" | "pending" | "in_progress" | "completed";
 export type TodoPriorityFilter = "all" | "low" | "medium" | "high";
@@ -68,10 +69,18 @@ export const TodoFilters = ({
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent className="rounded-[18px]">
-                <SelectItem value="all" className="rounded-[14px]">All Statuses</SelectItem>
-                <SelectItem value="pending" className="rounded-[14px]">⏳ Pending</SelectItem>
-                <SelectItem value="in_progress" className="rounded-[14px]">🔄 In Progress</SelectItem>
-                <SelectItem value="completed" className="rounded-[14px]">✅ Completed</SelectItem>
+                <SelectItem value="all" className="rounded-[14px]">
+                  All Statuses
+                </SelectItem>
+                <SelectItem value="pending" className="rounded-[14px]">
+                  ⏳ Pending
+                </SelectItem>
+                <SelectItem value="in_progress" className="rounded-[14px]">
+                  🔄 In Progress
+                </SelectItem>
+                <SelectItem value="completed" className="rounded-[14px]">
+                  ✅ Completed
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -86,37 +95,30 @@ export const TodoFilters = ({
                 <SelectValue placeholder="Filter by priority" />
               </SelectTrigger>
               <SelectContent className="rounded-[18px]">
-                <SelectItem value="all" className="rounded-[14px]">All Priorities</SelectItem>
-                <SelectItem value="low" className="rounded-[14px]">🟢 Low</SelectItem>
-                <SelectItem value="medium" className="rounded-[14px]">🟡 Medium</SelectItem>
-                <SelectItem value="high" className="rounded-[14px]">🔴 High</SelectItem>
+                <SelectItem value="all" className="rounded-[14px]">
+                  All Priorities
+                </SelectItem>
+                <SelectItem value="low" className="rounded-[14px]">
+                  🟢 Low
+                </SelectItem>
+                <SelectItem value="medium" className="rounded-[14px]">
+                  🟡 Medium
+                </SelectItem>
+                <SelectItem value="high" className="rounded-[14px]">
+                  🔴 High
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <Button
-            onClick={() => {
+          <SlideToConfirm
+            label="Slide to apply filters"
+            onConfirm={() => {
               onFilter();
               setIsOpen(false);
             }}
-            className="w-full rounded-[24px] text-white"
-            style={{ background: GRADIENTS.PRIMARY }}
-          >
-            Apply Filters
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={() => {
-              onStatusChange("all");
-              onPriorityChange("all");
-              onFilter();
-              setIsOpen(false);
-            }}
-            className="w-full rounded-[24px]"
-          >
-            Clear Filters
-          </Button>
+            variant="confirm"
+          />
         </div>
       </DrawerContent>
     </Drawer>

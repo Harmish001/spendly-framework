@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
 import { getBackgroundGradientStyle, GRADIENTS } from "@/constants/theme";
+import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
 
 interface Category {
   id: string;
@@ -229,21 +230,13 @@ export const CategoryManager = ({
                 </div>
               </div>
 
-              <Button
-                onClick={handleCreateCategory}
-                disabled={loading || !newCategory.name.trim()}
-                className="w-full rounded-full"
-                style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
-              >
-                {loading ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                ) : (
-                  <>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Category
-                  </>
-                )}
-              </Button>
+              <SlideToConfirm
+                label="Slide to create category"
+                onConfirm={handleCreateCategory}
+                loading={loading}
+                disabled={!newCategory.name.trim()}
+                variant="confirm"
+              />
             </CardContent>
           </Card>
 

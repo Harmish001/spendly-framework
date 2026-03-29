@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -72,6 +74,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "DM Sans", sans-serif;
   }
 }
 
@@ -86,31 +89,31 @@
 
   /* Gradient Background Classes */
   .gradient-primary-bg {
-    background: linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%);
+    background: linear-gradient(135deg, #2e2010 0%, #7b3f1e 100%);
   }
 
   .gradient-secondary-bg {
-    background: linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%);
+    background: linear-gradient(135deg, #2e2010 0%, #7b3f1e 100%);
   }
 
   .gradient-chat-bg {
-    background: linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%);
+    background: linear-gradient(135deg, #2e2010 0%, #7b3f1e 100%);
   }
 
   .gradient-stats-bg {
-    background: linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%);
+    background: linear-gradient(135deg, #2e2010 0%, #7b3f1e 100%);
   }
 
   /* Gradient Text Classes */
   .gradient-primary-text {
-    background: linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%);
+    background: linear-gradient(135deg, #2e2010 0%, #7b3f1e 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .gradient-secondary-text {
-    background: linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%);
+    background: linear-gradient(135deg, #2e2010 0%, #7b3f1e 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

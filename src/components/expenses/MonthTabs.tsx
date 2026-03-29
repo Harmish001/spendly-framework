@@ -5,6 +5,7 @@ import { GRADIENTS } from "@/constants/theme";
 interface MonthTabsProps {
   selectedMonth: string;
   onMonthChange: (month: string) => void;
+  isTransparent?: boolean;
 }
 
 const months = [
@@ -22,7 +23,11 @@ const months = [
   "December",
 ];
 
-export const MonthTabs = ({ selectedMonth, onMonthChange }: MonthTabsProps) => {
+export const MonthTabs = ({
+  selectedMonth,
+  onMonthChange,
+  isTransparent = false,
+}: MonthTabsProps) => {
   const tabsRef = useRef<HTMLDivElement>(null);
   const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, "0");
 
@@ -45,7 +50,7 @@ export const MonthTabs = ({ selectedMonth, onMonthChange }: MonthTabsProps) => {
     <div
       className="sticky top-0 z-50 w-full md:px-72 rounded-b-[24px] md:rounded-b-[0px]"
       ref={tabsRef}
-      style={{ background: GRADIENTS.PRIMARY }}
+      style={{ background: isTransparent ? "transparent" : GRADIENTS.PRIMARY }}
     >
       <Tabs
         defaultValue={currentMonth}
@@ -67,7 +72,7 @@ export const MonthTabs = ({ selectedMonth, onMonthChange }: MonthTabsProps) => {
                 background: "transparent",
                 color:
                   selectedMonth === (index + 1).toString().padStart(2, "0")
-                    ? "#1f0058ff"
+                    ? "#ffdc82e6"
                     : "white",
               }}
             >

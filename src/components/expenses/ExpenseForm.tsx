@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -97,8 +98,8 @@ export const ExpenseForm = ({
     }
   }, [prefilledData, editingExpense]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setLoading(true);
 
     try {
@@ -160,7 +161,7 @@ export const ExpenseForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={(e) => handleSubmit(e)} className="space-y-4">
       <div className="relative">
         <span className="absolute left-3 top-2.5 text-gray-500">₹</span>
         <Input
@@ -170,25 +171,23 @@ export const ExpenseForm = ({
           placeholder="0.00"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className={`pl-8 rounded-[24px] ${prefilledData || editingExpense ? "border-purple-300 bg-purple-50" : ""}`}
+          className={`pl-8 rounded-[20px]`}
           required
         />
       </div>
 
       <Select value={category} onValueChange={setCategory} required>
-        <SelectTrigger
-          className={`rounded-[24px] ${prefilledData || editingExpense ? "border-purple-300 bg-purple-50" : ""}`}
-        >
+        <SelectTrigger className={`rounded-[20px]`}>
           <SelectValue placeholder="Select category" />
         </SelectTrigger>
-        <SelectContent className="rounded-[24px]">
+        <SelectContent className="rounded-[20px]">
           {categories.map((cat) => {
             const Icon = cat.icon;
             return (
               <SelectItem
                 key={cat.id}
                 value={cat.id}
-                className="rounded-[24px]"
+                className="rounded-[20px]"
               >
                 <div className="flex items-center gap-2">
                   <Icon className="h-4 w-4" />
@@ -205,7 +204,7 @@ export const ExpenseForm = ({
         placeholder="Description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        className={`rounded-[24px] ${prefilledData || editingExpense ? "border-purple-300 bg-purple-50" : ""}`}
+        className={`rounded-[20px]`}
       />
 
       <Popover>
@@ -213,11 +212,8 @@ export const ExpenseForm = ({
           <Button
             variant="outline"
             className={cn(
-              "w-full justify-start text-left font-normal rounded-[24px]",
+              "w-full justify-start text-left font-normal rounded-[20px]",
               !date && "text-muted-foreground",
-              prefilledData || editingExpense
-                ? "border-purple-300 bg-purple-50"
-                : "",
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
@@ -235,21 +231,13 @@ export const ExpenseForm = ({
         </PopoverContent>
       </Popover>
 
-      <Button
-        type="submit"
-        className="w-full rounded-[24px]"
-        style={{ background: GRADIENTS.PRIMARY }}
-        disabled={loading}
-      >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-        {loading
-          ? isEditing
-            ? "Updating..."
-            : "Adding..."
-          : isEditing
-            ? "Update Expense"
-            : "Add Expense"}
-      </Button>
+      <SlideToConfirm
+        label={isEditing ? "Slide to update" : "Slide to add expense"}
+        onConfirm={handleSubmit}
+        loading={loading}
+        disabled={!amount || !category}
+        variant="confirm"
+      />
     </form>
   );
 };

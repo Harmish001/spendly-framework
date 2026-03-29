@@ -20,6 +20,7 @@ import MonthlyAnalysis from "./components/statistics/Analysis";
 import LandingPage from "./pages/LandingPage";
 import PasswordManager from "./pages/PasswordManager";
 import ChatBotTest from "./pages/ChatBotTest";
+import Todos from "./pages/Todos";
 import { FloatingChatBot } from "./components/chatbot/FloatingChatBot";
 import { FloatingChatButton } from "./components/chatbot/FloatingChatButton";
 import { createPortal } from "react-dom";
@@ -188,6 +189,7 @@ function App() {
         <Route path="/statistics" element={<Statistics />} />
         <Route path="/monthlyAnalysis" element={<MonthlyAnalysis />} />
         <Route path="/chatbot-test" element={<ChatBotTest />} />
+        <Route path="/todos" element={<Todos />} />
       </Routes>
       {/* Global Floating Chatbot */}
       {/* <FloatingChatButton onClick={() => setIsChatBotOpen(!isChatBotOpen)} /> */}

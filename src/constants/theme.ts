@@ -6,18 +6,18 @@
 // Gradient Definitions
 export const GRADIENTS = {
   // Primary gradient: Purple to Blue (most commonly used)
-  PRIMARY: "linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%)",
+  PRIMARY: "linear-gradient(135deg, #2E2010 0%, #7B3F1E 100%)",
   //   PRIMARY: "linear-gradient(to right, #9333ea, #2563eb)",
 
   // Secondary gradient: Blue to Purple (used in TravelExpenses)
   //   SECONDARY: "linear-gradient(to right, #2563eb, #7c3aed)",
-  SECONDARY: "linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%)",
+  SECONDARY: "linear-gradient(135deg, #2E2010 0%, #7B3F1E 100%)",
 
   // Chat gradient: Purple to Blue with opacity
-  CHAT: "linear-gradient(135deg, rgba(147, 51, 234, 1) 0%, rgba(37, 99, 235, 1) 100%)",
+  CHAT: "linear-gradient(135deg, #2E2010 0%, #7B3F1E 100%)",
 
   // Stats gradient: Orange to Pink (used in StatisticsCharts)
-  STATS: "linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%)",
+  STATS: "linear-gradient(135deg, #2E2010 0%, #7B3F1E 100%)",
   //   STATS: "linear-gradient(225deg, #FFE29F 0%, #FFA99F 48%, #FF719A 100%)",
 } as const;
 

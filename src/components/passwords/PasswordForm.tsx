@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Eye, EyeOff, Shuffle, Save } from "lucide-react";
+import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -118,8 +119,8 @@ export const PasswordForm = ({
     toast.success("Secure password generated!");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
 
     if (!formData.title || !formData.password_encrypted) {
       toast.error("Title and password are required");
@@ -189,7 +190,7 @@ export const PasswordForm = ({
         </DrawerHeader>
 
         <div className="p-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={(e) => handleSubmit(e)} className="space-y-4">
             <div>
               <Label htmlFor="title">Title *</Label>
               <Input
@@ -344,30 +345,14 @@ export const PasswordForm = ({
               />
             </div>
 
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                className="rounded-full flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="flex-1 rounded-full"
-                style={getBackgroundGradientStyle(GRADIENTS.PRIMARY)}
-              >
-                {loading ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    {password?.id ? "Update" : "Save"}
-                  </>
-                )}
-              </Button>
+            <div className="pt-4">
+              <SlideToConfirm
+                label={password?.id ? "Slide to update" : "Slide to save"}
+                onConfirm={handleSubmit}
+                loading={loading}
+                disabled={!formData.title || !formData.password_encrypted}
+                variant="confirm"
+              />
             </div>
           </form>
         </div>

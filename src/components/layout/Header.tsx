@@ -7,7 +7,11 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileNavigation } from "@/components/navigation/MobileNavigation";
 import { GRADIENTS } from "@/constants/theme";
 
-export const Header = () => {
+export const Header = ({
+  isTransparent = false,
+}: {
+  isTransparent?: boolean;
+}) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -24,7 +28,7 @@ export const Header = () => {
   return (
     <header
       className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-      style={{ background: GRADIENTS.PRIMARY }}
+      style={{ background: isTransparent ? "transparent" : GRADIENTS.PRIMARY }}
     >
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-1">

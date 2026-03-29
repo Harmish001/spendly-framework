@@ -79,11 +79,11 @@ const Statistics = () => {
   const chartConfig = {
     amount: {
       label: "Amount",
-      color: "#f59e42",
+      color: "#2E2010",
     },
     expenses: {
       label: "Expenses",
-      color: "#ff6b6b",
+      color: "#7B3F1E",
     },
   };
 

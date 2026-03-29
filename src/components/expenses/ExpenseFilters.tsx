@@ -24,6 +24,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { GRADIENTS } from "@/constants/theme";
+import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
 
 interface ExpenseFiltersProps {
   selectedYear: string;
@@ -81,7 +82,7 @@ export const ExpenseFilters = ({
         <DrawerHeader className="text-center pb-2">
           <SheetTitle>Filter Expenses</SheetTitle>
         </DrawerHeader>
-        <div className="space-y-4 mx-4">
+        <div className="space-y-4 mx-4 pb-6">
           <Select value={selectedYear} onValueChange={onYearChange}>
             <SelectTrigger className="rounded-[24px]">
               <SelectValue placeholder="Select year" />
@@ -113,18 +114,17 @@ export const ExpenseFilters = ({
               </SelectContent>
             </Select>
           )}
-          <Button
-            onClick={() => {
+          <SlideToConfirm
+            label="Slide to apply filters"
+            onConfirm={() => {
               onFilter();
               setIsOpen(false);
             }}
-            className="w-full rounded-[24px]"
-            style={{ background: GRADIENTS.PRIMARY }}
-          >
-            Apply Filters
-          </Button>
+            variant="confirm"
+          />
         </div>
       </DrawerContent>
     </Drawer>
   );
 };
+

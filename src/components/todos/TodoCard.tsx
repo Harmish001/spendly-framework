@@ -1,6 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, CheckCircle2, Circle, Clock, AlertCircle } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  CheckCircle2,
+  Circle,
+  Clock,
+  AlertCircle,
+} from "lucide-react";
 import { Todo, TodoStatus, TodoPriority } from "./TodoForm";
 import { getBackgroundGradientStyle, GRADIENTS } from "@/constants/theme";
 import { format } from "date-fns";
@@ -12,19 +19,30 @@ interface TodoCardProps {
   onToggleComplete: (todo: Todo) => void;
 }
 
-const priorityConfig: Record<TodoPriority, { label: string; color: string; bg: string }> = {
+const priorityConfig: Record<
+  TodoPriority,
+  { label: string; color: string; bg: string }
+> = {
   low: { label: "Low", color: "#16a34a", bg: "#dcfce7" },
   medium: { label: "Medium", color: "#d97706", bg: "#fef3c7" },
   high: { label: "High", color: "#dc2626", bg: "#fee2e2" },
 };
 
-const statusConfig: Record<TodoStatus, { label: string; icon: React.FC<{ className?: string }> }> = {
+const statusConfig: Record<
+  TodoStatus,
+  { label: string; icon: React.FC<{ className?: string }> }
+> = {
   pending: { label: "Pending", icon: Circle },
   in_progress: { label: "In Progress", icon: Clock },
   completed: { label: "Completed", icon: CheckCircle2 },
 };
 
-export const TodoCard = ({ todo, onEdit, onDelete, onToggleComplete }: TodoCardProps) => {
+export const TodoCard = ({
+  todo,
+  onEdit,
+  onDelete,
+  onToggleComplete,
+}: TodoCardProps) => {
   const isCompleted = todo.status === "completed";
   const priority = priorityConfig[todo.priority as TodoPriority];
   const statusInfo = statusConfig[todo.status as TodoStatus];

@@ -1,9 +1,29 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, Wallet, Utensils, Car, ShoppingBag, BanknoteIcon, MoreHorizontal } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  PlusCircle,
+  Wallet,
+  Utensils,
+  Car,
+  ShoppingBag,
+  BanknoteIcon,
+  MoreHorizontal,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -16,7 +36,11 @@ const categories = [
   { id: "others", label: "Others", icon: MoreHorizontal },
 ];
 
-export const ExpenseModal = ({ onExpenseAdded }: { onExpenseAdded: () => void }) => {
+export const ExpenseModal = ({
+  onExpenseAdded,
+}: {
+  onExpenseAdded: () => void;
+}) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
@@ -29,8 +53,10 @@ export const ExpenseModal = ({ onExpenseAdded }: { onExpenseAdded: () => void })
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) throw new Error("No user found");
 
       const { error } = await supabase.from("expenses").insert({
@@ -65,14 +91,13 @@ export const ExpenseModal = ({ onExpenseAdded }: { onExpenseAdded: () => void })
     }
   };
 
-  const CategoryIcon = categories.find(cat => cat.id === category)?.icon || MoreHorizontal;
+  const CategoryIcon =
+    categories.find((cat) => cat.id === category)?.icon || MoreHorizontal;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          className="rounded-[20px]"
-        >
+        <Button className="rounded-[20px]">
           <PlusCircle className="h-5 w-5 mr-2" />
           Add Expense
         </Button>
@@ -114,7 +139,11 @@ export const ExpenseModal = ({ onExpenseAdded }: { onExpenseAdded: () => void })
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 return (
-                  <SelectItem key={cat.id} value={cat.id} className="rounded-[16px]">
+                  <SelectItem
+                    key={cat.id}
+                    value={cat.id}
+                    className="rounded-[16px]"
+                  >
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4" />
                       {cat.label}

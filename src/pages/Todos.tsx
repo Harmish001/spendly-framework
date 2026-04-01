@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Loader2,
   CheckSquare,
@@ -56,6 +57,17 @@ const Todos = () => {
   const [selectedStatus, setSelectedStatus] = useState<TodoStatusFilter>("all");
   const [selectedPriority, setSelectedPriority] =
     useState<TodoPriorityFilter>("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("shortcut") === "add-todo") {
+      setIsTodoSheetOpen(true);
+      // Remove the parameter from the URL to avoid opening on every reload
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("shortcut");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     fetchTodos();
@@ -301,7 +313,7 @@ const Todos = () => {
               🗑️ Delete Todo
             </DialogTitle>
             <DrawerDescription className="text-sm text-gray-500 mt-1">
-              Slide to permanently delete this todo.
+              Confirm permanently delete this todo.
               <br />
               This action <strong>cannot</strong> be undone.
             </DrawerDescription>
@@ -310,7 +322,7 @@ const Todos = () => {
           <div className="px-6 pb-8 pt-2 space-y-4">
             <SlideToConfirm
               variant="danger"
-              label="Slide to delete"
+              label="Delete"
               onConfirm={() => {
                 if (todoToDelete) handleDelete(todoToDelete);
               }}

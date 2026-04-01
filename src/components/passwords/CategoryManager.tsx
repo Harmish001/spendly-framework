@@ -231,7 +231,7 @@ export const CategoryManager = ({
               </div>
 
               <SlideToConfirm
-                label="Slide to create category"
+                label="Create category"
                 onConfirm={handleCreateCategory}
                 loading={loading}
                 disabled={!newCategory.name.trim()}

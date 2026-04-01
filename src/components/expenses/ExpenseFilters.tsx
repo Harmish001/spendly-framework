@@ -115,7 +115,7 @@ export const ExpenseFilters = ({
             </Select>
           )}
           <SlideToConfirm
-            label="Slide to apply filters"
+            label="Confirm apply filters"
             onConfirm={() => {
               onFilter();
               setIsOpen(false);

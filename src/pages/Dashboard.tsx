@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -97,6 +98,17 @@ const Dashboard = () => {
   const [swipedCardId, setSwipedCardId] = useState<string | null>(null);
   const cardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const cardRef = useRef(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("shortcut") === "add-expense") {
+      setIsExpenseSheetOpen(true);
+      // Remove the parameter from the URL to avoid opening on every reload
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("shortcut");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     fetchExpenses();
@@ -532,7 +544,7 @@ const Dashboard = () => {
           open={!!editingExpense}
           onOpenChange={() => setEditingExpense(null)}
         >
-          <DrawerContent className="sm:max-w-[425px] px-3">
+          <DrawerContent className="sm:max-w-[425px] pb-3 px-3">
             <DrawerHeader>
               <DialogTitle>Edit Expense</DialogTitle>
             </DrawerHeader>
@@ -560,7 +572,7 @@ const Dashboard = () => {
           </DrawerHeader>
           <DrawerFooter className="pb-8">
             <SlideToConfirm
-              label="Slide to delete"
+              label="Delete"
               onConfirm={() => handleDeleteExpense(expenseToDelete)}
               variant="danger"
             />

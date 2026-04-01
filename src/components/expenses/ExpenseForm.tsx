@@ -232,7 +232,7 @@ export const ExpenseForm = ({
       </Popover>
 
       <SlideToConfirm
-        label={isEditing ? "Slide to update" : "Slide to add expense"}
+        label={isEditing ? "Update" : "Add Expense"}
         onConfirm={handleSubmit}
         loading={loading}
         disabled={!amount || !category}

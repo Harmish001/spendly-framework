@@ -499,15 +499,12 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* ── slide to sign in ─────────────────────────── */}
+              {/* ── Confirm sign in ─────────────────────────── */}
               <div
                 className={`pt-1 ${mounted ? "anim-slide-up delay-700" : "opacity-0"}`}
               >
-                <p className="text-white/30 text-[10px] text-center mb-2.5 tracking-widest font-semibold uppercase">
-                  ← slide to sign in →
-                </p>
                 <SlideToConfirm
-                  label="Slide to Sign In"
+                  label="Confirm Sign In"
                   onConfirm={handleSignIn}
                   disabled={!canSubmit}
                   loading={loading}

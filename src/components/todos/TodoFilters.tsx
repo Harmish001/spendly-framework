@@ -112,7 +112,7 @@ export const TodoFilters = ({
           </div>
 
           <SlideToConfirm
-            label="Slide to apply filters"
+            label="Apply filters"
             onConfirm={() => {
               onFilter();
               setIsOpen(false);

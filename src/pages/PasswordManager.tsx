@@ -532,7 +532,7 @@ const PasswordManager = () => {
           </DrawerHeader>
           <DrawerFooter className="pb-8">
             <SlideToConfirm
-              label="Slide to delete"
+              label="Delete"
               onConfirm={() => deletePassword(passwordToDelete!)}
               variant="danger"
             />

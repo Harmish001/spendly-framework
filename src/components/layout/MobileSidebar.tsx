@@ -1,4 +1,10 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { ExpenseFilters } from "../expenses/ExpenseFilters";
@@ -16,12 +22,16 @@ export const MobileSidebar = ({
   selectedCategory,
   onYearChange,
   onCategoryChange,
-  onFilter
+  onFilter,
 }: MobileSidebarProps) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden bg-gradient-to-r from-purple-600 to-blue-600">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden bg-gradient-to-r from-purple-600 to-blue-600"
+        >
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>

@@ -486,7 +486,7 @@ const SignUp = () => {
                 className={`pt-1 ${mounted ? "su-slide-up su-d7" : "opacity-0"}`}
               >
                 <SlideToConfirm
-                  label="Slide to Sign Up"
+                  label="Sign Up"
                   onConfirm={handleSignUp}
                   disabled={!canSubmit}
                   loading={loading}

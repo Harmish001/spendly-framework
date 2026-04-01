@@ -313,7 +313,7 @@ const Todos = () => {
               🗑️ Delete Todo
             </DialogTitle>
             <DrawerDescription className="text-sm text-gray-500 mt-1">
-              Slide to permanently delete this todo.
+              Confirm permanently delete this todo.
               <br />
               This action <strong>cannot</strong> be undone.
             </DrawerDescription>
@@ -322,7 +322,7 @@ const Todos = () => {
           <div className="px-6 pb-8 pt-2 space-y-4">
             <SlideToConfirm
               variant="danger"
-              label="Slide to delete"
+              label="Delete"
               onConfirm={() => {
                 if (todoToDelete) handleDelete(todoToDelete);
               }}

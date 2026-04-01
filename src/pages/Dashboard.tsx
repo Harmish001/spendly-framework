@@ -544,7 +544,7 @@ const Dashboard = () => {
           open={!!editingExpense}
           onOpenChange={() => setEditingExpense(null)}
         >
-          <DrawerContent className="sm:max-w-[425px] px-3">
+          <DrawerContent className="sm:max-w-[425px] pb-3 px-3">
             <DrawerHeader>
               <DialogTitle>Edit Expense</DialogTitle>
             </DrawerHeader>
@@ -572,7 +572,7 @@ const Dashboard = () => {
           </DrawerHeader>
           <DrawerFooter className="pb-8">
             <SlideToConfirm
-              label="Slide to delete"
+              label="Delete"
               onConfirm={() => handleDeleteExpense(expenseToDelete)}
               variant="danger"
             />

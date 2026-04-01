@@ -23,9 +23,9 @@ export const StatisticsCharts = ({ data, loading }: StatisticsChartsProps) => {
     );
   }
 
-  const barData = data.map(item => ({
+  const barData = data.map((item) => ({
     category: item.label,
-    amount: item.value
+    amount: item.value,
   }));
 
   return (
@@ -35,19 +35,19 @@ export const StatisticsCharts = ({ data, loading }: StatisticsChartsProps) => {
         <div className="h-[300px] w-full">
           <ResponsiveBar
             data={barData}
-            keys={['amount']}
+            keys={["amount"]}
             indexBy="category"
             margin={{ top: 30, right: 30, bottom: 50, left: 60 }}
             padding={0.2}
-            valueScale={{ type: 'linear' }}
+            valueScale={{ type: "linear" }}
             colors={[
-              'linear-gradient(225deg, #FFE29F 0%, #FFA99F 48%, #FF719A 100%)'
+              "linear-gradient(225deg, #FFE29F 0%, #FFA99F 48%, #FF719A 100%)",
             ]}
             borderRadius={4}
             borderWidth={1}
             borderColor={{
-              from: 'color',
-              modifiers: [['darker', 0.2]]
+              from: "color",
+              modifiers: [["darker", 0.2]],
             }}
             axisTop={null}
             axisRight={null}
@@ -55,17 +55,17 @@ export const StatisticsCharts = ({ data, loading }: StatisticsChartsProps) => {
               tickSize: 5,
               tickPadding: 5,
               tickRotation: -45,
-              legend: 'Category',
-              legendPosition: 'middle',
-              legendOffset: 40
+              legend: "Category",
+              legendPosition: "middle",
+              legendOffset: 40,
             }}
             axisLeft={{
               tickSize: 5,
               tickPadding: 5,
               tickRotation: 0,
-              legend: 'Amount (₹)',
-              legendPosition: 'middle',
-              legendOffset: -40
+              legend: "Amount (₹)",
+              legendPosition: "middle",
+              legendOffset: -40,
             }}
             labelSkipWidth={12}
             labelSkipHeight={12}

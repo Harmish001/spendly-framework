@@ -1,6 +1,7 @@
-import { useRef, useState, useCallback } from "react";
-import { CheckCircle2, ChevronRight, Trash2 } from "lucide-react";
+import { useState, useCallback } from "react";
+import { CheckCircle2, ChevronRight, Trash2, Loader2 } from "lucide-react";
 import { GRADIENTS } from "@/constants/theme";
+import { cn } from "@/lib/utils";
 
 type SlideVariant = "confirm" | "danger";
 
@@ -13,235 +14,126 @@ interface SlideToConfirmProps {
   isWhiteText?: boolean;
 }
 
-const THUMB_SIZE = 52; // px
-const CONFIRM_THRESHOLD = 0.82; // 82% of track
-const SPRING_DURATION = 350; // ms
-
-// ── Variant colour maps ───────────────────────────────────────────────────────
-const VARIANT_STYLES: Record<
+const VARIANT_CONFIG: Record<
   SlideVariant,
   {
-    trackBg: string;
-    trackBorder: string;
-    fillGradient: string;
-    labelGradient: string;
-    chevronColor: string;
-    thumbGradient: string;
-    thumbShadowDrag: string;
-    thumbShadowIdle: string;
-    successGradient: string;
+    gradient: string;
+    shadowColor: string;
+    icon: any;
+    successIcon: any;
   }
 > = {
   confirm: {
-    trackBg:
-      "linear-gradient(135deg, rgba(46,32,16,0.12) 0%, rgba(123,63,30,0.12) 100%)",
-    trackBorder: "rgba(123,63,30,0.3)",
-    fillGradient: GRADIENTS.PRIMARY,
-    labelGradient: GRADIENTS.PRIMARY,
-    chevronColor: "#7B3F1E",
-    thumbGradient: GRADIENTS.PRIMARY,
-    thumbShadowDrag: "0 6px 20px rgba(123,63,30,0.45)",
-    thumbShadowIdle: "0 3px 10px rgba(123,63,30,0.3)",
-    successGradient: "linear-gradient(135deg, #2e2010 0%, #7B3F1E 100%)",
+    gradient: GRADIENTS.PRIMARY,
+    shadowColor: "rgba(123, 63, 30, 0.45)",
+    icon: ChevronRight,
+    successIcon: CheckCircle2,
   },
   danger: {
-    trackBg:
-      "linear-gradient(135deg, rgba(220,38,38,0.08) 0%, rgba(239,68,68,0.08) 100%)",
-    trackBorder: "rgba(220,38,38,0.3)",
-    fillGradient: "linear-gradient(135deg, #dc2626 0%, #ef4444 100%)",
-    labelGradient: "linear-gradient(135deg, #dc2626 0%, #ef4444 100%)",
-    chevronColor: "#dc2626",
-    thumbGradient: "linear-gradient(135deg, #dc2626 0%, #ef4444 100%)",
-    thumbShadowDrag: "0 6px 20px rgba(220,38,38,0.45)",
-    thumbShadowIdle: "0 3px 10px rgba(220,38,38,0.3)",
-    successGradient: "linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)",
+    gradient: "linear-gradient(135deg, #dc2626 0%, #ef4444 100%)",
+    shadowColor: "rgba(220, 38, 38, 0.35)",
+    icon: Trash2,
+    successIcon: Trash2,
   },
 };
 
 export const SlideToConfirm = ({
-  label = "Slide to confirm",
+  label = "Confirm",
   onConfirm,
   disabled = false,
   loading = false,
   variant = "confirm",
-  isWhiteText = false,
+  isWhiteText = false, // Kept for compatibility but ignored for solid design
 }: SlideToConfirmProps) => {
-  const styles = VARIANT_STYLES[variant];
+  const config = VARIANT_CONFIG[variant];
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
 
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [dragX, setDragX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [confirmed, setConfirmed] = useState(false);
-  const [springing, setSpringing] = useState(false);
-  const startXRef = useRef(0);
-  const rafRef = useRef<number | null>(null);
+  const handleClick = useCallback(() => {
+    if (disabled || loading || isSuccess) return;
 
-  const getMaxX = () => {
-    const trackWidth = trackRef.current?.clientWidth ?? 0;
-    return trackWidth - THUMB_SIZE - 0;
-  };
+    setIsSuccess(true);
+    setTimeout(() => {
+      onConfirm();
+      setTimeout(() => setIsSuccess(false), 2000);
+    }, 600);
+  }, [disabled, loading, isSuccess, onConfirm]);
 
-  const clamp = (val: number) => Math.max(0, Math.min(val, getMaxX()));
-
-  // ── Pointer handlers ──────────────────────────────────────────────────────
-  const onPointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      if (disabled || loading || confirmed) return;
-      e.currentTarget.setPointerCapture(e.pointerId);
-      setIsDragging(true);
-      setSpringing(false);
-      startXRef.current = e.clientX - dragX;
-    },
-    [disabled, loading, confirmed, dragX],
-  );
-
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!isDragging) return;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        const newX = clamp(e.clientX - startXRef.current);
-        setDragX(newX);
-      });
-    },
-    [isDragging],
-  );
-
-  const onPointerUp = useCallback(() => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    const max = getMaxX();
-    if (dragX / max >= CONFIRM_THRESHOLD) {
-      setDragX(max);
-      setConfirmed(true);
-      setTimeout(() => {
-        onConfirm();
-        setTimeout(() => {
-          setConfirmed(false);
-          setSpringing(true);
-          setDragX(0);
-          setTimeout(() => setSpringing(false), SPRING_DURATION);
-        }, 1000);
-      }, 200);
-    } else {
-      setSpringing(true);
-      setDragX(0);
-      setTimeout(() => setSpringing(false), SPRING_DURATION);
-    }
-  }, [isDragging, dragX, onConfirm]);
-
-  // ── Derived values ────────────────────────────────────────────────────────
-  const max = getMaxX();
-  const progress = max > 0 ? dragX / max : 0;
-  const labelOpacity = Math.max(0, 1 - progress * 2.2);
-
-  const thumbTransition =
-    springing || confirmed
-      ? `transform ${SPRING_DURATION}ms cubic-bezier(0.34, 1.56, 0.64, 1)`
-      : "none";
+  const Icon = config.icon;
+  const SuccessIcon = config.successIcon;
 
   return (
-    <div
-      ref={trackRef}
-      className="relative select-none overflow-hidden rounded-full"
+    <button
+      onClick={handleClick}
+      onMouseDown={() => !disabled && !loading && setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onMouseLeave={() => setIsPressed(false)}
+      onTouchStart={() => !disabled && !loading && setIsPressed(true)}
+      onTouchEnd={() => setIsPressed(false)}
+      disabled={disabled || loading}
+      className={cn(
+        "relative w-full h-[58px] rounded-full overflow-hidden transition-all duration-300",
+        "flex items-center justify-center gap-3 px-8",
+        "group select-none outline-none focus:ring-4 focus:ring-[#7B3F1E]/20",
+        disabled || loading
+          ? "cursor-not-allowed opacity-70 grayscale-[0.5]"
+          : "cursor-pointer",
+        isPressed && !isSuccess
+          ? "scale-[0.96] brightness-90"
+          : "active:scale-[0.98]",
+      )}
       style={{
-        height: `${THUMB_SIZE + 4}px`,
-        background: disabled || loading ? "#e5e7eb" : styles.trackBg,
-        border: "2px solid",
-        borderColor: disabled || loading ? "#d1d5db" : styles.trackBorder,
-        cursor: disabled || loading ? "not-allowed" : "default",
-        transition: "border-color 0.2s",
+        background: config.gradient,
+        boxShadow:
+          isPressed && !isSuccess
+            ? `0 4px 10px -2px ${config.shadowColor}`
+            : `0 12px 24px -8px ${config.shadowColor}`,
+        borderTop: "1px solid rgba(255, 255, 255, 0.25)",
+        borderLeft: "1px solid rgba(255, 255, 255, 0.12)",
+        borderRight: "1px solid rgba(255, 255, 255, 0.12)",
       }}
-      aria-label={label}
-      role="slider"
-      aria-valuenow={Math.round(progress * 100)}
-      aria-valuemin={0}
-      aria-valuemax={100}
     >
-      {/* Track fill */}
+      {/* Automatic High-Intensity Sheen Effect (Mobile Friendly) */}
       <div
-        className="absolute top-0 left-0 h-full rounded-full pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          width: `${dragX + THUMB_SIZE + 2}px`,
-          background: confirmed ? styles.successGradient : styles.fillGradient,
-          opacity: confirmed ? 1 : 0.2 + progress * 0.8,
-          transition: confirmed ? "background 0.3s ease" : "none",
+          background:
+            "linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.22) 50%, transparent 80%)",
+          backgroundSize: "200% 100%",
+          animation: "sheen 3s infinite linear",
         }}
       />
 
-      {/* Shimmer label */}
-      <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-        style={{
-          opacity: labelOpacity,
-          transition: isDragging ? "none" : "opacity 0.2s",
-        }}
-      >
-        <span
-          className="text-sm font-semibold tracking-wide"
-          style={{
-            background: styles.labelGradient,
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: isWhiteText ? "#ffdc82e6" : "transparent",
-            backgroundClip: "text",
-          }}
-        >
-          {label}
+      {/* Radiant Pulse Layer (Success) */}
+      {isSuccess && (
+        <div className="absolute inset-0 animate-ping opacity-40 bg-white/20 rounded-full" />
+      )}
+
+      {/* Content Layer */}
+      <div className="relative z-10 flex items-center justify-center gap-3">
+        {loading ? (
+          <Loader2 className="h-6 w-6 animate-spin text-white" />
+        ) : isSuccess ? (
+          <SuccessIcon className="h-6 w-6 text-white animate-in zoom-in duration-300" />
+        ) : (
+          <Icon className="h-6 w-6 text-white transition-transform duration-300 group-hover:translate-x-1" />
+        )}
+
+        <span className="text-lg font-bold tracking-tight text-white drop-shadow-sm">
+          {loading ? "Processing..." : isSuccess ? "Success!" : label}
         </span>
-        {/* Animated chevrons */}
-        <div className="flex ml-1" style={{ opacity: 0.55 }}>
-          {[0, 1, 2].map((i) => (
-            <ChevronRight
-              key={i}
-              className="h-3.5 w-3.5 -ml-1.5 animate-pulse"
-              style={{
-                color: styles.chevronColor,
-                animationDelay: `${i * 150}ms`,
-                animationDuration: "1.2s",
-              }}
-            />
-          ))}
-        </div>
       </div>
 
-      {/* Thumb */}
-      <div
-        className="absolute top-[0px] left-[0px] rounded-full flex items-center justify-center shadow-lg"
-        style={{
-          width: THUMB_SIZE,
-          height: THUMB_SIZE,
-          background: confirmed ? styles.successGradient : styles.thumbGradient,
-          transform: `translateX(${dragX}px)`,
-          transition: thumbTransition,
-          cursor:
-            disabled || loading
-              ? "not-allowed"
-              : isDragging
-                ? "grabbing"
-                : "grab",
-          touchAction: "none",
-          userSelect: "none",
-          boxShadow: isDragging
-            ? styles.thumbShadowDrag
-            : styles.thumbShadowIdle,
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        @keyframes sheen {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+      `,
         }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-      >
-        {confirmed ? (
-          variant === "danger" ? (
-            <Trash2 className="h-5 w-5 text-white" />
-          ) : (
-            <CheckCircle2 className="h-6 w-6 text-white" />
-          )
-        ) : variant === "danger" ? (
-          <Trash2 className="h-5 w-5 text-white" />
-        ) : (
-          <ChevronRight className="h-6 w-6 text-white" />
-        )}
-      </div>
-    </div>
+      />
+    </button>
   );
 };

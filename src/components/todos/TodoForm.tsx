@@ -43,7 +43,11 @@ interface TodoFormProps {
   onClose?: () => void;
 }
 
-export const TodoForm = ({ onTodoAdded, editingTodo, onClose }: TodoFormProps) => {
+export const TodoForm = ({
+  onTodoAdded,
+  editingTodo,
+  onClose,
+}: TodoFormProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<TodoPriority>("medium");
@@ -59,7 +63,9 @@ export const TodoForm = ({ onTodoAdded, editingTodo, onClose }: TodoFormProps) =
       setDescription(editingTodo.description || "");
       setPriority(editingTodo.priority as TodoPriority);
       setStatus(editingTodo.status as TodoStatus);
-      setDueDate(editingTodo.due_date ? new Date(editingTodo.due_date) : undefined);
+      setDueDate(
+        editingTodo.due_date ? new Date(editingTodo.due_date) : undefined,
+      );
     } else {
       setTitle("");
       setDescription("");
@@ -143,28 +149,46 @@ export const TodoForm = ({ onTodoAdded, editingTodo, onClose }: TodoFormProps) =
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
           <p className="text-xs text-gray-500 pl-1">Priority</p>
-          <Select value={priority} onValueChange={(v) => setPriority(v as TodoPriority)}>
+          <Select
+            value={priority}
+            onValueChange={(v) => setPriority(v as TodoPriority)}
+          >
             <SelectTrigger className="rounded-[24px]">
               <SelectValue placeholder="Priority" />
             </SelectTrigger>
             <SelectContent className="rounded-[18px]">
-              <SelectItem value="low" className="rounded-[14px]">🟢 Low</SelectItem>
-              <SelectItem value="medium" className="rounded-[14px]">🟡 Medium</SelectItem>
-              <SelectItem value="high" className="rounded-[14px]">🔴 High</SelectItem>
+              <SelectItem value="low" className="rounded-[14px]">
+                🟢 Low
+              </SelectItem>
+              <SelectItem value="medium" className="rounded-[14px]">
+                🟡 Medium
+              </SelectItem>
+              <SelectItem value="high" className="rounded-[14px]">
+                🔴 High
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-1">
           <p className="text-xs text-gray-500 pl-1">Status</p>
-          <Select value={status} onValueChange={(v) => setStatus(v as TodoStatus)}>
+          <Select
+            value={status}
+            onValueChange={(v) => setStatus(v as TodoStatus)}
+          >
             <SelectTrigger className="rounded-[24px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent className="rounded-[18px]">
-              <SelectItem value="pending" className="rounded-[14px]">⏳ Pending</SelectItem>
-              <SelectItem value="in_progress" className="rounded-[14px]">🔄 In Progress</SelectItem>
-              <SelectItem value="completed" className="rounded-[14px]">✅ Completed</SelectItem>
+              <SelectItem value="pending" className="rounded-[14px]">
+                ⏳ Pending
+              </SelectItem>
+              <SelectItem value="in_progress" className="rounded-[14px]">
+                🔄 In Progress
+              </SelectItem>
+              <SelectItem value="completed" className="rounded-[14px]">
+                ✅ Completed
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -179,7 +203,7 @@ export const TodoForm = ({ onTodoAdded, editingTodo, onClose }: TodoFormProps) =
               variant="outline"
               className={cn(
                 "w-full justify-start text-left font-normal rounded-[24px]",
-                !dueDate && "text-muted-foreground"
+                !dueDate && "text-muted-foreground",
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -199,7 +223,7 @@ export const TodoForm = ({ onTodoAdded, editingTodo, onClose }: TodoFormProps) =
       </div>
 
       <SlideToConfirm
-        label={isEditing ? "Slide to update" : "Slide to add todo"}
+        label={isEditing ? "Update" : "Add todo"}
         onConfirm={handleSave}
         disabled={loading}
         loading={loading}

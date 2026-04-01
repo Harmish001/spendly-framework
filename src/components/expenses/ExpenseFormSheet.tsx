@@ -55,7 +55,7 @@ export const ExpenseFormSheet = ({
       <DrawerContent className="rounded-t-[24px] border-0 max-h-[85vh]">
         <DrawerHeader className="text-center pb-2">
           <div className="flex items-center justify-between">
-            <DrawerTitle className="text-lg font-semibold">
+            <DrawerTitle className="text-lg font-semibold text-center flex items-center">
               {isEditing ? "Edit Expense" : "Add New Expense"}
             </DrawerTitle>
             {(prefilledData || isEditing) && (

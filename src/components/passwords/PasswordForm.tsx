@@ -347,7 +347,7 @@ export const PasswordForm = ({
 
             <div className="pt-4">
               <SlideToConfirm
-                label={password?.id ? "Slide to update" : "Slide to save"}
+                label={password?.id ? "Update" : "Save"}
                 onConfirm={handleSubmit}
                 loading={loading}
                 disabled={!formData.title || !formData.password_encrypted}

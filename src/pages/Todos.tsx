@@ -155,7 +155,7 @@ const Todos = () => {
         {/* Page Title */}
         <div className="px-4 pt-4 pb-2">
           <h2
-            className="text-2xl font-bold"
+            className="text-2xl font-bold text-center bg-clip-text"
             style={getTextGradientStyle(GRADIENTS.PRIMARY)}
           >
             Todos
@@ -163,7 +163,7 @@ const Todos = () => {
         </div>
 
         {/* Stats Row */}
-        <div className="px-4 pb-2 grid grid-cols-3 gap-3">
+        <div className="px-4 pb-3 grid grid-cols-3 gap-3">
           <div
             className="rounded-[18px] p-3 text-center"
             style={{
@@ -209,7 +209,7 @@ const Todos = () => {
         </div>
 
         {/* Horizontal Status Tabs */}
-        <div className="px-4 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
+        <div className="pl-4 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
           {STATUS_TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeStatusTab === tab.value;
@@ -222,14 +222,13 @@ const Todos = () => {
                   // Also sync the drawer filter
                   setSelectedStatus(tab.value);
                 }}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0 border ${
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border ${
                   isActive
                     ? "text-white border-transparent shadow-md"
                     : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
                 }`}
                 style={isActive ? { background: GRADIENTS.PRIMARY } : {}}
               >
-                <Icon className="h-4 w-4" />
                 {tab.label}
               </button>
             );

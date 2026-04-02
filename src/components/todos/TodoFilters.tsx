@@ -43,7 +43,11 @@ export const TodoFilters = ({
         <Button
           variant="outline"
           className={`rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] ${isMobile ? "w-14 h-14 p-0 flex items-center justify-center p-0" : "rounded-[24px] px-6 h-12"}`}
-          style={{ background: GRADIENTS.PRIMARY, color: "white", border: "none" }}
+          style={{
+            background: GRADIENTS.PRIMARY,
+            color: "white",
+            border: "none",
+          }}
           id="todo-filter-btn"
         >
           <Filter className={`h-6 w-6 ${!isMobile && "mr-2"}`} />
@@ -66,13 +70,13 @@ export const TodoFilters = ({
                 All Statuses
               </SelectItem>
               <SelectItem value="pending" className="rounded-[14px]">
-                ⏳ Pending
+                Pending
               </SelectItem>
               <SelectItem value="in_progress" className="rounded-[14px]">
-                🔄 In Progress
+                In Progress
               </SelectItem>
               <SelectItem value="completed" className="rounded-[14px]">
-                ✅ Completed
+                Completed
               </SelectItem>
             </SelectContent>
           </Select>
@@ -92,13 +96,13 @@ export const TodoFilters = ({
                 All Priorities
               </SelectItem>
               <SelectItem value="low" className="rounded-[14px]">
-                🟢 Low
+                Low
               </SelectItem>
               <SelectItem value="medium" className="rounded-[14px]">
-                🟡 Medium
+                Medium
               </SelectItem>
               <SelectItem value="high" className="rounded-[14px]">
-                🔴 High
+                High
               </SelectItem>
             </SelectContent>
           </Select>

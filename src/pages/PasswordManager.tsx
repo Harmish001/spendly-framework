@@ -23,7 +23,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PasswordForm } from "@/components/passwords/PasswordForm";
 import { CategoryManager } from "@/components/passwords/CategoryManager";
-import { getTextGradientStyle, GRADIENTS } from "@/constants/theme";
+import {
+  getBackgroundGradientStyle,
+  getTextGradientStyle,
+  GRADIENTS,
+} from "@/constants/theme";
 import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
 import {
   Drawer,
@@ -67,7 +71,6 @@ const PasswordManager = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [showFavorites, setShowFavorites] = useState(false);
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(
     new Set(),
   );
@@ -196,19 +199,27 @@ const PasswordManager = () => {
     }
   };
 
-  const filteredPasswords = passwords.filter((password) => {
-    const matchesSearch =
-      password.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      password.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      password.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      password.website_url?.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredPasswords = passwords
+    .filter((password) => {
+      const matchesSearch =
+        password.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        password.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        password.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        password.website_url?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCategory =
-      selectedCategory === "all" || password.category_id === selectedCategory;
-    const matchesFavorites = !showFavorites || password.is_favorite;
+      const matchesCategory =
+        selectedCategory === "all" ||
+        (selectedCategory === "favorites"
+          ? password.is_favorite
+          : password.category_id === selectedCategory);
 
-    return matchesSearch && matchesCategory && matchesFavorites;
-  });
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      if (a.is_favorite && !b.is_favorite) return -1;
+      if (!a.is_favorite && b.is_favorite) return 1;
+      return 0;
+    });
 
   const favoriteCount = passwords.filter((p) => p.is_favorite).length;
 
@@ -224,24 +235,24 @@ const PasswordManager = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen">
       <Header />
 
-      <div className="container mx-auto px-4 py-6 space-y-6">
+      <div className="container mx-auto px-4 pt-4 pb-2 space-y-6">
         {/* Header Section */}
-        <div className="flex items-center justify-center gap-2">
+        <div>
           <h1
-            className="text-3xl font-bold bg-clip-text"
+            className="text-2xl font-bold bg-clip-text text-center"
             style={getTextGradientStyle(GRADIENTS.PRIMARY)}
           >
-            Password Manager
+            Passwords
           </h1>
         </div>
 
         {/* Search and Filter Section */}
-        <Card className="border-0 shadow-lg h-100 rounded-2xl bg-white/80 backdrop-blur-sm">
-          <CardContent className="p-6">
-            <div className="flex flex-col space-y-4">
+        <Card className="border-0 shadow-md from-white to-gray-50/50 border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden">
+          <CardContent className="p-3">
+            <div className="flex flex-col space-y-3">
               {/* Search Bar */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -261,13 +272,28 @@ const PasswordManager = () => {
                   className="flex-1"
                 >
                   <TabsList className="grid grid-cols-3 lg:grid-cols-6 w-full rounded-full bg-muted/50">
-                    <TabsTrigger value="all" className="rounded-full">
+                    <TabsTrigger
+                      value="all"
+                      className="rounded-full"
+                      style={{
+                        ...(selectedCategory === "all"
+                          ? getBackgroundGradientStyle(GRADIENTS.PRIMARY)
+                          : {}),
+                        color: selectedCategory === "all" ? "white" : "black",
+                      }}
+                    >
                       All
                     </TabsTrigger>
                     <TabsTrigger
                       value="favorites"
-                      onClick={() => setShowFavorites(!showFavorites)}
                       className="rounded-full"
+                      style={{
+                        ...(selectedCategory === "favorites"
+                          ? getBackgroundGradientStyle(GRADIENTS.PRIMARY)
+                          : {}),
+                        color:
+                          selectedCategory === "favorites" ? "white" : "black",
+                      }}
                     >
                       <Heart className="h-4 w-4 mr-1" />
                       Favorites ({favoriteCount})
@@ -286,7 +312,7 @@ const PasswordManager = () => {
 
         {/* Passwords Grid/List */}
         {filteredPasswords.length === 0 ? (
-          <Card className="border-0 shadow-lg rounded-2xl bg-white/80 backdrop-blur-sm">
+          <Card className="border-0 shadow-md from-white to-gray-50/50 border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden">
             <CardContent className="p-12 text-center">
               <Lock className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
               <h3 className="text-xl font-semibold mb-2">No passwords found</h3>
@@ -301,7 +327,7 @@ const PasswordManager = () => {
                     setEditingPassword(null);
                     setShowPasswordForm(true);
                   }}
-                  className="rounded-full"
+                  className="rounded-full gradient-primary-bg"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Add Password
@@ -320,7 +346,7 @@ const PasswordManager = () => {
             {filteredPasswords.map((password) => (
               <Card
                 key={password.id}
-                className="border-0 shadow-lg rounded-2xl bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                className="border-0 shadow-md from-white to-gray-50/50 border rounded-[20px] hover:border-gray-300 transition-colors overflow-hidden"
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
@@ -358,7 +384,7 @@ const PasswordManager = () => {
                       className="rounded-full"
                     >
                       <Heart
-                        className={`h-4 w-4 ${password.is_favorite ? "fill-red-500 text-red-500" : ""}`}
+                        className={` h-4 w-4 ${password.is_favorite ? "fill-red-500 text-red-500" : ""}`}
                       />
                     </Button>
                     <Button

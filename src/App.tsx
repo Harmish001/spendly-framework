@@ -24,6 +24,8 @@ import Todos from "./pages/Todos";
 import { FloatingChatBot } from "./components/chatbot/FloatingChatBot";
 import { FloatingChatButton } from "./components/chatbot/FloatingChatButton";
 import { createPortal } from "react-dom";
+import { PWAInstallPrompt } from "./components/layout/PWAInstallPrompt";
+
 
 // Handle OAuth redirect and query parameters
 const AuthHandler = () => {
@@ -200,6 +202,7 @@ function App() {
         />,
         document.body,
       )} */}
+      <PWAInstallPrompt />
       <Toaster />
     </Router>
   );

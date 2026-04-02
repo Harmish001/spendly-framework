@@ -1,0 +1,97 @@
+{
+  "name": "Spendly - Expense Tracker",
+  "short_name": "Spendly",
+  "description": "Track your expenses with AI-powered image recognition",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#517fa4",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "share_target": {
+    "action": "/fetch-data",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "image",
+          "accept": ["image/png", "image/jpeg", "image/jpg", "image/webp"]
+        }
+      ]
+    }
+  },
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "image/*": [".png", ".jpg", ".jpeg", ".webp"]
+      }
+    }
+  ],
+  "categories": ["finance", "productivity", "business"],
+  "shortcuts": [
+    {
+      "name": "Add Todo",
+      "short_name": "Add Todo",
+      "description": "Add a new todo item",
+      "url": "/todos?shortcut=add-todo",
+      "icons": [
+        {
+          "src": "favicon.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Add Expense",
+      "short_name": "Add Expense",
+      "description": "Add a new expense",
+      "url": "/dashboard?shortcut=add-expense",
+      "icons": [
+        {
+          "src": "favicon.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Add Password",
+      "short_name": "Add Password",
+      "description": "Add a new saved password",
+      "url": "/passwords?shortcut=add-password",
+      "icons": [
+        {
+          "src": "favicon.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "images/mobile_screenshot.png",
+      "sizes": "512x1024",
+      "type": "image/png"
+    }
+  ]
+}

@@ -384,7 +384,7 @@ const PasswordManager = () => {
                       className="rounded-full"
                     >
                       <Heart
-                        className={`h-4 w-4 ${password.is_favorite ? "fill-red-500 text-red-500" : ""}`}
+                        className={` h-4 w-4 ${password.is_favorite ? "fill-red-500 text-red-500" : ""}`}
                       />
                     </Button>
                     <Button

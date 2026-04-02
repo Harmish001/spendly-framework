@@ -159,13 +159,13 @@ export const TodoForm = ({
             </SelectTrigger>
             <SelectContent className="rounded-[18px]">
               <SelectItem value="low" className="rounded-[14px]">
-                🟢 Low
+                Low
               </SelectItem>
               <SelectItem value="medium" className="rounded-[14px]">
-                🟡 Medium
+                Medium
               </SelectItem>
               <SelectItem value="high" className="rounded-[14px]">
-                🔴 High
+                High
               </SelectItem>
             </SelectContent>
           </Select>
@@ -182,13 +182,13 @@ export const TodoForm = ({
             </SelectTrigger>
             <SelectContent className="rounded-[18px]">
               <SelectItem value="pending" className="rounded-[14px]">
-                ⏳ Pending
+                Pending
               </SelectItem>
               <SelectItem value="in_progress" className="rounded-[14px]">
-                🔄 In Progress
+                In Progress
               </SelectItem>
               <SelectItem value="completed" className="rounded-[14px]">
-                ✅ Completed
+                Completed
               </SelectItem>
             </SelectContent>
           </Select>

@@ -71,7 +71,6 @@ const PasswordManager = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [showFavorites, setShowFavorites] = useState(false);
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(
     new Set(),
   );
@@ -200,19 +199,27 @@ const PasswordManager = () => {
     }
   };
 
-  const filteredPasswords = passwords.filter((password) => {
-    const matchesSearch =
-      password.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      password.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      password.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      password.website_url?.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredPasswords = passwords
+    .filter((password) => {
+      const matchesSearch =
+        password.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        password.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        password.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        password.website_url?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCategory =
-      selectedCategory === "all" || password.category_id === selectedCategory;
-    const matchesFavorites = !showFavorites || password.is_favorite;
+      const matchesCategory =
+        selectedCategory === "all" ||
+        (selectedCategory === "favorites"
+          ? password.is_favorite
+          : password.category_id === selectedCategory);
 
-    return matchesSearch && matchesCategory && matchesFavorites;
-  });
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      if (a.is_favorite && !b.is_favorite) return -1;
+      if (!a.is_favorite && b.is_favorite) return 1;
+      return 0;
+    });
 
   const favoriteCount = passwords.filter((p) => p.is_favorite).length;
 
@@ -279,7 +286,6 @@ const PasswordManager = () => {
                     </TabsTrigger>
                     <TabsTrigger
                       value="favorites"
-                      onClick={() => setShowFavorites(!showFavorites)}
                       className="rounded-full"
                       style={{
                         ...(selectedCategory === "favorites"

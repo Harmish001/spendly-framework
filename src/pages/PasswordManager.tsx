@@ -23,7 +23,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PasswordForm } from "@/components/passwords/PasswordForm";
 import { CategoryManager } from "@/components/passwords/CategoryManager";
-import { getTextGradientStyle, GRADIENTS } from "@/constants/theme";
+import {
+  getBackgroundGradientStyle,
+  getTextGradientStyle,
+  GRADIENTS,
+} from "@/constants/theme";
 import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
 import {
   Drawer,
@@ -224,10 +228,10 @@ const PasswordManager = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen">
       <Header />
 
-      <div className="container mx-auto px-4 py-6 space-y-6">
+      <div className="container mx-auto px-4 py-4 space-y-6">
         {/* Header Section */}
         <div className="flex items-center justify-center gap-2">
           <h1
@@ -240,7 +244,7 @@ const PasswordManager = () => {
 
         {/* Search and Filter Section */}
         <Card className="border-0 shadow-lg h-100 rounded-2xl bg-white/80 backdrop-blur-sm">
-          <CardContent className="p-6">
+          <CardContent className="p-3">
             <div className="flex flex-col space-y-4">
               {/* Search Bar */}
               <div className="relative">
@@ -261,13 +265,29 @@ const PasswordManager = () => {
                   className="flex-1"
                 >
                   <TabsList className="grid grid-cols-3 lg:grid-cols-6 w-full rounded-full bg-muted/50">
-                    <TabsTrigger value="all" className="rounded-full">
+                    <TabsTrigger
+                      value="all"
+                      className="rounded-full"
+                      style={{
+                        ...(selectedCategory === "all"
+                          ? getBackgroundGradientStyle(GRADIENTS.PRIMARY)
+                          : {}),
+                        color: selectedCategory === "all" ? "white" : "black",
+                      }}
+                    >
                       All
                     </TabsTrigger>
                     <TabsTrigger
                       value="favorites"
                       onClick={() => setShowFavorites(!showFavorites)}
                       className="rounded-full"
+                      style={{
+                        ...(selectedCategory === "favorites"
+                          ? getBackgroundGradientStyle(GRADIENTS.PRIMARY)
+                          : {}),
+                        color:
+                          selectedCategory === "favorites" ? "white" : "black",
+                      }}
                     >
                       <Heart className="h-4 w-4 mr-1" />
                       Favorites ({favoriteCount})
@@ -301,7 +321,7 @@ const PasswordManager = () => {
                     setEditingPassword(null);
                     setShowPasswordForm(true);
                   }}
-                  className="rounded-full"
+                  className="rounded-full gradient-primary-bg"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Add Password

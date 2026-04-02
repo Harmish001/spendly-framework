@@ -100,6 +100,7 @@ export const ExpenseForm = ({
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (loading) return;
     setLoading(true);
 
     try {
@@ -238,6 +239,7 @@ export const ExpenseForm = ({
         disabled={!amount || !category}
         variant="confirm"
       />
+      <button type="submit" className="hidden" />
     </form>
   );
 };

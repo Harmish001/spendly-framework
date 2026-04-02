@@ -19,14 +19,8 @@ import {
   TodoPriorityFilter,
 } from "@/components/todos/TodoFilters";
 import { Todo, TodoStatus } from "@/components/todos/TodoForm";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerDescription,
-} from "@/components/ui/drawer";
-import { DialogTitle } from "@/components/ui/dialog";
 import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
+import { BottomSheet } from "@/components/ui/BottomSheet";
 import {
   GRADIENTS,
   getTextGradientStyle,
@@ -305,31 +299,31 @@ const Todos = () => {
         editingTodo={editingTodo}
       />
 
-      {/* Delete Confirmation Drawer */}
-      <Drawer open={!!todoToDelete} onOpenChange={() => setTodoToDelete(null)}>
-        <DrawerContent className="rounded-t-[24px] border-0">
-          <DrawerHeader className="text-center">
-            <DialogTitle className="text-lg font-semibold text-red-600">
-              🗑️ Delete Todo
-            </DialogTitle>
-            <DrawerDescription className="text-sm text-gray-500 mt-1">
-              Confirm permanently delete this todo.
-              <br />
-              This action <strong>cannot</strong> be undone.
-            </DrawerDescription>
-          </DrawerHeader>
-
-          <div className="px-6 pb-8 pt-2 space-y-4">
-            <SlideToConfirm
-              variant="danger"
-              label="Delete"
-              onConfirm={() => {
-                if (todoToDelete) handleDelete(todoToDelete);
-              }}
-            />
-          </div>
-        </DrawerContent>
-      </Drawer>
+      {/* Delete Confirmation Bottom Sheet */}
+      <BottomSheet
+        isOpen={!!todoToDelete}
+        onOpenChange={() => setTodoToDelete(null)}
+        title={
+          <span className="text-xl font-bold text-red-600">🗑️ Delete Todo</span>
+        }
+        description={
+          <>
+            Confirm permanently delete this todo.
+            <br />
+            This action <strong>cannot</strong> be undone.
+          </>
+        }
+      >
+        <div className="pt-2">
+          <SlideToConfirm
+            variant="danger"
+            label="Delete"
+            onConfirm={() => {
+              if (todoToDelete) handleDelete(todoToDelete);
+            }}
+          />
+        </div>
+      </BottomSheet>
     </div>
   );
 };

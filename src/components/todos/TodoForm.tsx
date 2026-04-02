@@ -80,6 +80,7 @@ export const TodoForm = ({
       toast.error("Title is required");
       return;
     }
+    if (loading) return;
     setLoading(true);
     try {
       const {

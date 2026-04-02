@@ -64,6 +64,7 @@ export const SlideToConfirm = ({
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       onMouseDown={() => !disabled && !loading && setIsPressed(true)}
       onMouseUp={() => setIsPressed(false)}
@@ -104,20 +105,13 @@ export const SlideToConfirm = ({
         }}
       />
 
-      {/* Radiant Pulse Layer (Success) */}
-      {isSuccess && (
-        <div className="absolute inset-0 animate-ping opacity-40 bg-white/20 rounded-full" />
-      )}
-
       {/* Content Layer */}
       <div className="relative z-10 flex items-center justify-center gap-3">
         {loading ? (
           <Loader2 className="h-6 w-6 animate-spin text-white" />
         ) : isSuccess ? (
           <SuccessIcon className="h-6 w-6 text-white animate-in zoom-in duration-300" />
-        ) : (
-          <Icon className="h-6 w-6 text-white transition-transform duration-300 group-hover:translate-x-1" />
-        )}
+        ) : null}
 
         <span className="text-lg font-bold tracking-tight text-white drop-shadow-sm">
           {loading ? "Processing..." : isSuccess ? "Success!" : label}

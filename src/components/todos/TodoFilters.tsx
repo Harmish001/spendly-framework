@@ -8,16 +8,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Filter } from "lucide-react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GRADIENTS } from "@/constants/theme";
 import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
+import { BottomSheet } from "@/components/ui/BottomSheet";
 
 export type TodoStatusFilter = "all" | "pending" | "in_progress" | "completed";
 export type TodoPriorityFilter = "all" | "low" | "medium" | "high";
@@ -41,78 +35,78 @@ export const TodoFilters = ({
   const isMobile = useIsMobile();
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerTrigger asChild>
+    <BottomSheet
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      title="Filter Todos"
+      trigger={
         <Button
           variant="outline"
-          className={`rounded-full ${isMobile ? "w-14 h-14" : "rounded-[24px]"}`}
-          style={{ background: GRADIENTS.PRIMARY, color: "white" }}
-          onClick={() => setIsOpen(true)}
+          className={`rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] ${isMobile ? "w-14 h-14 p-0 flex items-center justify-center p-0" : "rounded-[24px] px-6 h-12"}`}
+          style={{ background: GRADIENTS.PRIMARY, color: "white", border: "none" }}
           id="todo-filter-btn"
         >
           <Filter className={`h-6 w-6 ${!isMobile && "mr-2"}`} />
           {!isMobile && "Filters"}
         </Button>
-      </DrawerTrigger>
-      <DrawerContent className="rounded-t-[24px] border-0 max-h-[85vh] mb-4">
-        <DrawerHeader className="text-center pb-2">
-          <DrawerTitle>Filter Todos</DrawerTitle>
-        </DrawerHeader>
-        <div className="space-y-4 mx-4 pb-4">
-          <div className="space-y-1">
-            <p className="text-sm text-gray-500 pl-1 font-medium">Status</p>
-            <Select
-              value={selectedStatus}
-              onValueChange={(v) => onStatusChange(v as TodoStatusFilter)}
-            >
-              <SelectTrigger className="rounded-[24px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent className="rounded-[18px]">
-                <SelectItem value="all" className="rounded-[14px]">
-                  All Statuses
-                </SelectItem>
-                <SelectItem value="pending" className="rounded-[14px]">
-                  ⏳ Pending
-                </SelectItem>
-                <SelectItem value="in_progress" className="rounded-[14px]">
-                  🔄 In Progress
-                </SelectItem>
-                <SelectItem value="completed" className="rounded-[14px]">
-                  ✅ Completed
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+      }
+    >
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-gray-700 ml-1">Status</p>
+          <Select
+            value={selectedStatus}
+            onValueChange={(v) => onStatusChange(v as TodoStatusFilter)}
+          >
+            <SelectTrigger className="rounded-[20px] h-12 border-gray-100 bg-gray-50/50">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent className="rounded-[18px]">
+              <SelectItem value="all" className="rounded-[14px]">
+                All Statuses
+              </SelectItem>
+              <SelectItem value="pending" className="rounded-[14px]">
+                ⏳ Pending
+              </SelectItem>
+              <SelectItem value="in_progress" className="rounded-[14px]">
+                🔄 In Progress
+              </SelectItem>
+              <SelectItem value="completed" className="rounded-[14px]">
+                ✅ Completed
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div className="space-y-1">
-            <p className="text-sm text-gray-500 pl-1 font-medium">Priority</p>
-            <Select
-              value={selectedPriority}
-              onValueChange={(v) => onPriorityChange(v as TodoPriorityFilter)}
-            >
-              <SelectTrigger className="rounded-[24px]">
-                <SelectValue placeholder="Filter by priority" />
-              </SelectTrigger>
-              <SelectContent className="rounded-[18px]">
-                <SelectItem value="all" className="rounded-[14px]">
-                  All Priorities
-                </SelectItem>
-                <SelectItem value="low" className="rounded-[14px]">
-                  🟢 Low
-                </SelectItem>
-                <SelectItem value="medium" className="rounded-[14px]">
-                  🟡 Medium
-                </SelectItem>
-                <SelectItem value="high" className="rounded-[14px]">
-                  🔴 High
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-gray-700 ml-1">Priority</p>
+          <Select
+            value={selectedPriority}
+            onValueChange={(v) => onPriorityChange(v as TodoPriorityFilter)}
+          >
+            <SelectTrigger className="rounded-[20px] h-12 border-gray-100 bg-gray-50/50">
+              <SelectValue placeholder="Filter by priority" />
+            </SelectTrigger>
+            <SelectContent className="rounded-[18px]">
+              <SelectItem value="all" className="rounded-[14px]">
+                All Priorities
+              </SelectItem>
+              <SelectItem value="low" className="rounded-[14px]">
+                🟢 Low
+              </SelectItem>
+              <SelectItem value="medium" className="rounded-[14px]">
+                🟡 Medium
+              </SelectItem>
+              <SelectItem value="high" className="rounded-[14px]">
+                🔴 High
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
+        <div className="pt-2">
           <SlideToConfirm
-            label="Apply filters"
+            label="Apply Filters"
             onConfirm={() => {
               onFilter();
               setIsOpen(false);
@@ -120,7 +114,7 @@ export const TodoFilters = ({
             variant="confirm"
           />
         </div>
-      </DrawerContent>
-    </Drawer>
+      </div>
+    </BottomSheet>
   );
 };

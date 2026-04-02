@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,6 +76,18 @@ const PasswordManager = () => {
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [passwordToDelete, setPasswordToDelete] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("shortcut") === "add-password") {
+      setEditingPassword(null);
+      setShowPasswordForm(true);
+      // Remove the parameter from the URL to avoid opening on every reload
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("shortcut");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     fetchData();

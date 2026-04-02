@@ -65,6 +65,19 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "Add Password",
+      "short_name": "Add Password",
+      "description": "Add a new saved password",
+      "url": "/passwords?shortcut=add-password",
+      "icons": [
+        {
+          "src": "favicon.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ],
   "screenshots": []

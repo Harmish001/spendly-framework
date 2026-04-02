@@ -44,6 +44,7 @@ import {
   getBackgroundGradientStyle,
 } from "@/constants/theme";
 import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
+import { BottomSheet } from "@/components/ui/BottomSheet";
 
 const categories = [
   { id: "investment", label: "Investment", icon: null },
@@ -538,47 +539,36 @@ const Dashboard = () => {
       {/* Mobile Navigation */}
       {/* <MobileNavigation /> */}
 
-      {/* Edit Expense Dialog */}
-      {editingExpense && (
-        <Drawer
-          open={!!editingExpense}
-          onOpenChange={() => setEditingExpense(null)}
-        >
-          <DrawerContent className="sm:max-w-[425px] pb-3 px-3">
-            <DrawerHeader>
-              <DialogTitle>Edit Expense</DialogTitle>
-            </DrawerHeader>
-            <ExpenseForm
-              onExpenseAdded={() => {
-                handleExpenseAdded();
-                setEditingExpense(null);
-              }}
-              editingExpense={editingExpense}
-            />
-          </DrawerContent>
-        </Drawer>
-      )}
-      <Drawer
-        open={!!expenseToDelete}
-        onOpenChange={() => setExpenseToDelete(null)}
+      {/* Edit Expense Bottom Sheet */}
+      <BottomSheet
+        isOpen={!!editingExpense}
+        onOpenChange={() => setEditingExpense(null)}
+        title="Edit Expense"
       >
-        <DrawerContent>
-          <DrawerHeader>
-            <DialogTitle>Delete Expense</DialogTitle>
-            <DrawerDescription>
-              Are you sure you want to delete this expense? This action cannot
-              be undone.
-            </DrawerDescription>
-          </DrawerHeader>
-          <DrawerFooter className="pb-8">
-            <SlideToConfirm
-              label="Delete"
-              onConfirm={() => handleDeleteExpense(expenseToDelete)}
-              variant="danger"
-            />
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+        <ExpenseForm
+          onExpenseAdded={() => {
+            handleExpenseAdded();
+            setEditingExpense(null);
+          }}
+          editingExpense={editingExpense}
+        />
+      </BottomSheet>
+
+      {/* Delete Expense Bottom Sheet */}
+      <BottomSheet
+        isOpen={!!expenseToDelete}
+        onOpenChange={() => setExpenseToDelete(null)}
+        title="Delete Expense"
+        description="Are you sure you want to delete this expense? This action cannot be undone."
+      >
+        <div className="pt-2">
+          <SlideToConfirm
+            label="Delete"
+            onConfirm={() => handleDeleteExpense(expenseToDelete)}
+            variant="danger"
+          />
+        </div>
+      </BottomSheet>
     </div>
   );
 };

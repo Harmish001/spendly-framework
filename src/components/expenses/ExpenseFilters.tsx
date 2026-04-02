@@ -8,23 +8,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Filter } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
 import { GRADIENTS } from "@/constants/theme";
 import { SlideToConfirm } from "@/components/ui/SlideToConfirm";
+import { BottomSheet } from "@/components/ui/BottomSheet";
 
 interface ExpenseFiltersProps {
   selectedYear: string;
@@ -66,56 +53,63 @@ export const ExpenseFilters = ({
   const isMobile = useIsMobile();
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerTrigger asChild>
+    <BottomSheet
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      title="Filter Expenses"
+      trigger={
         <Button
           variant="outline"
-          className={`rounded-full ${isMobile ? "w-14 h-14" : "rounded-[24px]"}`}
-          style={{ background: GRADIENTS.PRIMARY, color: "white" }}
-          onClick={() => setIsOpen(true)}
+          className={`rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] ${isMobile ? "w-14 h-14 p-0 flex items-center justify-center p-0" : "rounded-[24px] px-6 h-12"}`}
+          style={{ background: GRADIENTS.PRIMARY, color: "white", border: "none" }}
         >
           <Filter className={`h-6 w-6 ${!isMobile && "mr-2"}`} />
           {!isMobile && "Filters"}
         </Button>
-      </DrawerTrigger>
-      <DrawerContent className="rounded-t-[24px] border-0 max-h-[85vh] mb-4">
-        <DrawerHeader className="text-center pb-2">
-          <SheetTitle>Filter Expenses</SheetTitle>
-        </DrawerHeader>
-        <div className="space-y-4 mx-4 pb-6">
+      }
+    >
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-gray-700 ml-1">Select Year</label>
           <Select value={selectedYear} onValueChange={onYearChange}>
-            <SelectTrigger className="rounded-[24px]">
+            <SelectTrigger className="rounded-[20px] h-12 border-gray-100 bg-gray-50/50">
               <SelectValue placeholder="Select year" />
             </SelectTrigger>
-            <SelectContent className="rounded-[24px]">
+            <SelectContent className="rounded-[20px]">
               {years.map((year) => (
-                <SelectItem key={year} value={year} className="rounded-[24px]">
+                <SelectItem key={year} value={year} className="rounded-[14px]">
                   {year}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+        </div>
 
-          {showCategoryFilter && (
+        {showCategoryFilter && (
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-700 ml-1">Select Category</label>
             <Select value={selectedCategory} onValueChange={onCategoryChange}>
-              <SelectTrigger className="rounded-[24px]">
+              <SelectTrigger className="rounded-[20px] h-12 border-gray-100 bg-gray-50/50">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent className="rounded-[24px]">
+              <SelectContent className="rounded-[20px]">
                 {categories.map((category) => (
                   <SelectItem
                     key={category}
                     value={category}
-                    className="rounded-[24px]"
+                    className="rounded-[14px]"
                   >
                     {category}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          )}
+          </div>
+        )}
+
+        <div className="pt-2">
           <SlideToConfirm
-            label="Confirm apply filters"
+            label="Apply Filters"
             onConfirm={() => {
               onFilter();
               setIsOpen(false);
@@ -123,8 +117,8 @@ export const ExpenseFilters = ({
             variant="confirm"
           />
         </div>
-      </DrawerContent>
-    </Drawer>
+      </div>
+    </BottomSheet>
   );
 };
 

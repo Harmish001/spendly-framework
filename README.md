@@ -1,69 +1,116 @@
-# Welcome to your Lovable project
+# Spendly — Next.js Migration
 
-## Project info
+This folder contains the full Next.js 14 migration of the Spendly framework.
 
-**URL**: https://lovable.dev/projects/fe3b15c3-2c15-4b04-8b99-85fefc4797f2
+## Stack
+- **Framework**: Next.js 14 (App Router)
+- **Database**: MongoDB + Mongoose
+- **Auth**: Passport.js Local Strategy + JWT Cookie (via `jose`)
+- **Data Fetching**: React Query (`@tanstack/react-query`)
+- **UI**: Tailwind CSS + Shadcn/ui (same as original)
 
-## How can I edit this code?
+## How to Use This Migration
 
-There are several ways of editing your application.
+### 1. Copy Files to `spendly-nextjs/`
+The `spendly-nextjs/` directory was scaffolded at `E:\Projects\Spendly\spendly-nextjs`. Copy the contents of this folder into it:
 
-**Use Lovable**
+```bash
+# From E:\Projects\Spendly\
+xcopy /E /I spendly-framework\nextjs-migration\* spendly-nextjs\
+```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/fe3b15c3-2c15-4b04-8b99-85fefc4797f2) and start prompting.
+### 2. Configure Environment
+```bash
+cp .env.local.example .env.local
+# Fill in MONGODB_URI and SESSION_SECRET
+```
 
-Changes made via Lovable will be committed automatically to this repo.
+### 3. Copy UI Components from Original Repo
+The UI components are reusable as-is — just need `'use client'` added and imports updated:
+```bash
+# Copy shared UI
+xcopy /E /I spendly-framework\src\components\ui\* spendly-nextjs\components\ui\
+xcopy /E /I spendly-framework\src\components\expenses\* spendly-nextjs\components\expenses\
+xcopy /E /I spendly-framework\src\components\layout\* spendly-nextjs\components\layout\
+xcopy /E /I spendly-framework\src\components\passwords\* spendly-nextjs\components\passwords\
+xcopy /E /I spendly-framework\src\components\todos\* spendly-nextjs\components\todos\
+xcopy /E /I spendly-framework\src\components\statistics\* spendly-nextjs\components\statistics\
+xcopy /E /I spendly-framework\src\constants\* spendly-nextjs\lib\constants\
 
-**Use your preferred IDE**
+# Copy pages as app router pages
+# See MIGRATION_PLAN.md for the mapping
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 4. Data Migration
+1. Export Supabase tables to `scripts/migration-data/` as JSON files:
+   - `profiles.json`, `expenses.json`, `todos.json`, `passwords.json`, `password_categories.json`
+2. Run:
+```bash
+npx ts-node --project tsconfig.json scripts/migrate-supabase-to-mongo.ts
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### 5. Run Dev Server
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## File Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+nextjs-migration/
+├── app/
+│   ├── layout.tsx              # Root layout with Providers
+│   ├── providers.tsx           # QueryClient + Toaster
+│   ├── globals.css             # (copy from original index.css)
+│   └── api/
+│       ├── auth/
+│       │   ├── login/route.ts
+│       │   ├── signup/route.ts
+│       │   ├── logout/route.ts
+│       │   └── me/route.ts
+│       ├── expenses/
+│       │   ├── route.ts
+│       │   └── [id]/route.ts
+│       ├── todos/
+│       │   ├── route.ts
+│       │   └── [id]/route.ts
+│       ├── passwords/
+│       │   ├── route.ts
+│       │   └── [id]/route.ts
+│       └── password-categories/
+│           ├── route.ts
+│           └── [id]/route.ts
+├── hooks/
+│   ├── useAuth.ts
+│   ├── useExpenses.ts
+│   ├── useTodos.ts
+│   └── usePasswords.ts
+├── lib/
+│   ├── mongodb.ts              # Singleton DB connection
+│   ├── auth.ts                 # Passport + session middleware
+│   ├── api-auth.ts             # JWT auth guard for API routes
+│   └── models/
+│       ├── User.ts
+│       ├── Expense.ts
+│       ├── Todo.ts
+│       ├── Password.ts
+│       └── PasswordCategory.ts
+├── middleware.ts               # Route protection
+├── next.config.ts
+└── scripts/
+    └── migrate-supabase-to-mongo.ts
 
-**Use GitHub Codespaces**
+## Remaining Work (Pages)
+Pages must be migrated one-by-one from `src/pages/` to `app/*/page.tsx`:
+- Replace `useNavigate` → `useRouter` from `next/navigation`
+- Replace `useSearchParams` from `react-router-dom` → `next/navigation`
+- Replace `supabase.from(...)` → corresponding React Query hook
+- Add `'use client'` directive at top of each page
+- Remove Capacitor imports and Chatbot imports
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## ⚠️ Important Notes
 
-## What technologies are used for this project?
+1. **Password Reset Required**: Existing users CANNOT log in after migration — Supabase password hashes are not portable. Implement a "Forgot Password" email flow before going live.
 
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/fe3b15c3-2c15-4b04-8b99-85fefc4797f2) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+2. **The `spendly-nextjs/` project** already has all dependencies installed (`npm install` was run during scaffolding). You just need to add `.env.local` and copy these files.

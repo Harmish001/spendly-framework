@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 const CreatePasswordSchema = z.object({
   title: z.string().min(1, "Title is required"),
   username: z.string().nullable().optional(),
-  email: z.string().email().nullable().optional(),
+  email: z.string().nullable().optional(),
   passwordEncrypted: z.string().min(1, "Password is required"),
   websiteUrl: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),

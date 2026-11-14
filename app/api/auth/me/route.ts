@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     }
 
     await connectDB();
-    const user = await User.findById(payload.userId).select("-passwordHash");
+    const user = await User.findById(payload.userId).select("-passwordHash").lean();
 
     if (!user) {
       return NextResponse.json({ error: "User not found." }, { status: 401 });

@@ -70,13 +70,11 @@ const ExpenseSchema = new Schema<IExpense>(
   }
 );
 
-// Compound index for fast per-user date-range queries (used on Dashboard)
+// Compound indexes for fast per-user date-range queries and sorted results
+ExpenseSchema.index({ userId: 1, date: -1, createdAt: -1 });
+ExpenseSchema.index({ userId: 1, category: 1, date: -1 });
 ExpenseSchema.index({ userId: 1, createdAt: -1 });
-ExpenseSchema.index({ userId: 1, date: -1 });
 
-// Delete cached model to pick up schema changes during hot reload
-if (mongoose.models.Expense) {
-  delete mongoose.models.Expense;
-}
-
-export const Expense = mongoose.model<IExpense>("Expense", ExpenseSchema);
+export const Expense =
+  (mongoose.models.Expense as mongoose.Model<IExpense>) ||
+  mongoose.model<IExpense>("Expense", ExpenseSchema);

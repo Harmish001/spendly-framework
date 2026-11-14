@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid email or password." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { error: "Invalid email or password." },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     if (!isMatch) {
       return NextResponse.json(
         { error: "Invalid email or password." },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -49,10 +49,13 @@ export async function POST(request: NextRequest) {
     const { SignJWT } = await import("jose");
     const secret = new TextEncoder().encode(process.env.SESSION_SECRET!);
 
-    const token = await new SignJWT({ userId: String(user._id || user.id), email: user.email })
+    const token = await new SignJWT({
+      userId: String(user._id || user.id),
+      email: user.email,
+    })
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
-      .setExpirationTime("7d")
+      .setExpirationTime("967d")
       .sign(secret);
 
     const response = NextResponse.json({
@@ -79,7 +82,7 @@ export async function POST(request: NextRequest) {
     console.error("[/api/auth/login] Error:", error);
     return NextResponse.json(
       { error: "Internal server error." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

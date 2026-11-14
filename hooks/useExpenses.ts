@@ -37,7 +37,12 @@ async function fetchExpenses(filter: ExpensesFilter): Promise<Expense[]> {
   const res = await fetch(`/api/expenses?${params.toString()}`);
   if (!res.ok) throw new Error("Failed to fetch expenses");
   const data = await res.json();
-  return data.expenses;
+  const list: Expense[] = data.expenses || [];
+  return list.sort((a, b) => {
+    const dateComp = (b.date || "").localeCompare(a.date || "");
+    if (dateComp !== 0) return dateComp;
+    return (b.createdAt || "").localeCompare(a.createdAt || "");
+  });
 }
 
 async function deleteExpense(id: string): Promise<void> {
@@ -74,6 +79,7 @@ export function useExpenses(filter: ExpensesFilter = {}) {
           return old.filter((e) => e._id !== deletedId);
         }
       );
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
     },
     onError: (error: Error) => toast.error(error.message),
   });

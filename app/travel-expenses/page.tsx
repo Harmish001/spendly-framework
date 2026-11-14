@@ -102,7 +102,20 @@ export default function TravelExpensesPage() {
                         <div className="text-left min-w-0 flex-1">
                           <p className="font-semibold truncate">{expense.description || "No description"}</p>
                           <p className="text-sm capitalize">Travel</p>
-                          <p className="text-xs">{new Date(expense.createdAt).toLocaleDateString()}</p>
+                          <p className="text-xs">
+                            {(() => {
+                              const dateStr = expense.date || expense.createdAt;
+                              if (typeof dateStr === "string") {
+                                const clean = dateStr.split("T")[0];
+                                const parts = clean.split("-").map(Number);
+                                if (parts.length === 3 && !parts.some(isNaN)) {
+                                  const d = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+                                  return d.toLocaleDateString();
+                                }
+                              }
+                              return new Date(dateStr).toLocaleDateString();
+                            })()}
+                          </p>
                         </div>
                         <div className="flex items-center gap-4 shrink-0">
                           <p className="text-xl font-bold whitespace-nowrap" style={{ background: "linear-gradient(135deg, #f59e42 0%, #ff6b6b 100%)", WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}>

@@ -33,6 +33,38 @@ async function updateExpense({
   return data.expense;
 }
 
+function sortExpenses(expenses: Expense[]): Expense[] {
+  return [...expenses].sort((a, b) => {
+    const dateComp = (b.date || "").localeCompare(a.date || "");
+    if (dateComp !== 0) return dateComp;
+    return (b.createdAt || "").localeCompare(a.createdAt || "");
+  });
+}
+
+function expenseMatchesFilter(
+  expense: Expense,
+  filter?: { month?: string; year?: string; category?: string }
+): boolean {
+  if (!filter) return true;
+  const dateStr = (expense.date || "").split("T")[0];
+  const [year, month] = dateStr.split("-");
+
+  if (filter.month && filter.month.padStart(2, "0") !== month) {
+    return false;
+  }
+  if (filter.year && filter.year !== year) {
+    return false;
+  }
+  if (
+    filter.category &&
+    filter.category !== "All Categories" &&
+    filter.category !== expense.category
+  ) {
+    return false;
+  }
+  return true;
+}
+
 // ─── Hook (mutations only — no query, no fetch) ───────────────────────────────
 
 export function useExpenseMutations() {
@@ -42,13 +74,29 @@ export function useExpenseMutations() {
     mutationFn: createExpense,
     onSuccess: (newExpense) => {
       toast.success("Expense added successfully!");
-      queryClient.setQueriesData(
-        { queryKey: ["expenses"] },
-        (old: Expense[] | undefined) => {
+
+      const queries = queryClient.getQueryCache().findAll({ queryKey: ["expenses"] });
+      queries.forEach((q) => {
+        const filter = q.queryKey[1] as
+          | { month?: string; year?: string; category?: string }
+          | undefined;
+
+        queryClient.setQueryData(q.queryKey, (old: Expense[] | undefined) => {
           if (!old) return old;
-          return [newExpense, ...old];
-        }
-      );
+          // Only add to the query cache if the new expense matches this query's month/year/category
+          if (!expenseMatchesFilter(newExpense, filter)) {
+            return old;
+          }
+
+          return sortExpenses([
+            newExpense,
+            ...old.filter((e) => e._id !== newExpense._id),
+          ]);
+        });
+      });
+
+      // Invalidate queries so active views get fresh data from server
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -57,15 +105,34 @@ export function useExpenseMutations() {
     mutationFn: updateExpense,
     onSuccess: (updatedExpense) => {
       toast.success("Expense updated successfully!");
-      queryClient.setQueriesData(
-        { queryKey: ["expenses"] },
-        (old: Expense[] | undefined) => {
+
+      const queries = queryClient.getQueryCache().findAll({ queryKey: ["expenses"] });
+      queries.forEach((q) => {
+        const filter = q.queryKey[1] as
+          | { month?: string; year?: string; category?: string }
+          | undefined;
+
+        queryClient.setQueryData(q.queryKey, (old: Expense[] | undefined) => {
           if (!old) return old;
-          return old.map((e) =>
-            e._id === updatedExpense._id ? updatedExpense : e
-          );
-        }
-      );
+          const matches = expenseMatchesFilter(updatedExpense, filter);
+
+          let next: Expense[];
+          if (matches) {
+            const exists = old.some((e) => e._id === updatedExpense._id);
+            next = exists
+              ? old.map((e) => (e._id === updatedExpense._id ? updatedExpense : e))
+              : [...old, updatedExpense];
+          } else {
+            // Expense no longer belongs in this filtered view (e.g. moved month or category)
+            next = old.filter((e) => e._id !== updatedExpense._id);
+          }
+
+          return sortExpenses(next);
+        });
+      });
+
+      // Invalidate queries so active views get fresh data from server
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -75,6 +142,7 @@ export function useExpenseMutations() {
     addExpenseAsync: createMutation.mutateAsync,
     isAdding: createMutation.isPending,
     editExpense: updateMutation.mutate,
+    editExpenseAsync: updateMutation.mutateAsync,
     isEditing: updateMutation.isPending,
   };
 }

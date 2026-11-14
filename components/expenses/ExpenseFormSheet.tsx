@@ -5,7 +5,7 @@ import { ExpenseForm } from "./ExpenseForm";
 import { getBackgroundGradientStyle, GRADIENTS } from "@/lib/constants/theme";
 
 interface ExpenseFormSheetProps {
-  onExpenseAdded: () => void;
+  onExpenseAdded: (date?: string) => void;
   prefilledData?: {
     amount: string;
     category: string;
@@ -16,11 +16,11 @@ interface ExpenseFormSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   editingExpense?: {
-    id: string;
+    id?: string;
+    _id?: string;
     amount: number;
     category: string;
-    description: string;
-    created_at: string;
+    description: string | null;
     date: string;
   } | null;
 }
@@ -56,9 +56,7 @@ export const ExpenseFormSheet = ({
             {isEditing ? "Edit Expense" : "Add New Expense"}
           </span>
           {headerExtras && (
-            <div className="absolute right-0">
-              {headerExtras}
-            </div>
+            <div className="absolute right-0">{headerExtras}</div>
           )}
         </div>
       }

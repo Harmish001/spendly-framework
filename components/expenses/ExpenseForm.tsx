@@ -48,8 +48,19 @@ const categories = [
   { id: "others", label: "Others", icon: MoreHorizontal },
 ];
 
+function parseLocalDate(dateStr: string | undefined | null): Date {
+  if (!dateStr) return new Date();
+  const clean = dateStr.split("T")[0];
+  const parts = clean.split("-").map(Number);
+  if (parts.length === 3 && !parts.some(isNaN)) {
+    return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+  }
+  const parsed = new Date(dateStr);
+  return isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
 interface ExpenseFormProps {
-  onExpenseAdded: () => void;
+  onExpenseAdded: (date?: string) => void;
   prefilledData?: {
     amount: string;
     category: string;
@@ -83,12 +94,12 @@ export const ExpenseForm = ({
     editingExpense ? editingExpense.category : (prefilledData?.category ?? "")
   );
   const [date, setDate] = useState<Date>(() => {
-    if (editingExpense) return new Date(editingExpense.date);
-    if (prefilledData?.date) return new Date(prefilledData.date);
+    if (editingExpense) return parseLocalDate(editingExpense.date);
+    if (prefilledData?.date) return parseLocalDate(prefilledData.date);
     return new Date();
   });
 
-  const { addExpense, editExpense, isAdding, isEditing } = useExpenseMutations();
+  const { addExpenseAsync, editExpenseAsync, isAdding, isEditing } = useExpenseMutations();
   const isLoading = isAdding || isEditing;
   const isEditingMode = !!editingExpense;
 
@@ -98,7 +109,7 @@ export const ExpenseForm = ({
       setAmount(prefilledData.amount);
       setDescription(prefilledData.description);
       setCategory(prefilledData.category);
-      if (prefilledData.date) setDate(new Date(prefilledData.date));
+      if (prefilledData.date) setDate(parseLocalDate(prefilledData.date));
     }
   }, [prefilledData, editingExpense]);
 
@@ -110,31 +121,41 @@ export const ExpenseForm = ({
       return;
     }
 
+    const numAmount = parseFloat(amount);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      toast.error("Please enter a valid amount greater than 0");
+      return;
+    }
+
     const formattedDate = format(date, "yyyy-MM-dd");
     const payload = {
-      amount: parseFloat(amount),
-      description,
+      amount: numAmount,
+      description: description.trim() || null,
       category: category as string,
       date: formattedDate,
     };
 
-    if (isEditingMode && editingExpense) {
-      const expenseId =
-        (editingExpense as { _id?: string; id?: string })._id ||
-        (editingExpense as { _id?: string; id?: string }).id ||
-        "";
-      editExpense({ id: expenseId, ...payload });
-    } else {
-      addExpense(payload);
-    }
+    try {
+      if (isEditingMode && editingExpense) {
+        const expenseId =
+          (editingExpense as { _id?: string; id?: string })._id ||
+          (editingExpense as { _id?: string; id?: string }).id ||
+          "";
+        await editExpenseAsync({ id: expenseId, ...payload });
+      } else {
+        await addExpenseAsync(payload);
+      }
 
-    // Reset form
-    setAmount("");
-    setDescription("");
-    setCategory("");
-    setDate(new Date());
-    if (onClearPrefilled) onClearPrefilled();
-    onExpenseAdded();
+      // Reset form
+      setAmount("");
+      setDescription("");
+      setCategory("");
+      setDate(new Date());
+      if (onClearPrefilled) onClearPrefilled();
+      onExpenseAdded(formattedDate);
+    } catch {
+      // toast error is handled by mutation onError
+    }
   };
 
   return (
@@ -143,8 +164,9 @@ export const ExpenseForm = ({
         <span className="absolute left-3 top-2.5 text-gray-500">₹</span>
         <Input
           type="number"
-          inputMode="numeric"
-          pattern="[0-9]*"
+          step="any"
+          min="0.01"
+          inputMode="decimal"
           placeholder="0.00"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}

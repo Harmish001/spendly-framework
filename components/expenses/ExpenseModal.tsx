@@ -59,7 +59,7 @@ export const ExpenseModal = ({
         amount: parseFloat(amount),
         description,
         category,
-        date: new Date().toISOString(),
+        date: new Date().toISOString().split("T")[0],
       });
 
       toast.success("Success!", {

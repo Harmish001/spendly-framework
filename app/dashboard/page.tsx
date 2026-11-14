@@ -61,6 +61,18 @@ const categoryIcons: Record<string, React.ElementType> = {
   houseExpense: House,
 };
 
+function formatExpenseDate(dateStr: string): string {
+  if (!dateStr) return "";
+  const clean = dateStr.split("T")[0];
+  const parts = clean.split("-").map(Number);
+  if (parts.length === 3 && !parts.some(isNaN)) {
+    const d = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+    return `${parts[2]} ${d.toLocaleString("default", { month: "long" })}`;
+  }
+  const d = new Date(dateStr);
+  return `${d.getDate()} ${d.toLocaleString("default", { month: "long" })}`;
+}
+
 export default function DashboardPage() {
   const searchParams = useSearchParams();
   const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, "0");
@@ -162,9 +174,16 @@ export default function DashboardPage() {
         {/* Add Expense Button */}
         <div className="px-4 pb-0">
           <ExpenseFormSheet
-            onExpenseAdded={() => {
+            onExpenseAdded={(date?: string) => {
               setIsExpenseSheetOpen(false);
               setPrefilledData(null);
+              if (date) {
+                const [year, month] = date.split("-");
+                if (year && month) {
+                  setSelectedYear(year);
+                  setSelectedMonth(month);
+                }
+              }
             }}
             prefilledData={prefilledData}
             onClearPrefilled={() => setPrefilledData(null)}
@@ -255,10 +274,7 @@ export default function DashboardPage() {
                             {expense.description || "No description"}
                           </p>
                           <p className="text-xs text-gray-600">
-                            {new Date(expense.date).getDate()}&nbsp;
-                            {new Date(expense.date).toLocaleString("default", {
-                              month: "long",
-                            })}
+                            {formatExpenseDate(expense.date)}
                           </p>
                         </div>
                         <div className="flex items-end gap-1 shrink-0 flex-col">
@@ -280,12 +296,18 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center flex-col justify-center">
                           <Edit
-                            className="h-5 w-5 mb-2 text-gray-500 cursor-pointer"
-                            onClick={() => setEditingExpense(expense)}
+                            className="h-5 w-5 mb-2 text-gray-500 cursor-pointer hover:text-gray-800 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingExpense(expense);
+                            }}
                           />
                           <Trash2
-                            className="h-5 w-5 text-red-600 cursor-pointer"
-                            onClick={() => setExpenseToDelete(expense._id)}
+                            className="h-5 w-5 text-red-600 cursor-pointer hover:text-red-700 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpenseToDelete(expense._id);
+                            }}
                           />
                         </div>
                       </div>
@@ -317,8 +339,15 @@ export default function DashboardPage() {
       >
         <ExpenseForm
           key={editingExpense?._id ?? editingExpense?.id ?? "new"}
-          onExpenseAdded={() => {
+          onExpenseAdded={(date?: string) => {
             setEditingExpense(null);
+            if (date) {
+              const [year, month] = date.split("-");
+              if (year && month) {
+                setSelectedYear(year);
+                setSelectedMonth(month);
+              }
+            }
           }}
           editingExpense={editingExpense}
         />

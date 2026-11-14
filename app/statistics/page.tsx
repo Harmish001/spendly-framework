@@ -29,29 +29,33 @@ export default function StatisticsPage() {
     setLoading(true);
     try {
       const currentDate = new Date();
-      const months: MonthlyData[] = [];
-
-      for (let i = 5; i >= 0; i--) {
+      const monthPromises = Array.from({ length: 6 }, (_, idx) => {
+        const i = 5 - idx;
         const date = subMonths(currentDate, i);
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
         const monthStr = month.toString().padStart(2, "0");
 
         const params = new URLSearchParams({ month: monthStr, year: year.toString() });
-        const res = await fetch(`/api/expenses?${params.toString()}`);
-        if (!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
+        return fetch(`/api/expenses?${params.toString()}`)
+          .then((res) => {
+            if (!res.ok) throw new Error("Failed to fetch");
+            return res.json();
+          })
+          .then((data) => {
+            const totalAmount = (data.expenses || []).reduce(
+              (sum: number, e: { amount: number | string }) => sum + Number(e.amount),
+              0
+            );
+            return {
+              month: format(date, "MMM yyyy"),
+              amount: totalAmount,
+              expenses: data.expenses?.length || 0,
+            };
+          });
+      });
 
-        const totalAmount = (data.expenses || []).reduce(
-          (sum: number, e: { amount: number | string }) => sum + Number(e.amount), 0
-        );
-
-        months.push({
-          month: format(date, "MMM yyyy"),
-          amount: totalAmount,
-          expenses: data.expenses?.length || 0,
-        });
-      }
+      const months = await Promise.all(monthPromises);
       setMonthlyData(months);
     } catch {
       toast.error("Failed to fetch statistics");

@@ -37,9 +37,14 @@ export async function PUT(
 
     await connectDB();
 
+    const updateData: Record<string, unknown> = { ...parsed.data };
+    if (typeof updateData.date === "string") {
+      updateData.date = updateData.date.split("T")[0];
+    }
+
     const expense = await Expense.findOneAndUpdate(
       { _id: params.id, userId: auth.userId }, // Ensures users can only edit their own
-      { $set: parsed.data },
+      { $set: updateData },
       { new: true }
     );
 

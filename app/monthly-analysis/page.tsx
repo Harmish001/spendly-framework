@@ -24,21 +24,43 @@ const categoryLabels: Record<string, string> = {
   travel: "Travel", houseExpense: "House Expense", others: "Others",
 };
 
+function formatExpenseDate(dateStr?: string | Date): string {
+  if (!dateStr) return "";
+  if (typeof dateStr === "string") {
+    const clean = dateStr.split("T")[0];
+    const parts = clean.split("-").map(Number);
+    if (parts.length === 3 && !parts.some(isNaN)) {
+      const d = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+      return `${parts[2]} ${d.toLocaleString("default", { month: "short" })} ${parts[0]}`;
+    }
+  }
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
+
 interface CategoryExpense {
   category: string;
   total: number;
-  expenses: { _id: string; category: string; amount: number | string; description?: string | null; createdAt: string | Date }[];
+  expenses: { _id: string; category: string; amount: number | string; description?: string | null; date?: string; createdAt: string | Date }[];
 }
 
-function groupByCategory(data: { _id: string; category: string; amount: number | string; description?: string | null; createdAt: string | Date }[]): CategoryExpense[] {
-  const result: Record<string, { total: number; expenses: { _id: string; category: string; amount: number | string; description?: string | null; createdAt: string | Date }[] }> = {};
+function groupByCategory(data: { _id: string; category: string; amount: number | string; description?: string | null; date?: string; createdAt: string | Date }[]): CategoryExpense[] {
+  const result: Record<string, { total: number; expenses: { _id: string; category: string; amount: number | string; description?: string | null; date?: string; createdAt: string | Date }[] }> = {};
   data.forEach((expense) => {
     const { category, amount } = expense;
     if (!result[category]) result[category] = { total: 0, expenses: [] };
     result[category].total += Number(amount);
     result[category].expenses.push(expense);
   });
-  return Object.entries(result).map(([category, d]) => ({ category, total: d.total, expenses: d.expenses }));
+  return Object.entries(result).map(([category, d]) => ({
+    category,
+    total: d.total,
+    expenses: d.expenses.sort((a, b) => {
+      const dateA = a.date || (typeof a.createdAt === "string" ? a.createdAt : "");
+      const dateB = b.date || (typeof b.createdAt === "string" ? b.createdAt : "");
+      return dateB.localeCompare(dateA);
+    }),
+  }));
 }
 
 export default function MonthlyAnalysisPage() {
@@ -111,7 +133,7 @@ export default function MonthlyAnalysisPage() {
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm truncate">{individualExpense.description || "No description"}</p>
                             <p className="text-xs text-gray-500 mt-1">
-                              {new Date(individualExpense.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                              {formatExpenseDate(individualExpense.date || individualExpense.createdAt)}
                             </p>
                           </div>
                           <p className="text-sm font-bold whitespace-nowrap ml-3" style={getTextGradientStyle(GRADIENTS.PRIMARY)}>

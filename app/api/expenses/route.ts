@@ -33,13 +33,14 @@ export async function GET(request: NextRequest) {
     const filter: Record<string, unknown> = { userId: auth.userId };
 
     if (month && year) {
-      const startDate = `${year}-${month.padStart(2, "0")}-01`;
+      const paddedMonth = month.padStart(2, "0");
       const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
-      const endDate = `${year}-${month.padStart(2, "0")}-${lastDay}`;
-      filter.createdAt = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate + "T23:59:59.999Z"),
-      };
+      const startDate = `${year}-${paddedMonth}-01`;
+      const endDate = `${year}-${paddedMonth}-${String(lastDay).padStart(2, "0")}T23:59:59.999Z`;
+
+      filter.date = { $gte: startDate, $lte: endDate };
+    } else if (year) {
+      filter.date = { $gte: `${year}-01-01`, $lte: `${year}-12-31T23:59:59.999Z` };
     }
 
     if (category && category !== "All Categories") {
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
     }
 
     const expenses = await Expense.find(filter)
-      .sort({ createdAt: -1 })
+      .sort({ date: -1, createdAt: -1 })
       .lean();
 
     return NextResponse.json({ expenses });
@@ -75,10 +76,13 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
+    const rawDate = parsed.data.date || new Date().toISOString();
+    const cleanDate = rawDate.split("T")[0];
+
     const expense = await Expense.create({
       userId: auth.userId,
       ...parsed.data,
-      date: parsed.data.date || new Date().toISOString().split("T")[0],
+      date: cleanDate,
     });
 
     return NextResponse.json({ expense }, { status: 201 });
